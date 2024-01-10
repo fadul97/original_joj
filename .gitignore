@@ -1,0 +1,9 @@
+# Visual Studio
+.vs/
+
+# Builds
+out/
+build/
+
+# testbed
+testbed/build/
