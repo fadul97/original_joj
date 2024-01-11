@@ -5,5 +5,8 @@
 out/
 build/
 
-# testbed
-testbed/build/
+# tests
+tests/build/
+
+# Cache
+.cache/
