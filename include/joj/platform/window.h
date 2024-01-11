@@ -16,10 +16,11 @@ namespace joj
         Window(i16 width = 600, i16 height = 400, std::string title = std::string{"Joj Window"});
         virtual ~Window();
 
-    private:
+    protected:
         i16 width;
         i16 height;
         std::string title;
+        b8 running;
 
         i16 get_width() const;
         i16 get_height() const;
@@ -27,16 +28,19 @@ namespace joj
         i16 get_xcenter() const;
         i16 get_ycenter() const;
         f32 get_aspect_ratio() const;
+        b8 is_running() const;
         
         void set_width(i16 width);
         void set_height(i16 height);
         void set_title(std::string title);
+        void close();
 
-        virtual void hide_cursor(b8 hide) const = 0;
+        virtual void hide_cursor(b8 hide) = 0;
         
         virtual b8 init() = 0;
         virtual b8 create() = 0;
-        virtual void close() = 0;
+        virtual void show() = 0;
+        virtual void shutdown() = 0;
         virtual void clear() = 0;
         virtual void swap_buffers() = 0;
     };
@@ -58,6 +62,9 @@ namespace joj
     
     inline f32 Window::get_aspect_ratio() const
     { return static_cast<f32>(width) / height ; }
+
+    inline b8 Window::is_running() const
+    { return running; }
     
     inline void Window::set_width(i16 width)
     { this->width = width; }
@@ -67,6 +74,9 @@ namespace joj
     
     inline void Window::set_title(std::string title)
     { this->title = title; }
+
+    inline void Window::close()
+    { running = false; }
 }
 
 #endif // JOJ_WINDOW_H
