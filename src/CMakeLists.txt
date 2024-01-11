@@ -5,3 +5,5 @@ project(joj)
 add_library(joj STATIC joj.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include/joj)
+
+add_subdirectory(platform)
