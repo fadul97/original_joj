@@ -1,13 +1,12 @@
 # Joj - Jogue o jogo
 
-## Game Engine WIP
+## Game Engine
 
 Version: 0.0.1
 
 ### Description
 
-For now, just a simple README.
-I'll add more information.
+A game engine under development.
 
 ### TODO
 
