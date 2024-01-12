@@ -5,6 +5,10 @@
 
 int main()
 {
+#if JPLATFORM_LINUX
+    std::cout << "LINUX!\n";
+#endif
+
     std::cout << "Hello, Joj!\n";
     joj_print();
 
