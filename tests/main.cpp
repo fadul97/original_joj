@@ -3,6 +3,9 @@
 #include "joj/joj.h"
 #include "joj/defines.h"
 #include "joj/platform/window.h"
+#include "joj/platform/x11/window_x11.h"
+
+#include <unistd.h>
 
 int main()
 {
@@ -12,6 +15,17 @@ int main()
     std::cout << "WINDOWS!\n";
 #endif
 
+    auto window = new joj::X11Window();
+    window->create_simple_window();
+    window->show();
+    while (window->is_running())
+    {
+        sleep(3);
+        window->close();
+    }
+
+    delete window;
+    
     std::cout << "Hello, Joj!\n";
     joj_print();
 
