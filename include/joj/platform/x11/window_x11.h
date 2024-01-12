@@ -2,14 +2,11 @@
 #define JOJ_X11_WINDOW_H
 
 #include "defines.h"
-// #include "../../defines.h"
 
 #if JPLATFORM_LINUX
 
-// #include "platform/window.h"
-#include "../window.h"
+#include "platform/window.h"
 #include <X11/Xlib.h>
-#include <time.h>
 #include <X11/Xutil.h>
 
 namespace joj

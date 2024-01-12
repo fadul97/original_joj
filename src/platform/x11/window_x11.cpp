@@ -58,8 +58,8 @@ b8 joj::X11Window::create()
         AllocNone
     );
     wnd_attribs.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask
-        | KeymapStateMask | StructureNotifyMask | ButtonPressMask 
-        | ButtonReleaseMask | EnterWindowMask | LeaveWindowMask 
+        | KeymapStateMask   | StructureNotifyMask   | ButtonPressMask 
+        | ButtonReleaseMask | EnterWindowMask       | LeaveWindowMask 
         | PointerMotionMask | FocusChangeMask;
     
     // Create window
@@ -168,11 +168,11 @@ b8 joj::X11Window::create_simple_window()
 
     XStoreName(display, id, title.c_str());
 
-    XSelectInput(display, id,
-                ExposureMask | KeyPressMask | KeyReleaseMask | KeymapStateMask
-                | StructureNotifyMask | ButtonPressMask | ButtonReleaseMask
-                | EnterWindowMask | LeaveWindowMask | PointerMotionMask
-                | FocusChangeMask);
+    XSelectInput(display, id, ExposureMask 
+        | KeyPressMask          | KeyReleaseMask    | KeymapStateMask
+        | StructureNotifyMask   | ButtonPressMask   | ButtonReleaseMask
+        | EnterWindowMask       | LeaveWindowMask   | PointerMotionMask
+        | FocusChangeMask);
 
     gc = XCreateGC(display, id, 0, 0);
 
