@@ -12,6 +12,18 @@ enum Buttons
     MAX_BUTTONS
 }; 
 
+struct Keyboard
+{
+    b8 keys[256];
+};
+
+struct Mouse
+{
+    i16 x;
+    i16 y;
+    b8 buttons[MAX_BUTTONS];
+};
+
 enum Keys {
     /** @brief The backspace key. */
     KEY_BACKSPACE = 0x08,
