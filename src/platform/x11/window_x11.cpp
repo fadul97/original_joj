@@ -1,5 +1,7 @@
 #include "platform/x11/window_x11.h"
 
+#if JPLATFORM_LINUX
+
 #include <X11/X.h>
 #include <X11/Xlib.h>
 #include <stdio.h>
@@ -183,3 +185,5 @@ b8 joj::X11Window::create_simple_window()
 
     return true;
 }
+
+#endif // JPLATFORM_LINUX

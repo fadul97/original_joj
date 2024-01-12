@@ -24,6 +24,7 @@ int main()
         window->close();
     }
 
+    window->shutdown();
     delete window;
     
     std::cout << "Hello, Joj!\n";
