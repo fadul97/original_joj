@@ -2,11 +2,14 @@
 
 #include "joj/joj.h"
 #include "joj/defines.h"
+#include "joj/platform/window.h"
 
 int main()
 {
 #if JPLATFORM_LINUX
     std::cout << "LINUX!\n";
+#elif JPLATFORM_WINDOWS
+    std::cout << "WINDOWS!\n";
 #endif
 
     std::cout << "Hello, Joj!\n";
