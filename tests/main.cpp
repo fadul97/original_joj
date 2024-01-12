@@ -4,6 +4,7 @@
 #include "joj/defines.h"
 #include "joj/platform/window.h"
 #include "joj/platform/x11/window_x11.h"
+#include "joj/platform/platform_manager.h"
 
 #include <unistd.h>
 
