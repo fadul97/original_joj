@@ -5,6 +5,7 @@
 #include "joj/platform/window.h"
 #include "joj/platform/x11/window_x11.h"
 #include "joj/platform/platform_manager.h"
+#include "joj/platform/x11/platform_manager_x11.h"
 
 #include <unistd.h>
 
@@ -16,17 +17,16 @@ int main()
     std::cout << "WINDOWS!\n";
 #endif
 
-    auto window = new joj::X11Window();
-    window->create_simple_window();
-    window->show();
-    while (window->is_running())
+    auto pm = new joj::X11PlatformManager();
+    pm->create_simple_window(800, 600);
+    while (pm->is_running())
     {
         sleep(3);
-        window->close();
+        pm->close_window();
     }
 
-    window->shutdown();
-    delete window;
+    pm->shutdown();
+    delete pm;
     
     std::cout << "Hello, Joj!\n";
     joj_print();
