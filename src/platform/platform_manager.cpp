@@ -2,6 +2,8 @@
 
 joj::PlatformManager::PlatformManager()
 {
+    window = nullptr;
+    input = nullptr;
 }
 
 joj::PlatformManager::~PlatformManager()
