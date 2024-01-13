@@ -21,6 +21,7 @@ struct Mouse
 {
     i16 x;
     i16 y;
+    i16 wheel;
     b8 buttons[MAX_BUTTONS];
 };
 
