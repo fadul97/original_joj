@@ -1,5 +1,5 @@
-#ifndef JOJ_PLATFORM_MANAGER_X11_H
-#define JOJ_PLATFORM_MANAGER_X11_H
+#ifndef JOJ_X11_PLATFORM_MANAGER_H
+#define JOJ_X11_PLATFORM_MANAGER_H
 
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
@@ -26,6 +26,6 @@ namespace joj
     };
 }
 
-#endif // JOJ_PLATFORM_MANAGER_X11_H
+#endif // JOJ_X11_PLATFORM_MANAGER_H
 
 #endif // JPLATFORM_LINUX
