@@ -15,7 +15,7 @@ namespace joj
     class JAPI X11Window : public Window
     {
     public:
-        X11Window(i16 width = 600, i16 height = 400, std::string title = std::string{"Joj Window"});
+        X11Window(i16 width = 600, i16 height = 400, std::string title = std::string{"Joj X11Window"});
         ~X11Window() override;
 
         Display* get_display() const;
