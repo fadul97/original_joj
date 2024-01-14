@@ -18,8 +18,8 @@ namespace joj
         X11Window(i16 width = 600, i16 height = 400, std::string title = std::string{"Joj X11Window"});
         ~X11Window() override;
 
-        Display* get_display() const;
-        u32 get_id() const;
+        void* get_display() const override;
+        u32 get_id() const override;
         Screen* get_screen() const;
         i32 get_screen_id() const;
         XSetWindowAttributes get_wnd_attribs() const;
@@ -44,8 +44,8 @@ namespace joj
         GC gc;
     };
 
-    inline Display* X11Window::get_display() const
-    { return display; }
+    inline void* X11Window::get_display() const
+    { return static_cast<void*>(display); }
     
     inline u32 X11Window::get_id() const
     { return id; }

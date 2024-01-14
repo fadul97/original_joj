@@ -16,6 +16,9 @@ namespace joj
         Window(i16 width = 600, i16 height = 400, std::string title = std::string{"Joj Window"});
         virtual ~Window();
 
+        virtual void* get_display() const = 0;
+        virtual u32 get_id() const = 0;
+
         i16 get_width() const;
         i16 get_height() const;
         std::string get_title() const;
