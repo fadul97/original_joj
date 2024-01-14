@@ -53,6 +53,10 @@ b8 joj::X11PlatformManager::create_simple_window(i16 width, i16 height, std::str
         return false;
     }
 
+    // Redirect close
+    delete_msg = XInternAtom(static_cast<Display*>(window->get_display()), "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(static_cast<Display*>(window->get_display()), window->get_id(), &delete_msg, 1);
+
     XAutoRepeatOff(static_cast<Display*>(window->get_display()));
 
     window->show();

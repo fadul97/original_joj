@@ -23,6 +23,9 @@ namespace joj
         void process_events() override;
         void swap_buffers() override;
         void shutdown() override;
+    
+    private:
+        unsigned long delete_msg;
     };
 }
 
