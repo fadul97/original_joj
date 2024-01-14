@@ -7,7 +7,6 @@
 #if JPLATFORM_LINUX
 
 #include "platform/platform_manager.h"
-#include "window_x11.h"
 
 namespace joj
 {

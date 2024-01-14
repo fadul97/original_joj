@@ -22,8 +22,16 @@ int main()
     pm->create_simple_window(800, 600);
     while (pm->is_running())
     {
-        sleep(3);
-        pm->close_window();
+        pm->process_events();
+
+        if (pm->is_key_pressed(KEY_SPACE))
+            std::cout << "KEY_SPACE!\n";
+
+        if (pm->is_key_down(KEY_ENTER) && pm->is_key_down(KEY_A))
+            std::cout << "KEY_ENTER!\n";
+
+        if (pm->is_key_pressed(KEY_ESCAPE))
+            pm->close_window();
     }
 
     pm->shutdown();
