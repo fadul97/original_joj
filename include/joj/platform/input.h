@@ -20,6 +20,8 @@ namespace joj
         i16 get_xmouse() const;
         i16 get_ymouse() const;
         i16 get_mouse_wheel() const;
+
+        Keys translate_keycode(u32 keycode);
     
     private:
         Keyboard keyboard;
