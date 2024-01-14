@@ -15,6 +15,8 @@ namespace joj
     public:
         X11Input();
         ~X11Input();
+
+        Keys translate_keycode(u32 keycode) override;
     };
 }
 
