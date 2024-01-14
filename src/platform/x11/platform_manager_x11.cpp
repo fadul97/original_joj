@@ -53,6 +53,8 @@ b8 joj::X11PlatformManager::create_simple_window(i16 width, i16 height, std::str
         return false;
     }
 
+    XAutoRepeatOff(static_cast<Display*>(window->get_display()));
+
     window->show();
 
     return true;
@@ -70,6 +72,7 @@ void joj::X11PlatformManager::swap_buffers()
 
 void joj::X11PlatformManager::shutdown()
 {
+    XAutoRepeatOn(static_cast<Display*>(window->get_display()));
     window->shutdown();
 }
 

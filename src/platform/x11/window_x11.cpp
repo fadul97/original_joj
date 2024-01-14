@@ -96,8 +96,6 @@ b8 joj::X11Window::create()
 
 void joj::X11Window::show()
 {
-    XAutoRepeatOff(display);
-
     // Show window
     XClearWindow(display, id);
     XMapRaised(display, id);
@@ -121,8 +119,6 @@ void joj::X11Window::swap_buffers()
 
 void joj::X11Window::shutdown()
 {
-    XAutoRepeatOn(display);
-
     // Release id
     if (id)
         XDestroyWindow(display, id);
@@ -186,8 +182,6 @@ b8 joj::X11Window::create_simple_window()
     // Redirect close
     delete_msg = XInternAtom(display, "WM_DELETE_WINDOW", False);
     XSetWMProtocols(display, id, &delete_msg, 1);
-
-    XAutoRepeatOff(display);
 
     return true;
 }
