@@ -1,5 +1,7 @@
 #include "platform/x11/input_x11.h"
 
+#if JPLATFORM_LINUX
+
 #include <X11/Xutil.h>
 #include <X11/keysymdef.h>
 
@@ -293,3 +295,5 @@ Keys joj::X11Input::translate_keycode(u32 keycode)
             break;
     }    
 }
+
+#endif // JPLATFORM_LINUX
