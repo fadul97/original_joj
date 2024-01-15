@@ -7,7 +7,8 @@ add_library(jojX11Platform STATIC window_x11.cpp input_x11.cpp timer_x11.cpp pla
 target_link_directories(
     jojX11Platform 
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR/..}
+    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../graphics/
 )
 
-target_link_libraries(jojX11Platform PUBLIC jojPlatform -lX11)
+target_link_libraries(jojX11Platform PUBLIC jojPlatform -lX11 jojGraphics)

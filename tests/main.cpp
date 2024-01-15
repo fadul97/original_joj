@@ -10,6 +10,7 @@
 #include "joj/platform/timer.h"
 #include "joj/platform/x11/timer_x11.h"
 #include "joj/graphics/context.h"
+#include "joj/graphics/x11/context_gl.h"
 
 int main()
 {
@@ -20,7 +21,8 @@ int main()
 #endif
 
     auto pm = new joj::X11PlatformManager();
-    pm->create_simple_window(800, 600);
+    pm->init(800, 600);
+    pm->create_window();
     while (pm->is_running())
     {
         pm->process_events();

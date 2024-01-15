@@ -4,12 +4,15 @@
 
 #include "platform/x11/window_x11.h"
 #include "platform/x11/input_x11.h"
+#include "graphics/context.h"
+#include "graphics/x11/context_gl.h"
 #include <memory>
 
 joj::X11PlatformManager::X11PlatformManager()
 {
     window = nullptr;
     input = nullptr;
+    context = nullptr;
 }
 
 joj::X11PlatformManager::~X11PlatformManager()
@@ -21,11 +24,19 @@ b8 joj::X11PlatformManager::init(i16 width, i16 height, std::string title)
 {
     window = std::make_unique<X11Window>(width, height, title);
     input = std::make_unique<X11Input>();
+    context = std::make_unique<X11GLContext>();
 
     if (!window->init())
     {
-        // TODO: use own logger and return value
+        // TODO: use own logger and return value, cleanup?
         printf("Failed to initialize X11Window.\n");
+        return false;
+    }
+
+    if (!context->create(window))
+    {
+        // TODO: use own logger and return value, cleanup?
+        printf("Failed to initialize GLContext.\n");
         return false;
     }
 
@@ -36,10 +47,18 @@ b8 joj::X11PlatformManager::create_window()
 {
     if (!window->create())
     {
-        // TODO: use own logger and return value
+        // TODO: use own logger and return value, cleanup?
         printf("Failed to create X11Window.\n");
         return false;
     }
+
+    context->make_current(window);
+
+    // Redirect close
+    delete_msg = XInternAtom(static_cast<Display*>(window->get_display()), "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(static_cast<Display*>(window->get_display()), window->get_id(), &delete_msg, 1);
+
+    XAutoRepeatOff(static_cast<Display*>(window->get_display()));
 
     window->show();
 
@@ -53,7 +72,7 @@ b8 joj::X11PlatformManager::create_simple_window(i16 width, i16 height, std::str
 
     if (!window->create_simple_window())
     {
-        // TODO: use own logger and return value
+        // TODO: use own logger and return value, cleanup?
         printf("Failed to create X11Window.\n");
         return false;
     }

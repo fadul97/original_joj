@@ -4,7 +4,6 @@ project(joj)
 
 add_library(jojGraphics STATIC context.cpp)
 
-
 # Specify include directories for jojGraphics
 target_include_directories(
     jojGraphics
@@ -14,5 +13,12 @@ target_include_directories(
 
 add_subdirectory(x11)
 
-target_link_directories(jojGraphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../platform)
-target_link_libraries(jojGraphics PUBLIC jojPlatform)
+target_link_directories(
+    jojGraphics 
+    PUBLIC 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../platform
+    ${CMAKE_CURRENT_SOURCE_DIR}/x11
+)
+
+
+    target_link_libraries(jojGraphics PUBLIC jojPlatform jojX11GLGraphics)
