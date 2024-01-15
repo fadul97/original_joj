@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojPlatform STATIC window.cpp input.cpp platform_manager.cpp)
+add_library(jojPlatform STATIC window.cpp input.cpp timer.cpp platform_manager.cpp)
 
 # Specify include directories for jojPlatform
 target_include_directories(
