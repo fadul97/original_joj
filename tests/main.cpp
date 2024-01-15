@@ -9,6 +9,7 @@
 #include "joj/platform/input.h"
 #include "joj/platform/timer.h"
 #include "joj/platform/x11/timer_x11.h"
+#include "joj/graphics/context.h"
 
 int main()
 {
