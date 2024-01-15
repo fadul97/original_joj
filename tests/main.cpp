@@ -8,6 +8,7 @@
 #include "joj/platform/x11/platform_manager_x11.h"
 #include "joj/platform/input.h"
 #include "joj/platform/timer.h"
+#include "joj/platform/x11/timer_x11.h"
 
 #include <unistd.h>
 

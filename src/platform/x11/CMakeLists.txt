@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojX11Platform STATIC window_x11.cpp input_x11.cpp platform_manager_x11.cpp)
+add_library(jojX11Platform STATIC window_x11.cpp input_x11.cpp timer_x11.cpp platform_manager_x11.cpp)
 
 target_link_directories(
     jojX11Platform 

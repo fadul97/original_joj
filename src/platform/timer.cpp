@@ -2,6 +2,7 @@
 
 joj::Timer::Timer()
 {
+    stopped = false;
 }
 
 joj::Timer::~Timer()
