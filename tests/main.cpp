@@ -10,8 +10,6 @@
 #include "joj/platform/timer.h"
 #include "joj/platform/x11/timer_x11.h"
 
-#include <unistd.h>
-
 int main()
 {
 #if JPLATFORM_LINUX
