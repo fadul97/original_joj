@@ -15,8 +15,9 @@ namespace joj
         GraphicsContext();
         virtual ~GraphicsContext();
 
-        virtual b8 init(std::unique_ptr<Window>& window) = 0;
-        virtual void make_current();
+        virtual b8 create(std::unique_ptr<Window>& window) = 0;
+        virtual void make_current(std::unique_ptr<Window>& window) = 0;
+        virtual void destroy() = 0;
           
     protected:
         virtual void log_hardware_info() = 0;
