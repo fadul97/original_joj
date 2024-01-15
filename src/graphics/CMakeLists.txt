@@ -12,5 +12,7 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/joj
 )
 
+add_subdirectory(x11)
+
 target_link_directories(jojGraphics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/../platform)
 target_link_libraries(jojGraphics PUBLIC jojPlatform)
