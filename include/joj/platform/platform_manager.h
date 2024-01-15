@@ -7,6 +7,7 @@
 #include <string>
 #include "window.h"
 #include "input.h"
+#include "graphics/context.h"
 #include <memory>
 
 namespace joj
@@ -39,6 +40,7 @@ namespace joj
     protected:  
         std::unique_ptr<Window> window;
         std::unique_ptr<Input> input;
+        std::unique_ptr<GraphicsContext> context;
     };
 
     inline b8 PlatformManager::is_running() const
