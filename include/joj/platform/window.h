@@ -18,6 +18,9 @@ namespace joj
 
         virtual void* get_display() const = 0;
         virtual u32 get_id() const = 0;
+        virtual i32 get_screen_id() const = 0;
+        virtual void* get_visual() const = 0;
+        virtual void set_visual(void* visual) = 0;
 
         i16 get_width() const;
         i16 get_height() const;

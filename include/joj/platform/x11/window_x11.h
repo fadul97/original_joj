@@ -21,7 +21,9 @@ namespace joj
         void* get_display() const override;
         u32 get_id() const override;
         Screen* get_screen() const;
-        i32 get_screen_id() const;
+        i32 get_screen_id() const override;
+        void* get_visual() const override;
+        void set_visual(void* visual) override;
         XSetWindowAttributes get_wnd_attribs() const;
 
         void hide_cursor(b8 hide) override;
@@ -55,6 +57,12 @@ namespace joj
     
     inline i32 X11Window::get_screen_id() const
     { return screen_id; }
+
+    inline void* X11Window::get_visual() const
+    { return static_cast<void*>(visual); }
+
+    inline void X11Window::set_visual(void* visual)
+    { this->visual = static_cast<XVisualInfo*>(visual); }
     
     inline XSetWindowAttributes X11Window::get_wnd_attribs() const
     { return wnd_attribs; }
