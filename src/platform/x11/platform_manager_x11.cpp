@@ -178,7 +178,7 @@ void joj::X11PlatformManager::process_events()
 
 void joj::X11PlatformManager::swap_buffers()
 {
-    printf("TODO()!\n");
+    glXSwapBuffers(static_cast<Display*>(window->get_display()), window->get_id());
 }
 
 void joj::X11PlatformManager::shutdown()
