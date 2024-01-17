@@ -2,7 +2,7 @@
 
 #if JPLATFORM_LINUX
 
-#include <GL/glxext.h>
+#include "graphics/x11/joj_gl_x11.h"
 #include <string.h>
 
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
@@ -158,6 +158,8 @@ void joj::X11GLContext::make_current(std::unique_ptr<Window>& window)
 
 	// int version = gladLoadGL((GLADloadfunc) glXGetProcAddress);
     // printf("Current GL loaded: %d.%d\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
+
+    load_opengl_functions();
 
 	printf("GL Renderer: %s\n", glGetString(GL_RENDERER));
 	printf("GL Version: %s\n", glGetString(GL_VERSION));

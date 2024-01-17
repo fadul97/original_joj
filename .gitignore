@@ -1,6 +1,10 @@
 # Visual Studio
 .vs/
 
+# Clion
+cmake-build-debug/
+.idea/
+
 # Builds
 out/
 build/

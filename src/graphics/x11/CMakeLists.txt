@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojX11GLGraphics STATIC context_gl.cpp)
+add_library(jojX11GLGraphics STATIC context_gl.cpp joj_gl_x11.cpp)
 
 target_link_directories(
     jojX11GLGraphics 
