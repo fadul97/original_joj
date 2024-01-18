@@ -18,7 +18,14 @@ project(
 	joj 
 	VERSION 0.0.1
 	LANGUAGES CXX)
+	
+# Update the submodules here
+include(cmake/UpdateSubmodules.cmake)
 
+# Enable testing for this project
+include(CTest)
+
+add_subdirectory(external)
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(tests)
