@@ -4,24 +4,6 @@
 # Adapted from https://cliutils.gitlab.io/modern-cmake/chapters/projects/submodule.html
 find_package(Git QUIET)
 if(GIT_FOUND)
-    # Check if the submodule folder exists
-    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/googletest/CMakeLists.txt")
-        message("Submodule googletest not found. Adding Git submodule...")
-
-        # Run the git submodule add command
-        execute_process(
-            COMMAND git submodule add https://github.com/google/googletest.git external/googletest
-            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-            RESULT_VARIABLE GIT_SUBMODULE_RESULT
-        )
-
-        # Check if the submodule was added successfully
-        if(NOT ${GIT_SUBMODULE_RESULT} EQUAL 0)
-            message("Failed to add Git googletest submodule. 
-                ${CMAKE_CURRENT_SOURCE_DIR}/external/googletest/CMakeLists.txt already exists.")
-        endif()
-    endif()
-
     option(UPDATE_SUBMODULES "Check submodules during build" ON)
     if(NOT UPDATE_SUBMODULES)
         return()
