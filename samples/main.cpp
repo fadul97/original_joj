@@ -39,48 +39,29 @@ unsigned int VAO = 0;
 
 int main()
 {
-#if JPLATFORM_LINUX
-    std::cout << "LINUX!\n";
-#elif JPLATFORM_WINDOWS
-    std::cout << "WINDOWS!\n";
-#endif
-
     auto pm = new joj::X11PlatformManager();
     pm->init(800, 600);
     pm->create_window();
 
     auto renderer = new joj::GLRenderer();
-    // renderer->init(pm->get_window());
-
-
-    joj::Vector3 v{};
-    std::cout << "Vector3 = " << v.to_string() << "\n";
-
-    joj::Vector4 v4{};
-    std::cout << "Vector4 = " << v4.to_string() << "\n";
-
-    joj::Matrix4 m{};
-    std::cout << "Matrix4:\n" << m.to_string() << "\n";
-
-    f32 r = joj::to_radians(45.0f);
-    std::cout << "r = " << r << "\n";
 
     joj::GLShader *shader = new joj::GLShader{};
     if (!shader->compile_shaders(vertexShaderSource, fragmentShaderSource))
         std::cout << "Failed to compile shaders.\n";
 
+
+    // -----------------------------------------------------------------------------------------------------------------
     // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
     float vertices[] = {
             -0.5f, -0.5f, 0.0f, // left
-            0.5f, -0.5f, 0.0f, // right
-            0.0f,  0.5f, 0.0f  // top
+            0.5f, -0.5f, 0.0f,  // right
+            0.0f,  0.5f, 0.0f   // top
     };
 
     unsigned int VBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
+
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -89,20 +70,12 @@ int main()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
 
-    // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
+    // Unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-    // You can unbind the VAO afterwards so other VAO calls won't accidentally modify this VAO, but this rarely happens. Modifying other
-    // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
+    // -----------------------------------------------------------------------------------------------------------------
 
-
-
-
-
-
-
-
+    
     while (pm->is_running())
     {
         pm->process_events();
@@ -127,18 +100,10 @@ int main()
     }
 
     pm->shutdown();
+
+    delete shader;
+    delete renderer;
     delete pm;
     
-    std::cout << "Hello, Joj!\n";
-    joj_print();
-
-    u8 a = 0;
-    std::cout << "a = " << a << "\n";
-
-    u32 b = 10;
-    std::cout << "b = " << b << "\n";
-
-    i32 c = -10;
-    std::cout << "c = " << c << "\n";
     return 0;
 }
