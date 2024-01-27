@@ -19,6 +19,7 @@
 #include "joj/renderer/opengl/renderer_gl.h"
 #include "joj/math/jmath.h"
 #include "platform/x11/input_x11.h"
+#include "joj/renderer/shader.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
