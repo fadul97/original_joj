@@ -14,6 +14,7 @@
 #include "joj/graphics/x11/joj_gl_x11.h"
 #include "joj/math/vector3.h"
 #include "joj/math/vector4.h"
+#include "joj/math/matrix4.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
@@ -47,9 +48,11 @@ int main()
     joj::Vector3 v{};
     std::cout << "Vector3 = " << v.to_string() << "\n";
 
-
     joj::Vector4 v4{};
     std::cout << "Vector4 = " << v4.to_string() << "\n";
+
+    joj::Matrix4 m{};
+    std::cout << "Matrix4:\n" << m.to_string() << "\n";
 
 
     std::cout << "Creating shader.\n";
