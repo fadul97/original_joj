@@ -13,7 +13,7 @@
 
 namespace joj
 {
-    class Vector4
+    class JAPI Vector4
     {
     public:
         Vector4()
