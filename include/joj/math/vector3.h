@@ -59,24 +59,59 @@ namespace joj
         void normalize()
         { *this / this->length(); }
 
+        Vector3 operator=(const Vector3& v)
+        {
+            x = v.x;
+            y = v.y;
+            z = v.z;
+
+            return *this;
+        }
+
         Vector3 operator-(const Vector3& v)
         {
-            return Vector3 {
-                x - v.x,
-                y - v.y,
-                z - v.z
-            };
+            x -= v.x;
+            y -= v.y;
+            z -= v.z;
+
+            return *this;
+        }
+
+        Vector3 operator+(const Vector3& v)
+        {
+            x += v.x;
+            y += v.y;
+            z += v.z;
+
+            return *this;
         }
 
         Vector3 operator/(const f32 k)
         {
-            return Vector3 {
-                x / k,
-                y / k,
-                z / k
-            };
+            x /= k;
+            y /= k;
+            z /= k;
+
+            return *this;
         }
 
+        Vector3 operator*(const f32 k)
+        {
+            x *= k;
+            y *= k;
+            z *= k;
+
+            return *this;
+        }
+
+        // vector3 operator*(const f32 k, const vector3& v)
+        // {
+        //     x *= k;
+        //     y *= k;
+        //     z *= k;
+
+        //     return *this;
+        // }
 
         bool operator==(const Vector3& v)
         {
