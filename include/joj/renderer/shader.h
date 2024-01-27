@@ -5,8 +5,7 @@
 #include "defines.h"
 
 #include <string>
-#include "math/matrix4.h"
-#include "math/vector3.h"
+#include "math/jmath.h"
 
 namespace joj
 {
