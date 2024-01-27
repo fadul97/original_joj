@@ -29,4 +29,5 @@ add_subdirectory(external)
 add_subdirectory(include)
 add_subdirectory(src)
 add_subdirectory(tests)
+add_subdirectory(samples)
 

@@ -4,3 +4,4 @@ project(joj)
 
 add_subdirectory(platform)
 add_subdirectory(graphics)
+add_subdirectory(math)

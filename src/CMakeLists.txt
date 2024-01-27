@@ -20,6 +20,7 @@ target_link_directories(
     PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/platform
     ${CMAKE_CURRENT_SOURCE_DIR}/graphics
+    ${CMAKE_CURRENT_SOURCE_DIR}/math
 )
 
-target_link_libraries(joj PUBLIC jojPlatform jojGraphics)
+target_link_libraries(joj PUBLIC jojPlatform jojGraphics jojMath)
