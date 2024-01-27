@@ -95,9 +95,9 @@ STATIC_ASSERT(sizeof(b32) == 4, "Expected f64 to be 4 bytes.");
 
 // Inline functions
 #if defined(__linux__) || defined(__gnu_linux__)
-#define FINLINE static inline
+#define JINLINE static inline
 #elif defined(_MSC_VER)
-#define FINLINE __forceinline
+#define JINLINE __forceinline
 #endif
 
 // Dynamic libraries
