@@ -17,6 +17,8 @@
 #include "joj/math/matrix4.h"
 #include "joj/renderer/renderer.h"
 #include "joj/renderer/opengl/renderer_gl.h"
+#include "joj/math/jmath.h"
+#include "platform/x11/input_x11.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
@@ -59,6 +61,8 @@ int main()
     joj::Matrix4 m{};
     std::cout << "Matrix4:\n" << m.to_string() << "\n";
 
+    f32 r = joj::to_radians(45.0f);
+    std::cout << "r = " << r << "\n";
 
     std::cout << "Creating shader.\n";
     unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
