@@ -20,6 +20,7 @@
 #include "joj/math/jmath.h"
 #include "platform/x11/input_x11.h"
 #include "joj/renderer/shader.h"
+#include "joj/renderer/opengl/shader_gl.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
@@ -32,9 +33,8 @@ const char *fragmentShaderSource = "#version 330 core\n"
                                        "out vec4 FragColor;\n"
                                        "void main()\n"
                                        "{\n"
-                                       "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                       "   FragColor = vec4(1.0f, 0.5f, 1.0f, 1.0f);\n"
                                        "}\n\0";
-unsigned int shaderProgram = 0;
 unsigned int VAO = 0;
 
 int main()
@@ -65,51 +65,9 @@ int main()
     f32 r = joj::to_radians(45.0f);
     std::cout << "r = " << r << "\n";
 
-    std::cout << "Creating shader.\n";
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    std::cout << "vertexShader = " << vertexShader << "\n";
-    std::cout << "Finished creating shader.\n";
-    glShaderSource(vertexShader, 1, &vertexShaderSource, NULL);
-    glCompileShader(vertexShader);
-    std::cout << "Compiled shaders!\n";
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    std::cout << "Success = " << success << "\n";
-    std::cout << "vertexShader = " << vertexShader << "\n";
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-
-    // fragment shader
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    std::cout << "Success = " << success << "\n";
-    std::cout << "fragmentShader = " << fragmentShader << "\n";
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n" << infoLog << std::endl;
-    }
-    // link shaders
-    shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::cout << "ERROR::SHADER::PROGRAM::LINKING_FAILED\n" << infoLog << std::endl;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
+    joj::GLShader *shader = new joj::GLShader{};
+    if (!shader->compile_shaders(vertexShaderSource, fragmentShaderSource))
+        std::cout << "Failed to compile shaders.\n";
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
@@ -161,7 +119,7 @@ int main()
         renderer->clear();
 
         // draw our first triangle
-        glUseProgram(shaderProgram);
+        shader->use();
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glDrawArrays(GL_TRIANGLES, 0, 3);
 

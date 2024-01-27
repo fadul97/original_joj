@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojGLRenderer STATIC renderer_gl.cpp)
+add_library(jojGLRenderer STATIC renderer_gl.cpp shader_gl.cpp)
 
 target_link_directories(
     jojGLRenderer
