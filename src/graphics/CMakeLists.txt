@@ -21,4 +21,4 @@ target_link_directories(
 )
 
 
-    target_link_libraries(jojGraphics PUBLIC jojPlatform jojX11GLGraphics)
+target_link_libraries(jojGraphics PUBLIC jojPlatform jojX11GLGraphics)

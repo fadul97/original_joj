@@ -15,6 +15,7 @@
 #include "joj/math/vector3.h"
 #include "joj/math/vector4.h"
 #include "joj/math/matrix4.h"
+#include "joj/renderer/renderer.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
