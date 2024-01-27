@@ -11,6 +11,8 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/joj
 )
 
+add_subdirectory(opengl)
+
 target_link_directories(
     jojRenderer 
     PUBLIC 
