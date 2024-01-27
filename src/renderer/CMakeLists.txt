@@ -17,6 +17,7 @@ target_link_directories(
     jojRenderer 
     PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/../platform
+    ${CMAKE_CURRENT_SOURCE_DIR}/opengl
 )
 
-target_link_libraries(jojRenderer PUBLIC jojPlatform)
+target_link_libraries(jojRenderer PUBLIC jojPlatform jojGLRenderer -lGL)

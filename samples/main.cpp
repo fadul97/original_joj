@@ -16,6 +16,7 @@
 #include "joj/math/vector4.h"
 #include "joj/math/matrix4.h"
 #include "joj/renderer/renderer.h"
+#include "joj/renderer/opengl/renderer_gl.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
@@ -44,6 +45,9 @@ int main()
     auto pm = new joj::X11PlatformManager();
     pm->init(800, 600);
     pm->create_window();
+
+    auto renderer = new joj::GLRenderer();
+    // renderer->init(pm->get_window());
 
 
     joj::Vector3 v{};
@@ -149,9 +153,7 @@ int main()
         if (pm->is_key_pressed(KEY_ESCAPE))
             pm->close_window();
         
-        // render
-        glClearColor(0.5f, 0.3f, 0.7f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        renderer->clear();
 
         // draw our first triangle
         glUseProgram(shaderProgram);
