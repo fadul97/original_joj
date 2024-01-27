@@ -13,6 +13,7 @@
 #include "joj/graphics/x11/context_gl.h"
 #include "joj/graphics/x11/joj_gl_x11.h"
 #include "joj/math/vector3.h"
+#include "joj/math/vector4.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
@@ -47,6 +48,8 @@ int main()
     std::cout << "Vector3 = " << v.to_string() << "\n";
 
 
+    joj::Vector4 v4{};
+    std::cout << "Vector4 = " << v4.to_string() << "\n";
 
 
     std::cout << "Creating shader.\n";
