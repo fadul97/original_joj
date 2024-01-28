@@ -26,6 +26,7 @@
 #include "joj/resources/geometry/cube.h"
 #include "joj/resources/geometry/sphere.h"
 #include "joj/resources/geometry/cylinder.h"
+#include "joj/resources/geometry/geo_sphere.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
@@ -62,7 +63,8 @@ int main()
 
     // joj::Cube geo{1.0f, 1.0f, 1.0f};
     // joj::Sphere geo{0.5f, 40, 40};
-    joj::Cylinder geo{1.0f, 0.5f, 3.0f, 20, 10};
+    // joj::Cylinder geo{1.0f, 0.5f, 3.0f, 20, 10};
+    joj::GeoSphere geo{1.0f, 3};
     
     unsigned int VBO, EBO;
     glGenVertexArrays(1, &VAO);
