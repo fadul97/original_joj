@@ -25,6 +25,7 @@
 #include "joj/resources/geometry/geometry.h"
 #include "joj/resources/geometry/cube.h"
 #include "joj/resources/geometry/sphere.h"
+#include "joj/resources/geometry/cylinder.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
@@ -60,7 +61,8 @@ int main()
         std::cout << "Failed to compile shaders.\n";
 
     // joj::Cube geo{1.0f, 1.0f, 1.0f};
-    joj::Sphere geo{0.5f, 40, 40};
+    // joj::Sphere geo{0.5f, 40, 40};
+    joj::Cylinder geo{1.0f, 0.5f, 3.0f, 20, 10};
     
     unsigned int VBO, EBO;
     glGenVertexArrays(1, &VAO);
@@ -89,7 +91,7 @@ int main()
     // -----------------------------------------------------------------------------------------------------------------
 
     joj::Matrix4 world = joj::Matrix4{};
-    geo.move_to(0.0f, 0.0f, -18.0f);
+    geo.move_to(0.0f, 0.0f, -10.0f);
     world = joj::translate(world, geo.get_position());
 
     joj::Vector3 pos = joj::Vector3{0, 0, -20};

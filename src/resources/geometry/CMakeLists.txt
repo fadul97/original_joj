@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojGeometry STATIC geometry.cpp cube.cpp sphere.cpp)
+add_library(jojGeometry STATIC geometry.cpp cube.cpp sphere.cpp cylinder.cpp)
 
 # Specify include directories for jojGeometry
 target_include_directories(
