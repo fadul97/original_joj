@@ -79,11 +79,13 @@ namespace joj
 
         Vector3 operator+(const Vector3& v)
         {
-            x += v.x;
-            y += v.y;
-            z += v.z;
+            Vector3 out;
 
-            return *this;
+            out.x = x + v.x;
+            out.y = y + v.y;
+            out.z = z + v.z;
+
+            return out;
         }
 
         Vector3 operator/(const f32 k)
