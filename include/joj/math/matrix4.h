@@ -62,6 +62,14 @@ namespace joj
             return str;
         }
 
+        Matrix4 operator=(const Matrix4& m)
+        {
+            for(int i = 0; i < 16; ++i)
+                data[i] = m.data[i];
+
+            return *this;
+        }
+
         Matrix4 operator*(const Matrix4& m)
         {
             Matrix4 out;
