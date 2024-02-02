@@ -8,7 +8,9 @@
 
 #include "vbo.h"
 #include "ebo.h"
+#include "resources/geometry/vertex.h"
 #include "resources/geometry/geometry.h"
+#include "graphics/x11/joj_gl_x11.h"
 
 namespace joj
 {

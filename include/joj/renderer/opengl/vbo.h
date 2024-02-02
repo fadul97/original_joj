@@ -7,8 +7,6 @@
 #if JPLATFORM_LINUX
 
 #include "resources/geometry/vertex.h"
-#include <vector>
-
 #include "graphics/x11/joj_gl_x11.h"
 
 namespace joj

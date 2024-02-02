@@ -1,10 +1,4 @@
 #include "renderer/opengl/vao.h"
-#include "renderer/opengl/vbo.h"
-#include "resources/geometry/vertex.h"
-
-#if JPLATFORM_LINUX
-#include "graphics/x11/joj_gl_x11.h"
-#endif // JPLATFORM_LINUX
 
 joj::VAO::VAO()
 {
@@ -37,6 +31,7 @@ void joj::VAO::bind_buffer_data(GLsizeiptr vertex_size, const Vertex* vertex_dat
     ebo.bind();
     ebo.bind_buffer_data(index_size, index_data);
 
+    // TODO: Abstract position and color specification
     vbo.specify_position_data(sizeof(Vertex), (void*)0);
     vbo.specify_color_data(sizeof(Vertex), (void*)(3 * sizeof(f32)));
 
