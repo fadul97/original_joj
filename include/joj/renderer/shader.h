@@ -21,6 +21,7 @@ namespace joj
         virtual void set_vec3(const std::string name, const Vector3 v) const = 0;
         virtual void set_vec4(const std::string name, const Vector4 v) const = 0;
         virtual void set_mat4(const std::string name, const Matrix4 m) const = 0;
+        virtual void destroy() = 0;
     };
 }
 #endif // JOJ_SHADER_H

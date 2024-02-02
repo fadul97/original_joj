@@ -26,6 +26,7 @@ namespace joj
         void set_vec3(const std::string name, const Vector3 v) const override;
         void set_vec4(const std::string name, const Vector4 v) const override;
         void set_mat4(const std::string name, const Matrix4 m) const override;
+        void destroy() override;
 
     private:
         u32 id;
@@ -43,6 +44,9 @@ namespace joj
 
     inline void GLShader::set_mat4(const std::string name, const Matrix4 m) const
     { glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, m.data); }
+
+    inline void GLShader::destroy()
+    { glDeleteProgram(id); }
 }
 
 #endif // JOJ_GL_SHADER_H
