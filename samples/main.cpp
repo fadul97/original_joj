@@ -29,6 +29,8 @@
 #include "joj/resources/geometry/geo_sphere.h"
 #include "joj/resources/geometry/grid.h"
 #include "joj/resources/geometry/quad.h"
+#include "joj/renderer/opengl/vao.h"
+#include "resources/geometry/vertex.h"
 
 
 const char *vertexShaderSource = "#version 330 core\n"
@@ -57,80 +59,32 @@ int main()
     pm->init(800, 600);
     pm->create_window();
 
-    auto renderer = new joj::GLRenderer();
+    joj::GLRenderer renderer{};
 
     joj::GLShader shader{"shaders/vertex.glsl", "shaders/frag.glsl"};
-    // if (!shader.compile_shaders(vertexShaderSource, fragmentShaderSource))
-    //     std::cout << "Failed to compile shaders.\n";
 
     // joj::Cube geo{1.0f, 1.0f, 1.0f};
     // joj::Sphere geo{0.5f, 40, 40};
     // joj::Cylinder geo{1.0f, 0.5f, 3.0f, 20, 10};
     // joj::GeoSphere geo{1.0f, 3};
     // joj::Grid geo{100.0f, 20.0f, 20, 20};
-    joj::Quad geo{1.0f, 10.0f};
-    joj::Quad geo2{1.0f, 10.0f, joj::Vector4{0.0f, 1.0f, 1.0f, 1.0f}};
+    joj::Quad geo{05.0f, 05.0f};
     
-    // First quad
-    unsigned int VBO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
+    joj::VAO vao = joj::VAO{};
+    vao.bind_buffer_data(
+        geo.get_vertex_count() * sizeof(joj::Vertex),
+        geo.get_vertex_data(),
+        geo.get_index_count() * sizeof(u32),
+        geo.get_index_data()
+    );
 
-    glBindVertexArray(VAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, geo.get_vertex_count() * sizeof(joj::Vertex), geo.get_vertex_data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, geo.get_index_count() * sizeof(u32), geo.get_index_data(), GL_STATIC_DRAW);
-
-    // Specify the layout of the vertex(pos) data
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(joj::Vertex), (void*)0);
-
-    // Specify the layout of the vertex(color) data
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(joj::Vertex), (GLvoid*)(3 * sizeof(f32)));
-
-    // Unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-
-
-    // Second quad
-    u32 sVAO, sVBO, sEBO;
-    glGenVertexArrays(1, &sVAO);
-    glGenBuffers(1, &sVBO);
-    glGenBuffers(1, &sEBO);
-
-    glBindVertexArray(sVAO);
-
-    glBindBuffer(GL_ARRAY_BUFFER, sVBO);
-    glBufferData(GL_ARRAY_BUFFER, geo2.get_vertex_count() * sizeof(joj::Vertex), geo2.get_vertex_data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sEBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, geo2.get_index_count() * sizeof(u32), geo2.get_index_data(), GL_STATIC_DRAW);
-
-    // Specify the layout of the vertex(pos) data
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(joj::Vertex), (void*)0);
-
-    // Specify the layout of the vertex(color) data
-    glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(joj::Vertex), (GLvoid*)(3 * sizeof(f32)));
-
-    // Unbind
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
     // -----------------------------------------------------------------------------------------------------------------
 
     joj::Matrix4 world = joj::Matrix4{};
-    joj::Matrix4 world2 = joj::Matrix4{};
-    geo.move_to(-20.0f, +00.0f, +20.0f);
-    geo2.move_to(+20.0f, +00.0f, +20.0f);
+    f32 z = -000.0f;
+    f32 x = -000.0f;
+    geo.move_to(x, +00.0f, z);
     world = joj::translate(world, geo.get_position());
-    world2 = joj::translate(world2, geo2.get_position());
 
     joj::Vector3 pos = joj::Vector3{0, 0, -20};
     joj::Vector3 target = joj::Vector3{0};
@@ -144,45 +98,30 @@ int main()
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     while (pm->is_running())
     {
         pm->process_events();
 
-        if (pm->is_key_pressed(KEY_SPACE))
-        {
-            shader.destroy();
-            shader = joj::GLShader{"shaders/vertex.glsl", "shaders/frag.glsl"};
-            std::cout << "SPACE_KEY!\n";
-        }
-
-        if (pm->is_key_down(KEY_ENTER) && pm->is_key_down(KEY_A))
-            std::cout << "KEY_ENTER!\n";
-
         if (pm->is_key_pressed(KEY_ESCAPE))
             pm->close_window();
         
-        renderer->clear();
+        renderer.clear();
+
+        transform = world * view * proj;
 
         shader.use();
-        joj::Matrix4 transform = world * view * proj;
         shader.set_mat4("transform", transform);
-        glBindVertexArray(VAO);
+        // glBindVertexArray(VAO);
+        vao.bind();
         glDrawElements(GL_TRIANGLES, geo.get_index_count(), GL_UNSIGNED_INT, 0);
-
-        joj::Matrix4 transform2 = world2 * view * proj;
-        shader.set_mat4("transform", transform2);
-        glBindVertexArray(sVAO);
-        
-        glDrawElements(GL_TRIANGLES, geo2.get_index_count() * 2, GL_UNSIGNED_INT, 0);
 
         pm->swap_buffers();
     }
 
     pm->shutdown();
 
-    delete renderer;
     delete pm;
     
     return 0;
