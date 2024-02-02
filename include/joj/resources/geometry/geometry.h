@@ -4,18 +4,12 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#include "math/jmath.h"
+#include "vertex.h"
 #include <vector>
 
 namespace joj
 {
     enum class GeometryType { UNKNOWN, CUBE, CYLINDER, SPHERE, GEOSPHERE, GRID, QUAD };
-
-    struct Vertex
-    {
-        Vector3 pos;
-        Vector4 color;
-    };
 
     class JAPI Geometry
     {
