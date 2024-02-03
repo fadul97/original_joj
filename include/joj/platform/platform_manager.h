@@ -37,6 +37,8 @@ namespace joj
         virtual void swap_buffers() = 0;
         virtual void shutdown() = 0;
 
+        virtual std::unique_ptr<Window>& get_window();
+
     protected:  
         std::unique_ptr<Window> window;
         std::unique_ptr<Input> input;
@@ -66,6 +68,9 @@ namespace joj
 
     inline void PlatformManager::close_window()
     { window->close(); }
+
+    inline std::unique_ptr<Window>& PlatformManager::get_window()
+	{ return window; }
 }
 
 #endif // JOJ_PLATFORM_MANAGER_H

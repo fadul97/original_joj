@@ -22,10 +22,15 @@ namespace joj
         void process_events() override;
         void swap_buffers() override;
         void shutdown() override;
+
+        std::unique_ptr<Window>& get_window() override;
     
     private:
         unsigned long delete_msg;
     };
+
+    inline std::unique_ptr<Window>& X11PlatformManager::get_window()
+	{ return window; }
 }
 
 #endif // JOJ_X11_PLATFORM_MANAGER_H
