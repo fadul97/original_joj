@@ -16,6 +16,10 @@ joj::GLRenderer::~GLRenderer()
 b8 joj::GLRenderer::init(std::unique_ptr<Window>& window)
 {
     glViewport(0, 0, window->get_width(), window->get_height());
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     
     return true;
 }

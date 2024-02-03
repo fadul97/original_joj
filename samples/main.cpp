@@ -1,4 +1,3 @@
-#include <GL/glcorearb.h>
 #include <iostream>
 
 #include "joj/joj.h"
@@ -30,28 +29,7 @@
 #include "joj/resources/geometry/grid.h"
 #include "joj/resources/geometry/quad.h"
 #include "joj/renderer/opengl/vao.h"
-#include "resources/geometry/vertex.h"
-
-
-const char *vertexShaderSource = "#version 330 core\n"
-            "layout (location = 0) in vec3 aPos;\n"
-			"layout (location = 1) in vec4 aColor;\n"
-            "uniform mat4 transform;\n"
-            "out vec4 vertColor;\n"
-            "void main()\n"
-            "{\n"
-            "    gl_Position = transform * vec4(aPos, 1.0);\n"
-            "    vertColor = aColor;\n"
-            "}\0";
-
-const char *fragmentShaderSource = "#version 330 core\n"
-            "in vec4 vertColor;\n"
-            "out vec4 FragColor;\n"
-            "void main()\n"
-            "{\n"
-            "   FragColor = vertColor;\n"
-            "}\n\0";
-unsigned int VAO = 0;
+#include "joj/resources/geometry/vertex.h"
 
 int main()
 {
@@ -78,8 +56,6 @@ int main()
         geo.get_index_data()
     );
 
-    // -----------------------------------------------------------------------------------------------------------------
-
     joj::Matrix4 world = joj::Matrix4{};
     f32 z = -000.0f;
     f32 x = -000.0f;
@@ -96,9 +72,7 @@ int main()
     joj::Matrix4 transform = world * view * proj;
     shader.set_mat4("transform", transform);
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    renderer.init(pm->get_window());
     
     while (pm->is_running())
     {
@@ -113,7 +87,6 @@ int main()
 
         shader.use();
         shader.set_mat4("transform", transform);
-        // glBindVertexArray(VAO);
         vao.bind();
         glDrawElements(GL_TRIANGLES, geo.get_index_count(), GL_UNSIGNED_INT, 0);
 
@@ -121,7 +94,6 @@ int main()
     }
 
     pm->shutdown();
-
     delete pm;
     
     return 0;
