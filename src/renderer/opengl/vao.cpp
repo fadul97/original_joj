@@ -1,10 +1,14 @@
 #include "renderer/opengl/vao.h"
+#include "graphics/x11/joj_gl_x11.h"
 
 joj::VAO::VAO()
 {
     glGenVertexArrays(1, &id);
     vbo = joj::VBO{};
     ebo = joj::EBO{};
+
+    vbos = std::vector<VBO>{};
+    ebos = std::vector<EBO>{};
 }
 
 joj::VAO::~VAO()
@@ -19,6 +23,64 @@ void joj::VAO::bind() const
 void joj::VAO::unbind() const
 {
     glBindVertexArray(0);
+}
+
+
+u32 joj::VAO::create_vbo()
+{
+    vbos.push_back(VBO{});
+    glCreateBuffers(1, &vbos.back().id);
+    return vbos.back().id;
+}
+
+u32 joj::VAO::create_ebo()
+{
+    ebos.push_back(EBO{});
+    glCreateBuffers(1, &ebos.back().id);
+    return ebos.back().id;
+}
+
+void joj::VAO::bind_vbo(u32 binding_index, u32 vbo_id, GLintptr offset, GLintptr stride)
+{
+    glBindVertexBuffer(binding_index, vbo_id, offset, stride);
+}
+
+void joj::VAO::unbind_vbo()
+{
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void joj::VAO::bind_ebo(u32 ebo_id)
+{
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+}
+
+void joj::VAO::specify_position_data(u32 bindind_index, i32 size, u32 offset, u32 attrib_location)
+{
+    position_location = attrib_location;
+    glEnableVertexAttribArray(position_location);
+    glVertexAttribFormat(position_location, size, GL_FLOAT, GL_FALSE, offset);
+    glVertexAttribBinding(position_location, bindind_index);
+}
+
+void joj::VAO::specify_color_data(u32 bindind_index, i32 size, u32 offset, u32 attrib_location)
+{
+    color_location = attrib_location;
+    glEnableVertexAttribArray(color_location);
+    glVertexAttribFormat(color_location, size, GL_FLOAT, GL_FALSE, offset);
+    glVertexAttribBinding(color_location, bindind_index);
+}
+
+void joj::VAO::bind_buffer_data(u32 vbo_id, GLsizeiptr vertex_size, const Vertex* vertex_data)
+{
+    glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
+    glBufferData(GL_ARRAY_BUFFER, vertex_size, vertex_data, GL_STATIC_DRAW);
+}
+
+void joj::VAO::bind_buffer_data(u32 ebo_id, GLsizeiptr index_size, const u32* index_data)
+{
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, index_data, GL_STATIC_DRAW);
 }
 
 void joj::VAO::bind_buffer_data(GLsizeiptr vertex_size, const Vertex* vertex_data, GLsizeiptr index_size, const u32* index_data)
