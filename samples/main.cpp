@@ -48,72 +48,34 @@ int main()
     joj::GeoSphere geos{1.0f, 3};
     // joj::Grid geo{100.0f, 20.0f, 20, 20};
     joj::Quad geo{03.0f, 03.0f};
-    
-    u32 vao;
-    u32 vbo;
-    u32 ebo;
 
-    u32 svbo;
-    u32 sebo;
+    joj::VAO vao{};
+    vao.bind();
 
-    u32 tvbo;
-    u32 tebo;
+    u32 cyl_vbo = vao.create_vbo();
+    u32 cyl_ebo = vao.create_ebo();
 
-    // Generate buffers
-    glCreateVertexArrays(1, &vao);
-    glCreateBuffers(1, &vbo);
-    glCreateBuffers(1, &ebo);
+    u32 sphe_vbo = vao.create_vbo();
+    u32 sphe_ebo = vao.create_ebo();
 
-    glCreateBuffers(1, &svbo);
-    glCreateBuffers(1, &sebo);
+    u32 quad_vbo = vao.create_vbo();
+    u32 quad_ebo = vao.create_ebo();
 
-    glCreateBuffers(1, &tvbo);
-    glCreateBuffers(1, &tebo);
+    u32 bind_index = 0;
+    vao.specify_position_data(bind_index, 3, 0);
+    vao.specify_color_data(bind_index, 4, 3 * sizeof(f32));
 
-    // Bind vao
-    glBindVertexArray(vao);
-    
-    // Setup buffer format
-    i32 bind_index = 0;
+    vao.bind_buffer_data(cyl_vbo, geoc.get_vertex_count() * sizeof(joj::Vertex), geoc.get_vertex_data());
+    vao.bind_buffer_data(cyl_ebo, geoc.get_index_count() * sizeof(u32), geoc.get_index_data());
 
-    // Vertices
-    u32 pos_location = 0;
-    glEnableVertexAttribArray(pos_location);
-    glVertexAttribFormat(pos_location, 3, GL_FLOAT, GL_FALSE, 0);
-    glVertexAttribBinding(pos_location, bind_index);
+    vao.bind_buffer_data(sphe_vbo, geos.get_vertex_count() * sizeof(joj::Vertex), geos.get_vertex_data());
+    vao.bind_buffer_data(sphe_ebo, geos.get_index_count() * sizeof(u32), geos.get_index_data());
 
-    // Color
-    u32 color_location = 1;
-    glEnableVertexAttribArray(color_location);
-    glVertexAttribFormat(color_location, 4, GL_FLOAT, GL_FALSE, 3 * sizeof(f32));
-    glVertexAttribBinding(color_location, bind_index);
+    vao.bind_buffer_data(quad_vbo, geo.get_vertex_count() * sizeof(joj::Vertex), geo.get_vertex_data());
+    vao.bind_buffer_data(quad_ebo, geo.get_index_count() * sizeof(u32), geo.get_index_data());
 
-    // Set buffer data
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, geo.get_vertex_count() * sizeof(joj::Vertex), geo.get_vertex_data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, geo.get_index_count() * sizeof(u32), geo.get_index_data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, svbo);
-    glBufferData(GL_ARRAY_BUFFER, geos.get_vertex_count() * sizeof(joj::Vertex), geos.get_vertex_data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, geos.get_index_count() * sizeof(u32), geos.get_index_data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, tvbo);
-    glBufferData(GL_ARRAY_BUFFER, geoc.get_vertex_count() * sizeof(joj::Vertex), geoc.get_vertex_data(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, geoc.get_index_count() * sizeof(u32), geoc.get_index_data(), GL_STATIC_DRAW);
-
-
-    
-    // glBindVertexBuffer(bind_index, vbo, 0, 7 * sizeof(f32));
-    // glBindVertexBuffer(bind_index, vbo, 0, sizeof(joj::Vertex));
-
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
+    vao.unbind_vbo();
+    vao.unbind();
     
     joj::Matrix4 world = joj::Matrix4{};
     f32 z = -000.0f;
@@ -159,29 +121,28 @@ int main()
         
         renderer.clear();
 
-        // vao.bind();
-        glBindVertexArray(vao);
+        vao.bind();
         shader.use();
 
         transform = world * view * proj;
         shader.set_mat4("transform", transform);
-        glBindVertexBuffer(bind_index, vbo, 0, sizeof(joj::Vertex));
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        vao.bind_vbo(bind_index, quad_vbo, 0, sizeof(joj::Vertex));
+        vao.bind_ebo(quad_ebo);
         glDrawElements(GL_TRIANGLES, geo.get_index_count(), GL_UNSIGNED_INT, 0);
 
         t2 = w2 * view * proj;
         shader.set_mat4("transform", t2);
-        glBindVertexBuffer(bind_index, svbo, 0, sizeof(joj::Vertex));
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, sebo);
+        vao.bind_vbo(bind_index, sphe_vbo, 0, sizeof(joj::Vertex));
+        vao.bind_ebo(sphe_ebo);
         glDrawElements(GL_TRIANGLES, geos.get_index_count(), GL_UNSIGNED_INT, 0);
 
         t2 = w3 * view * proj;
         shader.set_mat4("transform", t2);
-        glBindVertexBuffer(bind_index, tvbo, 0, sizeof(joj::Vertex));
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tebo);
+        vao.bind_vbo(bind_index, cyl_vbo, 0, sizeof(joj::Vertex));
+        vao.bind_ebo(cyl_ebo);
         glDrawElements(GL_TRIANGLES, geoc.get_index_count(), GL_UNSIGNED_INT, 0);
 
-        glBindVertexArray(0);
+        vao.unbind();
 
         pm->swap_buffers();
     }
