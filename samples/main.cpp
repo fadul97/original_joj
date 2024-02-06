@@ -1,3 +1,4 @@
+#include <GL/glcorearb.h>
 #include <iostream>
 #include <memory>
 
@@ -19,7 +20,7 @@
 #include "joj/renderer/renderer.h"
 #include "joj/renderer/opengl/renderer_gl.h"
 #include "joj/math/jmath.h"
-#include "platform/x11/input_x11.h"
+#include "joj/platform/x11/input_x11.h"
 #include "joj/renderer/shader.h"
 #include "joj/renderer/opengl/shader_gl.h"
 #include "joj/resources/geometry/geometry.h"
@@ -32,6 +33,7 @@
 #include "joj/renderer/opengl/vao.h"
 #include "joj/resources/geometry/vertex.h"
 #include "joj/renderer/opengl/render_object.h"
+#include "joj/vendor/stb/stb_image.h"
 
 int main()
 {
@@ -43,79 +45,97 @@ int main()
 
     joj::GLShader shader{"shaders/vertex.glsl", "shaders/frag.glsl"};
 
-    auto quad = std::make_unique<joj::RenderObject>(joj::GeometryType::QUAD);
-    auto cylinder = std::make_unique<joj::RenderObject>(joj::GeometryType::CYLINDER);
-    auto geosphere = std::make_unique<joj::RenderObject>(joj::GeometryType::GEOSPHERE);
-    auto cube = std::make_unique<joj::RenderObject>(joj::GeometryType::CUBE);
-    
-    cylinder->geometry.move_to(0, -5, 0);
-    geosphere->geometry.move_to(-5, -5, 0);
-    cube->geometry.move_to(+5, -5, 0);
-    
+    f32 vertices[] = {
+        // positions          // colors           // texture coords
+         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,   // top right
+         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,   // bottom left
+        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // top left 
+    };
+
+    u32 indices[] = {  
+        0, 1, 3, // first triangle
+        1, 2, 3  // second triangle
+    };
+
     joj::VAO vao{};
     vao.bind();
 
     u32 bind_index = 0;
     vao.specify_position_data(bind_index, 3, 0);
-    vao.specify_color_data(bind_index, 4, 3 * sizeof(f32));
+    vao.specify_color_data(bind_index, 3, 3 * sizeof(f32));
+    vao.specify_texture_data(bind_index, 2, 6 * sizeof(f32));
 
-    quad->vbo_id = vao.create_vbo();
-    quad->ebo_id = vao.create_ebo();
-    vao.bind_buffer_data(quad->vbo_id, quad->geometry.get_vertex_count() * sizeof(joj::Vertex), quad->geometry.get_vertex_data());
-    vao.bind_buffer_data(quad->ebo_id, quad->geometry.get_index_count() * sizeof(u32), quad->geometry.get_index_data());
-
-    cylinder->vbo_id = vao.create_vbo();
-    cylinder->ebo_id = vao.create_ebo();
-    vao.bind_buffer_data(cylinder->vbo_id, cylinder->geometry.get_vertex_count() * sizeof(joj::Vertex), cylinder->geometry.get_vertex_data());
-    vao.bind_buffer_data(cylinder->ebo_id, cylinder->geometry.get_index_count() * sizeof(u32), cylinder->geometry.get_index_data());
-
-    geosphere->vbo_id = vao.create_vbo();
-    geosphere->ebo_id = vao.create_ebo();
-    vao.bind_buffer_data(geosphere->vbo_id, geosphere->geometry.get_vertex_count() * sizeof(joj::Vertex), geosphere->geometry.get_vertex_data());
-    vao.bind_buffer_data(geosphere->ebo_id, geosphere->geometry.get_index_count() * sizeof(u32), geosphere->geometry.get_index_data());
-
-    cube->vbo_id = vao.create_vbo();
-    cube->ebo_id = vao.create_ebo();
-    vao.bind_buffer_data(cube->vbo_id, cube->geometry.get_vertex_count() * sizeof(joj::Vertex), cube->geometry.get_vertex_data());
-    vao.bind_buffer_data(cube->ebo_id, cube->geometry.get_index_count() * sizeof(u32), cube->geometry.get_index_data());
+    u32 vbo = vao.create_vbo();
+    u32 ebo = vao.create_ebo();
+    vao.bind_vbo_data(vbo, sizeof(vertices), vertices);
+    vao.bind_ebo_data(ebo, sizeof(indices), indices);
 
     vao.unbind_vbo();
     vao.unbind();
     
-    joj::Matrix4 world = joj::Matrix4{};
-    f32 x = -005.0f;
-    f32 y = +005.0f;
-    f32 z = -000.0f;
-    quad->geometry.move_to(x, y, z);
+    stbi_set_flip_vertically_on_load(true);
+    i32 width;
+    i32 height;
+    i32 nr_channels;
+    unsigned char* data = stbi_load("textures/container.jpg", &width, &height, &nr_channels, 0);
 
-    joj::Vector3 pos = joj::Vector3{0, 0, -20};
-    joj::Vector3 target = joj::Vector3{0};
-    joj::Vector3 up = joj::Vector3{0, 1, 0};
-    joj::Matrix4 view = joj::look_at_lh(pos, target, up);
+    u32 texture;
+    if (data)
+    {
+        glGenTextures(1, &texture);
 
-    joj::Matrix4 proj = joj::perspective_lh(joj::to_radians(45.0f), 800.0f / 600.0f, 0.1f, 1000.0f);
-    joj::Matrix4 transform = world * view * proj;
+        glBindTexture(GL_TEXTURE_2D, texture);
 
-    f32 sz = -000.0f;
-    f32 sx = +005.0f;
-    geosphere->geometry.move_to(sx, +00.0f, sz);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    f32 tz = -010.0f;
-    f32 tx = +000.0f;
-    cylinder->geometry.move_to(tx, +00.0f, tz);
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        stbi_image_free(data);
+    }
+    else
+    {
+        std::cout << "Failed to load image.\n";
+    }
+
+    i32 swidth;
+    i32 sheight;
+    i32 snr_channels;
+    unsigned char* sdata = stbi_load("textures/awesomeface.png", &swidth, &sheight, &snr_channels, 0);
+
+    u32 stexture;
+    if (sdata)
+    {
+        glGenTextures(1, &stexture);
+
+        glBindTexture(GL_TEXTURE_2D, stexture);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, swidth, sheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, sdata);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        stbi_image_free(sdata);
+    }
+    else
+    {
+        std::cout << "Failed to load awesomeface.png.\n";
+    }
 
     renderer.init(pm->get_window());
 
-    f32 mx = 0.0f;
-    f32 my = 0.0f;
-    f32 mz = 0.0f;
-    
-    // std::array<std::unique_ptr<joj::RenderObject>, 4> objects{std::move(quad), std::move(cylinder), std::move(geosphere), std::move(cube)};
-    std::vector<std::unique_ptr<joj::RenderObject>> objects{};
-    objects.push_back(std::move(quad));
-    objects.push_back(std::move(cylinder));
-    objects.push_back(std::move(geosphere));
-    objects.push_back(std::move(cube));
+    shader.use();
+    shader.set_int("texture1", 0);
+    shader.set_int("texture2", 1);
 
     while (pm->is_running())
     {
@@ -123,38 +143,19 @@ int main()
 
         if (pm->is_key_pressed(KEY_ESCAPE))
             pm->close_window();
-
-        if (pm->is_key_down(KEY_D))
-            mx++;
-        if (pm->is_key_down(KEY_A))
-            mx--;
-        if (pm->is_key_down(KEY_W))
-            my++;
-        if (pm->is_key_down(KEY_S))
-            my--;
-        if (pm->is_key_down(KEY_F))
-            mz++;
-        if (pm->is_key_down(KEY_B))
-            mz--;
-
-        objects[3]->geometry.move_to(mx, my, mz);
         
         renderer.clear();
 
-        vao.bind();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, stexture);
         shader.use();
 
-        for (auto const& obj : objects)
-        {
-            world = joj::identity();
-            world = joj::translate(world, obj->geometry.get_position());
-            transform = world * view * proj;
-            shader.set_mat4("transform", transform);
-            vao.bind_vbo(bind_index, obj->vbo_id, 0, sizeof(joj::Vertex));
-            vao.bind_ebo(obj->ebo_id);
-            glDrawElements(GL_TRIANGLES, obj->geometry.get_index_count(), GL_UNSIGNED_INT, 0);
-        }
-
+        vao.bind();
+        vao.bind_vbo(bind_index, vbo, 0, 8 * sizeof(f32));
+        vao.bind_ebo(ebo);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         vao.unbind();
 
         pm->swap_buffers();
