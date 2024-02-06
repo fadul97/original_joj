@@ -34,9 +34,10 @@ namespace joj
         
         void specify_position_data(u32 bindind_index, i32 size, u32 offset, u32 attrib_location = 0);
         void specify_color_data(u32 bindind_index, i32 size, u32 offset, u32 attrib_location = 1);
+        void specify_texture_data(u32 bindind_index, i32 size, u32 offset, u32 attrib_location = 2);
 
-        void bind_buffer_data(u32 vbo_id, GLsizeiptr vertex_size, const Vertex* vertex_data);
-        void bind_buffer_data(u32 ebo_id, GLsizeiptr index_size, const u32* index_data);
+        void bind_vbo_data(u32 vbo_id, GLsizeiptr vertex_size, const void* vertex_data);
+        void bind_ebo_data(u32 ebo_id, GLsizeiptr index_size, const void* index_data);
 
         void bind_buffer_data(GLsizeiptr vertex_size, const Vertex* vertex_data, GLsizeiptr index_size, const u32* index_data);
         void bind_buffer_data(Geometry& geometry);
@@ -50,6 +51,7 @@ namespace joj
 
         u32 position_location;
         u32 color_location;
+        u32 texture_location;
     };
 }
 

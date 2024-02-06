@@ -1,5 +1,6 @@
 #include "renderer/opengl/vao.h"
 #include "graphics/x11/joj_gl_x11.h"
+#include <GL/gl.h>
 
 joj::VAO::VAO()
 {
@@ -9,6 +10,10 @@ joj::VAO::VAO()
 
     vbos = std::vector<VBO>{};
     ebos = std::vector<EBO>{};
+
+    position_location = 0;
+    color_location = 1;
+    texture_location = 2;
 }
 
 joj::VAO::~VAO()
@@ -71,13 +76,21 @@ void joj::VAO::specify_color_data(u32 bindind_index, i32 size, u32 offset, u32 a
     glVertexAttribBinding(color_location, bindind_index);
 }
 
-void joj::VAO::bind_buffer_data(u32 vbo_id, GLsizeiptr vertex_size, const Vertex* vertex_data)
+void joj::VAO::specify_texture_data(u32 bindind_index, i32 size, u32 offset, u32 attrib_location)
+{
+    texture_location = attrib_location;
+    glEnableVertexAttribArray(texture_location);
+    glVertexAttribFormat(texture_location, size, GL_FLOAT, GL_FALSE, offset);
+    glVertexAttribBinding(texture_location, bindind_index);
+}
+
+void joj::VAO::bind_vbo_data(u32 vbo_id, GLsizeiptr vertex_size, const void* vertex_data)
 {
     glBindBuffer(GL_ARRAY_BUFFER, vbo_id);
     glBufferData(GL_ARRAY_BUFFER, vertex_size, vertex_data, GL_STATIC_DRAW);
 }
 
-void joj::VAO::bind_buffer_data(u32 ebo_id, GLsizeiptr index_size, const u32* index_data)
+void joj::VAO::bind_ebo_data(u32 ebo_id, GLsizeiptr index_size, const void* index_data)
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_id);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_size, index_data, GL_STATIC_DRAW);
