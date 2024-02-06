@@ -19,7 +19,7 @@ b8 joj::GLRenderer::init(std::unique_ptr<Window>& window)
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     
     return true;
 }

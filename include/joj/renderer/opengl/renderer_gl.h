@@ -7,6 +7,7 @@
 #if JPLATFORM_LINUX
 
 #include "renderer/renderer.h"
+#include "graphics/x11/joj_gl_x11.h"
 
 namespace joj
 {
@@ -20,7 +21,12 @@ namespace joj
         void render() override;
         void clear(f32 r = 0.0f, f32 g = 0.0f, f32 b = 0.0f, f32 a = 0.0f) override;
         void shutdown() override;
+
+        void set_polygon_mode(GLenum face, GLenum mode) const;
     };
+
+    inline void GLRenderer::set_polygon_mode(GLenum face, GLenum mode) const
+    { glPolygonMode(face, mode); }
 }
 
 
