@@ -11,6 +11,7 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../include/joj
 )
 
+add_subdirectory(vendor)
 add_subdirectory(platform)
 add_subdirectory(graphics)
 add_subdirectory(renderer)
@@ -25,6 +26,7 @@ target_link_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/math
     ${CMAKE_CURRENT_SOURCE_DIR}/renderer
     ${CMAKE_CURRENT_SOURCE_DIR}/resources
+    ${CMAKE_CURRENT_SOURCE_DIR}/vendor
 )
 
-target_link_libraries(joj PUBLIC jojPlatform jojGraphics jojMath jojRenderer jojGeometry)
+target_link_libraries(joj PUBLIC jojPlatform jojGraphics jojMath jojRenderer jojGeometry jojSTBImage)
