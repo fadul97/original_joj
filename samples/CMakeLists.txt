@@ -13,3 +13,8 @@ target_link_libraries(jojTest PUBLIC joj)
 # Copy shaders files to samples/shaders/
 configure_file(shaders/vertex.glsl shaders/vertex.glsl COPYONLY)
 configure_file(shaders/frag.glsl shaders/frag.glsl COPYONLY)
+
+# TODO: Find a better way to:
+# Copy texture files to samples/textures/
+configure_file(textures/container.jpg textures/container.jpg COPYONLY)
+configure_file(textures/awesomeface.png textures/awesomeface.png COPYONLY)
