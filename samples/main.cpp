@@ -34,6 +34,7 @@
 #include "joj/resources/geometry/vertex.h"
 #include "joj/renderer/opengl/render_object.h"
 #include "joj/vendor/stb/stb_image.h"
+#include "joj/renderer/opengl/texture_gl.h"
 
 int main()
 {
@@ -75,61 +76,17 @@ int main()
     vao.unbind();
     
     stbi_set_flip_vertically_on_load(true);
+    joj::GLTexture t1{"textures/container.jpg"};
+
     i32 width;
     i32 height;
     i32 nr_channels;
-    unsigned char* data = stbi_load("textures/container.jpg", &width, &height, &nr_channels, 0);
+    unsigned char* data = stbi_load("textures/awesomeface.png", &width, &height, &nr_channels, 0);
 
-    u32 texture;
-    if (data)
-    {
-        glGenTextures(1, &texture);
+    joj::GLTexture t2{};
+    t2.create(width, height, data, GL_RGBA, GL_RGBA);
 
-        glBindTexture(GL_TEXTURE_2D, texture);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        stbi_image_free(data);
-    }
-    else
-    {
-        std::cout << "Failed to load image.\n";
-    }
-
-    i32 swidth;
-    i32 sheight;
-    i32 snr_channels;
-    unsigned char* sdata = stbi_load("textures/awesomeface.png", &swidth, &sheight, &snr_channels, 0);
-
-    u32 stexture;
-    if (sdata)
-    {
-        glGenTextures(1, &stexture);
-
-        glBindTexture(GL_TEXTURE_2D, stexture);
-
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, swidth, sheight, 0, GL_RGBA, GL_UNSIGNED_BYTE, sdata);
-        glGenerateMipmap(GL_TEXTURE_2D);
-
-        stbi_image_free(sdata);
-    }
-    else
-    {
-        std::cout << "Failed to load awesomeface.png.\n";
-    }
+    stbi_image_free(data);
 
     renderer.init(pm->get_window());
 
@@ -147,9 +104,9 @@ int main()
         renderer.clear();
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture);
+        t1.bind();
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, stexture);
+        t2.bind();
         shader.use();
 
         vao.bind();
