@@ -18,6 +18,7 @@ joj::VAO::VAO()
 
 joj::VAO::~VAO()
 {
+    glDeleteVertexArrays(1, &id);
 }
 
 void joj::VAO::bind() const
@@ -30,6 +31,10 @@ void joj::VAO::unbind() const
     glBindVertexArray(0);
 }
 
+void joj::VAO::delete_vao()
+{
+    glDeleteVertexArrays(1, &id);
+}
 
 u32 joj::VAO::create_vbo()
 {

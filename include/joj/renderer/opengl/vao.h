@@ -24,6 +24,8 @@ namespace joj
         void bind() const;
         void unbind() const;
 
+        void delete_vao();
+
         u32 create_vbo();
         u32 create_ebo();
 
