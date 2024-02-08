@@ -1,4 +1,5 @@
 #include "renderer/opengl/vbo.h"
+#include "graphics/x11/joj_gl_x11.h"
 
 joj::VBO::VBO()
 {
@@ -10,6 +11,7 @@ joj::VBO::VBO()
 
 joj::VBO::~VBO()
 {
+    glDeleteBuffers(1, &id);
 }
 
 void joj::VBO::bind() const
@@ -20,6 +22,11 @@ void joj::VBO::bind() const
 void joj::VBO::unbind() const
 {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void joj::VBO::delete_vbo()
+{
+    glDeleteBuffers(1, &id);
 }
 
 void joj::VBO::bind_buffer_data(GLsizeiptr size, const Vertex* data)

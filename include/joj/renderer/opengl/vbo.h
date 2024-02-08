@@ -20,6 +20,8 @@ namespace joj
         void bind() const;
         void unbind() const;
 
+        void delete_vbo();
+
         void bind_buffer_data(GLsizeiptr size, const Vertex* data);
 
         void specify_position_data(GLsizei stride, const GLvoid * pointer, u32 location = 0);
