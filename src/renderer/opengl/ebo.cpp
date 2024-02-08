@@ -1,4 +1,5 @@
 #include "renderer/opengl/ebo.h"
+#include "graphics/x11/joj_gl_x11.h"
 
 joj::EBO::EBO()
 {
@@ -7,11 +8,17 @@ joj::EBO::EBO()
 
 joj::EBO::~EBO()
 {
+    glDeleteBuffers(1, &id);
 }
 
 void joj::EBO::bind() const
 {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
+}
+
+void joj::EBO::delete_ebo()
+{
+    glDeleteBuffers(1, &id);
 }
 
 void joj::EBO::bind_buffer_data(GLsizeiptr size, const u32* data)

@@ -18,6 +18,8 @@ namespace joj
 
         void bind() const;
 
+        void delete_ebo();
+
         void bind_buffer_data(GLsizeiptr size, const u32* data);
 
         u32 id;
