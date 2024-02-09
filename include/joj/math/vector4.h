@@ -10,6 +10,7 @@
 #include <string>
 #include <sstream>
 #include <iomanip>
+#include "vector2.h"
 
 namespace joj
 {
@@ -28,6 +29,11 @@ namespace joj
 
         Vector4(f32 x, f32 y, f32 z, f32 w)
             : x(x), y(y), z(z), w(w)
+        {
+        }
+
+        Vector4(Vector2 v1, Vector2 v2)
+            : x(v1.x), y(v1.y), z(v2.x), w(v2.y)
         {
         }
 
