@@ -5,13 +5,13 @@
 
 joj::GLTexture::GLTexture()
     : width{0}, height{0}, internal_format{GL_RGB}, image_format{GL_RGB},
-      wrap_s{GL_REPEAT}, wrap_t{GL_REPEAT}, filter_min{GL_LINEAR}, filter_max{GL_LINEAR}
+      wrap_s{GL_REPEAT}, wrap_t{GL_REPEAT}, filter_min{GL_LINEAR}, filter_max{GL_NEAREST}
 {
     glGenTextures(1, &id);
 }
 
-joj::GLTexture::GLTexture(const char* image_path)
-    : width{0}, height{0}, internal_format{GL_RGB}, image_format{GL_RGB},
+joj::GLTexture::GLTexture(const char* image_path, i32 internal_format, GLenum image_format)
+    : width{0}, height{0}, internal_format{internal_format}, image_format{image_format},
       wrap_s{GL_REPEAT}, wrap_t{GL_REPEAT}, filter_min{GL_LINEAR}, filter_max{GL_LINEAR}
 {
     glGenTextures(1, &id);

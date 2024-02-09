@@ -14,7 +14,7 @@ namespace joj
     {
     public:
         GLTexture();
-        GLTexture(const char* image_path);
+        GLTexture(const char* image_path, i32 internal_format, GLenum image_format);
         ~GLTexture();
 
         void bind() const;
