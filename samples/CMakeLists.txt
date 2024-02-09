@@ -14,7 +14,10 @@ target_link_libraries(jojTest PUBLIC joj)
 configure_file(shaders/vertex.glsl shaders/vertex.glsl COPYONLY)
 configure_file(shaders/frag.glsl shaders/frag.glsl COPYONLY)
 
+# Textures from kenney (https://www.kenney.nl/) and itch.io (https://itch.io/game-assets/free/tag-animation)
 # TODO: Find a better way to:
 # Copy texture files to samples/textures/
 configure_file(textures/container.jpg textures/container.jpg COPYONLY)
 configure_file(textures/awesomeface.png textures/awesomeface.png COPYONLY)
+configure_file(textures/spritesheet.png textures/spritesheet.png COPYONLY)
+configure_file(textures/char_purple.png textures/char_purple.png COPYONLY)
