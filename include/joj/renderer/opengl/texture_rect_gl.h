@@ -13,7 +13,7 @@ namespace joj
     {
     public:
         GLTextureRect();
-        GLTextureRect(f32 x0, f32 y0, f32 x1, f32 y1, f32 sprite_width, f32 sprite_height);
+        GLTextureRect(f32 x, f32 y, f32 sprite_width, f32 sprite_height, f32 sheet_width, f32 sheet_height);
         ~GLTextureRect();
 
         f32 m_x0;
