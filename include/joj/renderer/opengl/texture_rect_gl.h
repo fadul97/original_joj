@@ -16,15 +16,10 @@ namespace joj
         GLTextureRect(f32 x0, f32 y0, f32 x1, f32 y1, f32 sprite_width, f32 sprite_height);
         ~GLTextureRect();
 
-        // union
-        // {
-            Vector4 rect;
-        //     struct
-        //     {
-        //         Vector2 bottom_left;
-        //         Vector2 top_right;
-        //     };
-        // };
+        f32 m_x0;
+        f32 m_y0;
+        f32 m_x1;
+        f32 m_y1;
     };
 }
 
