@@ -60,6 +60,8 @@ enum Keys {
     KEY_END = 0x23,
     /** @brief The home key. */
     KEY_HOME = 0x24,
+
+    // FIXME: Arrow keys not working.
     /** @brief The left arrow key. */
     KEY_LEFT = 0x25,
     /** @brief The up arrow key. */
@@ -68,6 +70,7 @@ enum Keys {
     KEY_RIGHT = 0x27,
     /** @brief The down arrow key. */
     KEY_DOWN = 0x28,
+
     KEY_SELECT = 0x29,
     KEY_PRINT = 0x2A,
     KEY_EXECUTE = 0x2B,
