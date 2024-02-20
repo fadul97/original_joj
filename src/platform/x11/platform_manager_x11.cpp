@@ -7,6 +7,7 @@
 #include "graphics/context.h"
 #include "graphics/x11/context_gl.h"
 #include <memory>
+#include <X11/Xatom.h>
 
 joj::X11PlatformManager::X11PlatformManager()
 {
@@ -185,6 +186,50 @@ void joj::X11PlatformManager::shutdown()
 {
     XAutoRepeatOn(static_cast<Display*>(window->get_display()));
     window->shutdown();
+}
+
+void joj::X11PlatformManager::set_window_icon(i32 count, IconImage& image)
+{
+    if (count)
+    {
+        i32 longCount = 0;
+
+        for (i32 i = 0;  i < count;  i++)
+            longCount += 2 + image.width * image.height;
+
+        unsigned long* icon = static_cast<unsigned long*>(calloc(longCount, sizeof(unsigned long)));
+        unsigned long* target = icon;
+
+        for (i32 i = 0;  i < count;  i++)
+        {
+            *target++ = image.width;
+            *target++ = image.height;
+
+            for (i32 j = 0;  j < image.width * image.height;  j++)
+            {
+                *target++ = (((unsigned long) image.pixels[j * 4 + 0]) << 16) |
+                            (((unsigned long) image.pixels[j * 4 + 1]) <<  8) |
+                            (((unsigned long) image.pixels[j * 4 + 2]) <<  0) |
+                            (((unsigned long) image.pixels[j * 4 + 3]) << 24);
+            }
+        }
+
+        XChangeProperty(static_cast<Display*>(window->get_display()), window->get_id(),
+                        XInternAtom(static_cast<Display*>(window->get_display()), "_NET_WM_ICON", False),
+                        XA_CARDINAL, 32,
+                        PropModeReplace,
+                        (unsigned char*) icon,
+                        longCount);
+
+        free(icon);
+    }
+    else
+    {
+        XDeleteProperty(static_cast<Display*>(window->get_display()), window->get_id(),
+                        XInternAtom(static_cast<Display*>(window->get_display()), "_NET_WM_ICON", False));
+    }
+
+    XFlush(static_cast<Display*>(window->get_display()));
 }
 
 #endif // JPLATFORM_LINUX

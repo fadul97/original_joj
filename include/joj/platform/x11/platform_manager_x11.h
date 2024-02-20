@@ -24,6 +24,8 @@ namespace joj
         void shutdown() override;
 
         std::unique_ptr<Window>& get_window() override;
+
+        void set_window_icon(i32 count, IconImage& image) override;
     
     private:
         unsigned long delete_msg;

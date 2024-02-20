@@ -9,6 +9,7 @@
 #include "input.h"
 #include "graphics/context.h"
 #include <memory>
+#include "icon_image.h"
 
 namespace joj
 {
@@ -28,6 +29,8 @@ namespace joj
         i16 get_ymouse() const;
         i16 get_mouse_wheel() const;
 
+        virtual std::unique_ptr<Window>& get_window();
+
         void close_window();
 
         virtual b8 init(i16 width = 800, i16 height = 600, std::string title = std::string{ "Joj PlatformManager" }) = 0;
@@ -37,7 +40,7 @@ namespace joj
         virtual void swap_buffers() = 0;
         virtual void shutdown() = 0;
 
-        virtual std::unique_ptr<Window>& get_window();
+        virtual void set_window_icon(i32 count, IconImage& image) = 0;
 
     protected:  
         std::unique_ptr<Window> window;
