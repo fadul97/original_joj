@@ -37,9 +37,7 @@
 #include "joj/renderer/opengl/texture_gl.h"
 #include "joj/renderer/opengl/animation2d_gl.h"
 #include "joj/renderer/opengl/texture_rect_gl.h"
-
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#include "joj/platform/icon_image.h"
 
 double get_abs_time()
 {
@@ -55,6 +53,10 @@ int main()
     auto pm = new joj::X11PlatformManager();
     pm->init(800, 600);
     pm->create_window();
+
+    joj::IconImage logo;
+    logo.pixels = stbi_load("../logo.png", &logo.width, &logo.height, 0, 4);
+    pm->set_window_icon(1, logo);
 
     joj::GLRenderer renderer{};
 
