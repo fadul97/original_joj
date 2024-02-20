@@ -1,6 +1,7 @@
 #include "renderer/opengl/texture_gl.h"
 
 #include "vendor/stb/stb_image.h"
+#include <GL/glext.h>
 #include <iostream>
 
 joj::GLTexture::GLTexture()
@@ -12,7 +13,7 @@ joj::GLTexture::GLTexture()
 
 joj::GLTexture::GLTexture(const char* image_path, i32 internal_format, GLenum image_format)
     : width{0}, height{0}, internal_format{internal_format}, image_format{image_format},
-      wrap_s{GL_REPEAT}, wrap_t{GL_REPEAT}, filter_min{GL_LINEAR}, filter_max{GL_LINEAR}
+      wrap_s{GL_MIRRORED_REPEAT}, wrap_t{GL_MIRRORED_REPEAT}, filter_min{GL_LINEAR}, filter_max{GL_LINEAR}
 {
     glGenTextures(1, &id);
 
