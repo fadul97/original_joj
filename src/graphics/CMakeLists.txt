@@ -11,7 +11,9 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/joj
 )
 
-add_subdirectory(x11)
+if(LINUX)
+    add_subdirectory(x11)
+endif()
 
 target_link_directories(
     jojGraphics 

@@ -14,5 +14,6 @@ project(joj)
 # TODO: if interface, remove 'legacy' include_directories()
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
-
-add_subdirectory(x11)
+if(LINUX)
+    add_subdirectory(x11)
+endif()
