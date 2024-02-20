@@ -1,6 +1,6 @@
-#include <GL/glcorearb.h>
 #include <iostream>
 #include <memory>
+#include <unistd.h>
 
 #include "joj/joj.h"
 #include "joj/defines.h"
@@ -37,6 +37,18 @@
 #include "joj/renderer/opengl/texture_gl.h"
 #include "joj/renderer/opengl/animation2d_gl.h"
 #include "joj/renderer/opengl/texture_rect_gl.h"
+
+#include <X11/Xlib.h>
+#include <X11/Xutil.h>
+
+double get_abs_time()
+{
+    struct timespec now;
+    clock_gettime(CLOCK_MONOTONIC_RAW, &now);
+    return now.tv_sec + now.tv_nsec * 0.000000001;
+}
+
+const f64 TARGET_FRAME_TIME = 1.0 / 60.0; // 60 FPS
 
 int main()
 {
@@ -107,32 +119,78 @@ int main()
     joj::GLAnimation2D walking_right;
     walking_right.texture = &t2;
     walking_right.add_frame(joj::GLTextureRect{0, 8, 56, 56, 448, 616});
+    walking_right.add_frame(joj::GLTextureRect{0, 8, 56, 56, 448, 616});
+    walking_right.add_frame(joj::GLTextureRect{1, 8, 56, 56, 448, 616});
     walking_right.add_frame(joj::GLTextureRect{1, 8, 56, 56, 448, 616});
     walking_right.add_frame(joj::GLTextureRect{2, 8, 56, 56, 448, 616});
+    walking_right.add_frame(joj::GLTextureRect{2, 8, 56, 56, 448, 616});
+    walking_right.add_frame(joj::GLTextureRect{3, 8, 56, 56, 448, 616});
     walking_right.add_frame(joj::GLTextureRect{3, 8, 56, 56, 448, 616});
     walking_right.add_frame(joj::GLTextureRect{4, 8, 56, 56, 448, 616});
+    walking_right.add_frame(joj::GLTextureRect{4, 8, 56, 56, 448, 616});
+    walking_right.add_frame(joj::GLTextureRect{5, 8, 56, 56, 448, 616});
     walking_right.add_frame(joj::GLTextureRect{5, 8, 56, 56, 448, 616});
     walking_right.add_frame(joj::GLTextureRect{6, 8, 56, 56, 448, 616});
+    walking_right.add_frame(joj::GLTextureRect{6, 8, 56, 56, 448, 616});
+    walking_right.add_frame(joj::GLTextureRect{7, 8, 56, 56, 448, 616});
     walking_right.add_frame(joj::GLTextureRect{7, 8, 56, 56, 448, 616});
 
-    joj::GLAnimation2D jumping;
-    jumping.texture = &t2;
-    jumping.add_frame(joj::GLTextureRect{0, 7, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{1, 7, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{2, 7, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{3, 7, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{4, 7, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{5, 7, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{6, 7, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{7, 7, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{0, 6, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{1, 6, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{2, 6, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{3, 6, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{4, 6, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{5, 6, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{6, 6, 56, 56, 448, 616});
-    jumping.add_frame(joj::GLTextureRect{7, 6, 56, 56, 448, 616});
+    joj::GLAnimation2D walking_left;
+    walking_left.texture = &t2;
+    walking_left.add_frame(joj::GLTextureRect{-1, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-1, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-2, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-2, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-3, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-3, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-4, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-4, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-5, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-5, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-6, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-6, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-7, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-7, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-8, +8, 56, 56, -448, +616});
+    walking_left.add_frame(joj::GLTextureRect{-8, +8, 56, 56, -448, +616});
+
+    joj::GLAnimation2D jumping_right;
+    jumping_right.texture = &t2;
+    jumping_right.add_frame(joj::GLTextureRect{0, 7, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{1, 7, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{2, 7, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{3, 7, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{4, 7, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{5, 7, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{6, 7, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{7, 7, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{0, 6, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{1, 6, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{2, 6, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{3, 6, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{4, 6, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{5, 6, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{6, 6, 56, 56, 448, 616});
+    jumping_right.add_frame(joj::GLTextureRect{7, 6, 56, 56, 448, 616});
+
+    joj::GLAnimation2D jumping_left;
+    jumping_left.texture = &t2;
+    jumping_left.add_frame(joj::GLTextureRect{-0, 7, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-1, 7, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-2, 7, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-3, 7, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-4, 7, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-5, 7, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-6, 7, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-7, 7, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-0, 6, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-1, 6, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-2, 6, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-3, 6, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-4, 6, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-5, 6, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-6, 6, 56, 56, -448, 616});
+    jumping_left.add_frame(joj::GLTextureRect{-7, 6, 56, 56, -448, 616});
 
     joj::GLAnimation2D attacking;
     attacking.texture = &t2;
@@ -148,20 +206,38 @@ int main()
     joj::GLAnimation2D idle;
     idle.texture = &t2;
     idle.add_frame(joj::GLTextureRect{0, 10, 56, 56, 448, 616});
+    idle.add_frame(joj::GLTextureRect{0, 10, 56, 56, 448, 616});
+    idle.add_frame(joj::GLTextureRect{1, 10, 56, 56, 448, 616});
     idle.add_frame(joj::GLTextureRect{1, 10, 56, 56, 448, 616});
     idle.add_frame(joj::GLTextureRect{2, 10, 56, 56, 448, 616});
+    idle.add_frame(joj::GLTextureRect{2, 10, 56, 56, 448, 616});
+    idle.add_frame(joj::GLTextureRect{3, 10, 56, 56, 448, 616});
     idle.add_frame(joj::GLTextureRect{3, 10, 56, 56, 448, 616});
     idle.add_frame(joj::GLTextureRect{4, 10, 56, 56, 448, 616});
+    idle.add_frame(joj::GLTextureRect{4, 10, 56, 56, 448, 616});
+    idle.add_frame(joj::GLTextureRect{5, 10, 56, 56, 448, 616});
     idle.add_frame(joj::GLTextureRect{5, 10, 56, 56, 448, 616});
 
     joj::GLTextureRect rect = idle.m_frames[0];
     shader.set_vec4("rect", rect);
 
+    f32 delta_time = 0.0f;              // Time between current frame and last frame
+    f32 last_frame = get_abs_time();
+    f32 current_frame;
+
+    f64 accumulated_time = 0.0f;
+
     u32 i = 0;
-    b8 moving = false;
+
+    joj::GLAnimation2D* current_anim = &idle;
     while (pm->is_running())
     {
-        moving = false;
+        current_frame = get_abs_time();
+        delta_time = current_frame - last_frame;
+        last_frame = current_frame;
+        accumulated_time += delta_time;
+
+        current_anim = &idle;
         pm->process_events();
 
         rect = idle.m_frames[i];
@@ -170,30 +246,32 @@ int main()
             pm->close_window();
 
         if (pm->is_key_down(KEY_D))
-        {
-            moving = true;
-            i = (i + 1) % 3;
-            rect = walking_right.m_frames[i];
-        }        
+            current_anim = &walking_right;
+
+        if (pm->is_key_down(KEY_A))
+            current_anim = &walking_left;
 
         if (pm->is_key_down(KEY_Z))
-        {
-            moving = true;
-            i = (i + 1) % attacking.m_frames.size();
-            rect = attacking.m_frames[i];
-        }
+            current_anim = &attacking;
 
         if (pm->is_key_down(KEY_SPACE))
-        {
-            moving = true;
-            i = (i + 1) % jumping.m_frames.size();
-            rect = jumping.m_frames[i];
-        }
-       
-        if (!moving)
-            i = (i + 1) % idle.m_frames.size();
+            current_anim = &jumping_right;
 
-        shader.set_vec4("rect", rect);
+        std::cout << "delta_time = " << delta_time << "\n";
+        std::cout << "        accum_time = " << accumulated_time << "\n";
+
+        if (accumulated_time > TARGET_FRAME_TIME)
+        {
+            i = (i + 1) % current_anim->m_frames.size();
+            rect = current_anim->m_frames[i];
+            shader.set_vec4("rect", rect);
+            shader.set_float("time", delta_time);
+            accumulated_time = 0.0f;
+        }
+        else
+        {
+            rect = current_anim->m_frames[i];
+        }
 
         renderer.clear();
 
