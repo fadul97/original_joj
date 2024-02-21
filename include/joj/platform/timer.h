@@ -21,7 +21,7 @@ namespace joj
         void time_end_period(){}
           
     protected:
-        b8 stopped;
+        b8 m_stopped;
     };
 }
 
