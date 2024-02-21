@@ -1,10 +1,14 @@
+#define JOJ_ENGINE_IMPLEMENTATION
 #include "joj/defines.h"
 #include <iostream>
 
 #if JPLATFORM_LINUX  
 #include "joj/platform/x11/platform_manager_x11.h"
 #include "renderer/opengl/renderer_gl.h"
-#endif // JPLATFORM_LINUX 
+#elif JPLATFORM_WINDOWS
+#include "joj/platform/win32/window_win32.h"
+#include "joj/joj.h"
+#endif
 
 int main()
 {
@@ -20,7 +24,7 @@ int main()
     while (pm.is_running())
     {
         pm.process_events();
-        
+
         if (pm.is_key_down(KEY_ESCAPE))
             pm.close_window();
 
@@ -30,7 +34,23 @@ int main()
 
     pm.shutdown();
 #elif JPLATFORM_WINDOWS
-    std::cout << "Hello, Windows!\n";
+    joj::Win32Window w{};
+    w.set_mode(joj::WindowMode::WINDOWED);
+    w.set_color(60, 60, 60);
+    w.create();
+    MSG msg = { 0 };
+    while (msg.message != WM_QUIT)
+    {
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        
+    }
+    
+    w.shutdown();
+    joj::joj_print();
 #endif // JPLATFORM_WINDOWS
 
     return 0;
