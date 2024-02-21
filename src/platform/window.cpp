@@ -2,7 +2,9 @@
 
 #if JPLATFORM_LINUX
 #include "platform/x11/window_x11.h"
-#endif // JPLATFORM_LINUX
+#elif JPLATFORM_WINDOWS
+#include "platform/win32/window_win32.h"
+#endif
 
 template<typename Tid>
 joj::Window<Tid>::Window(i16 width, i16 height, std::string title)
@@ -17,4 +19,6 @@ joj::Window<Tid>::~Window()
 
 #if JPLATFORM_LINUX
 template class joj::Window<u32>;
-#endif // JPLATFORM_LINUX
+#elif JPLATFORM_WINDOWS
+template class joj::Window<HWND>;
+#endif

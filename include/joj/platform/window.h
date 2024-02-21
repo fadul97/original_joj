@@ -8,7 +8,7 @@
 
 namespace joj
 {
-    enum class WindowMode { Borderless, Fullscreen };
+    enum class WindowMode { BORDERLESS, FULLSCREEN, WINDOWED };
 
     template<typename Tid>
     class JAPI Window
@@ -33,6 +33,8 @@ namespace joj
         void close();
 
         virtual void hide_cursor(b8 hide) = 0;
+        virtual void set_mode(WindowMode mode) = 0;
+        virtual void set_color(u32 r, u32 g, u32 b) = 0;
         
         virtual b8 init() = 0;
         virtual b8 create() = 0;
@@ -47,6 +49,7 @@ namespace joj
         i16 height;
         std::string title;
         b8 running;
+        WindowMode m_mode;
     };
     
     template<typename Tid>
