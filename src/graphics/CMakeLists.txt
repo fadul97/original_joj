@@ -13,14 +13,13 @@ target_include_directories(
 
 if(LINUX)
     add_subdirectory(x11)
+    target_link_directories(
+        jojGraphics 
+        PUBLIC 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../platform
+        ${CMAKE_CURRENT_SOURCE_DIR}/x11
+    )
+
+    target_link_libraries(jojGraphics PUBLIC jojPlatform jojX11GLGraphics)
 endif()
 
-target_link_directories(
-    jojGraphics 
-    PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../platform
-    ${CMAKE_CURRENT_SOURCE_DIR}/x11
-)
-
-
-target_link_libraries(jojGraphics PUBLIC jojPlatform jojX11GLGraphics)

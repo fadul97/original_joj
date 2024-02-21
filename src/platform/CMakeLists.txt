@@ -13,7 +13,7 @@ target_include_directories(
 
 if(LINUX)
     add_subdirectory(x11)
+    target_link_directories(jojPlatform PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/x11)
+    target_link_libraries(jojPlatform PUBLIC jojX11Platform)
 endif()
 
-target_link_directories(jojPlatform PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/x11)
-target_link_libraries(jojPlatform PUBLIC jojX11Platform)
