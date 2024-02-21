@@ -29,43 +29,41 @@ namespace joj
         void release_key(Keys key);
         void release_button(Buttons button);
 
-        virtual Keys translate_keycode(u32 keycode) = 0;
-    
-    private:
-        Keyboard keyboard;
-        Keyboard ctrl;
-        Mouse mouse;
+    protected:
+        static Keyboard m_keyboard;
+        static Keyboard m_ctrl;
+        static Mouse m_mouse;
     };
 
         inline b8 Input::is_key_down(Keys key) const
-        { return keyboard.keys[key]; }
+        { return m_keyboard.keys[key]; }
 
         inline b8 Input::is_key_up(Keys key) const
-        { return !keyboard.keys[key]; }
+        { return !m_keyboard.keys[key]; }
 
         inline i16 Input::get_xmouse() const
-        { return mouse.x; }
+        { return m_mouse.x; }
 
         inline i16 Input::get_ymouse() const
-        { return mouse.y; }
+        { return m_mouse.y; }
 
         inline i16 Input::get_mouse_wheel() const
-        { return mouse.wheel; }
+        { return m_mouse.wheel; }
 
         inline void Input::move_mouse(i16 x, i16 y)
-        { mouse.x = x; mouse.y = y; }
+        { m_mouse.x = x; m_mouse.y = y; }
 
         inline void Input::press_key(Keys key)
-        { keyboard.keys[key] = true; }
+        { m_keyboard.keys[key] = true; }
 
         inline void Input::click_button(Buttons button)
-        { mouse.buttons[button] = true; }
+        { m_mouse.buttons[button] = true; }
 
         inline void Input::release_key(Keys key)
-        { keyboard.keys[key] = false; }
+        { m_keyboard.keys[key] = false; }
 
         inline void Input::release_button(Buttons button)
-        { mouse.buttons[button] = false; }
+        { m_mouse.buttons[button] = false; }
 }
 
 #endif // JOJ_INPUT_H
