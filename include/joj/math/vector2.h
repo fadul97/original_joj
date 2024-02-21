@@ -4,7 +4,7 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#if JPLATFORM_LINUX
+// #if JPLATFORM_LINUX
 
 #include <cmath>
 #include <string>
@@ -121,6 +121,6 @@ namespace joj
 
 }
 
-#endif // JPLATFORM_LINUX
+// #endif // JPLATFORM_LINUX
 
 #endif // JOJ_VECTOR2_H
