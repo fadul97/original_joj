@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-void joj_print()
+void joj::joj_print()
 {
     std::cout << "Hello, from Joj!\n";
 }
