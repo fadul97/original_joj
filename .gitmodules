@@ -3,4 +3,4 @@
 	url = https://github.com/google/googletest.git
 [submodule "include/joj/vendor/stb"]
 	path = include/joj/vendor/stb
-	url = git@github.com:nothings/stb.git
+	url = https://github.com/nothings/stb.git
