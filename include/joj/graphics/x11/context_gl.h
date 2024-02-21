@@ -7,19 +7,19 @@
 #if JPLATFORM_LINUX
 
 #include "graphics/context.h"
-
 #include <GL/glx.h>
+#include "platform/x11/window_x11.h"
 
 namespace joj
 {
-    class JAPI X11GLContext : public GraphicsContext
+    class JAPI X11GLContext : public GraphicsContext<X11Window>
     {
     public:
         X11GLContext();
         ~X11GLContext();
 
-        b8 create(std::unique_ptr<Window>& window) override;
-        void make_current(std::unique_ptr<Window>& window) override;
+        b8 create(std::unique_ptr<X11Window>& window) override;
+        void make_current(std::unique_ptr<X11Window>& window) override;
         void destroy() override;
           
     private:  

@@ -1,9 +1,19 @@
 #include "renderer/renderer.h"
 
-joj::Renderer::Renderer()
+#if JPLATFORM_LINUX
+#include "platform/x11/window_x11.h"
+#endif // JPLATFORM_LINUX
+
+template<class Twindow>
+joj::Renderer<Twindow>::Renderer()
 {
 }
 
-joj::Renderer::~Renderer()
+template<class Twindow>
+joj::Renderer<Twindow>::~Renderer()
 {
 }
+
+#if JPLATFORM_LINUX
+template class joj::Renderer<joj::X11Window>;
+#endif // JPLATFORM_LINUX

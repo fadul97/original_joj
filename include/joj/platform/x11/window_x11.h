@@ -12,7 +12,7 @@
 
 namespace joj
 {
-    class JAPI X11Window : public Window
+    class JAPI X11Window : public Window<u32>
     {
     public:
         X11Window(i16 width = 600, i16 height = 400, std::string title = std::string{"Joj X11Window"});

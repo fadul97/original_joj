@@ -7,10 +7,13 @@
 #if JPLATFORM_LINUX
 
 #include "platform/platform_manager.h"
+#include "platform/x11/window_x11.h"
+#include "platform/x11/input_x11.h"
+#include "graphics/x11/context_gl.h"
 
 namespace joj
 {
-    class JAPI X11PlatformManager : public PlatformManager
+    class JAPI X11PlatformManager : public PlatformManager<X11Window, X11Input, X11GLContext>
     {
     public:
         X11PlatformManager();
@@ -23,7 +26,7 @@ namespace joj
         void swap_buffers() override;
         void shutdown() override;
 
-        std::unique_ptr<Window>& get_window() override;
+        std::unique_ptr<X11Window>& get_window() override;
 
         void set_window_icon(i32 count, IconImage& image) override;
     
@@ -31,7 +34,7 @@ namespace joj
         unsigned long delete_msg;
     };
 
-    inline std::unique_ptr<Window>& X11PlatformManager::get_window()
+    inline std::unique_ptr<X11Window>& X11PlatformManager::get_window()
 	{ return window; }
 }
 

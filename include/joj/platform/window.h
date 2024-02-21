@@ -10,6 +10,7 @@ namespace joj
 {
     enum class WindowMode { Borderless, Fullscreen };
 
+    template<typename Tid>
     class JAPI Window
     {
     public:
@@ -17,7 +18,7 @@ namespace joj
         virtual ~Window();
 
         virtual void* get_display() const = 0;
-        virtual u32 get_id() const = 0;
+        virtual Tid get_id() const = 0;
         virtual i32 get_screen_id() const = 0;
         virtual void* get_visual() const = 0;
         virtual void set_visual(void* visual) = 0;
@@ -52,37 +53,48 @@ namespace joj
         b8 running;
     };
     
-    inline i16 Window::get_width() const
+    template<typename Tid>
+    inline i16 Window<Tid>::get_width() const
     { return width; }
     
-    inline i16 Window::get_height() const
+    template<typename Tid>
+    inline i16 Window<Tid>::get_height() const
     { return height; }
     
-    inline std::string Window::get_title() const
+    template<typename Tid>
+    inline std::string Window<Tid>::get_title() const
     { return title; }
     
-    inline i16 Window::get_xcenter() const
+    template<typename Tid>
+    inline i16 Window<Tid>::get_xcenter() const
     { return static_cast<i16>(width / 2); }
     
-    inline i16 Window::get_ycenter() const
+    template<typename Tid>
+    inline i16 Window<Tid>::get_ycenter() const
     { return static_cast<i16>(height / 2); }
     
-    inline f32 Window::get_aspect_ratio() const
+    template<typename Tid>
+    inline f32 Window<Tid>::get_aspect_ratio() const
     { return static_cast<f32>(width) / height ; }
 
-    inline b8 Window::is_running() const
+    template<typename Tid>
+    inline b8 Window<Tid>::is_running() const
     { return running; }
     
-    inline void Window::set_width(i16 width)
+    template<typename Tid>
+    inline void Window<Tid>::set_width(i16 width)
     { this->width = width; }
     
-    inline void Window::set_height(i16 height)
+    template<typename Tid>
+    inline void Window<Tid>::set_height(i16 height)
     { this->height = height; }
     
-    inline void Window::set_title(std::string title)
+    template<typename Tid>
+    inline void Window<Tid>::set_title(std::string title)
     { this->title = title; }
 
-    inline void Window::close()
+    template<typename Tid>
+    inline void Window<Tid>::close()
     { running = false; }
 }
 

@@ -17,7 +17,7 @@ joj::X11GLContext::~X11GLContext()
 {
 }
 
-b8 joj::X11GLContext::create(std::unique_ptr<Window>& window)
+b8 joj::X11GLContext::create(std::unique_ptr<X11Window>& window)
 {
     // Check GLX version
     int major_glx = 0;
@@ -117,7 +117,7 @@ b8 joj::X11GLContext::create(std::unique_ptr<Window>& window)
     return true;
 }
 
-void joj::X11GLContext::make_current(std::unique_ptr<Window>& window)
+void joj::X11GLContext::make_current(std::unique_ptr<X11Window>& window)
 {
     // Create GLX OpenGL Context
     glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
@@ -209,4 +209,5 @@ b8 joj::X11GLContext::is_extension_supported(const char *ext_list, const char *e
 
 	return false;
 }
+
 #endif // JPLATFORM_LINUX

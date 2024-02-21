@@ -12,8 +12,7 @@ joj::GLRenderer::~GLRenderer()
 {
 }
 
-
-b8 joj::GLRenderer::init(std::unique_ptr<Window>& window)
+b8 joj::GLRenderer::init(std::unique_ptr<X11Window>& window)
 {
     glViewport(0, 0, window->get_width(), window->get_height());
 

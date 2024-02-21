@@ -7,7 +7,7 @@
 #include <stdio.h>
 
 joj::X11Window::X11Window(i16 width, i16 height, std::string title)
-    : joj::Window(width, height, title)
+    : joj::Window<u32>(width, height, title)
 {
     display = nullptr;
     id = 0;

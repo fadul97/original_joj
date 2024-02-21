@@ -13,6 +13,7 @@
 
 namespace joj
 {
+    template<class Twindow, class Tinput, class Tcontext>
     class JAPI PlatformManager
     {
     public:
@@ -29,7 +30,7 @@ namespace joj
         i16 get_ymouse() const;
         i16 get_mouse_wheel() const;
 
-        virtual std::unique_ptr<Window>& get_window();
+        virtual std::unique_ptr<Twindow>& get_window();
 
         void close_window();
 
@@ -43,36 +44,45 @@ namespace joj
         virtual void set_window_icon(i32 count, IconImage& image) = 0;
 
     protected:  
-        std::unique_ptr<Window> window;
-        std::unique_ptr<Input> input;
-        std::unique_ptr<GraphicsContext> context;
+        std::unique_ptr<Twindow> window;
+        std::unique_ptr<Tinput> input;
+        std::unique_ptr<Tcontext> context;
     };
 
-    inline b8 PlatformManager::is_running() const
+    template<class Twindow, class Tinput, class Tcontext>
+    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_running() const
     { return window->is_running(); }
 
-    inline b8 PlatformManager::is_key_down(Keys key) const
+    template<class Twindow, class Tinput, class Tcontext>
+    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_down(Keys key) const
     { return input->is_key_down(key); }
 
-    inline b8 PlatformManager::is_key_pressed(Keys key) const
+    template<class Twindow, class Tinput, class Tcontext>
+    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_pressed(Keys key) const
     { return input->is_key_pressed(key); }
 
-    inline b8 PlatformManager::is_key_up(Keys key) const
+    template<class Twindow, class Tinput, class Tcontext>
+    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_up(Keys key) const
     { return input->is_key_up(key); }
 
-    inline i16 PlatformManager::get_xmouse() const
+    template<class Twindow, class Tinput, class Tcontext>
+    inline i16 PlatformManager<Twindow, Tinput, Tcontext>::get_xmouse() const
     { return input->get_xmouse(); }
 
-    inline i16 PlatformManager::get_ymouse() const
+    template<class Twindow, class Tinput, class Tcontext>
+    inline i16 PlatformManager<Twindow, Tinput, Tcontext>::get_ymouse() const
     { return input->get_ymouse(); }
 
-    inline i16 PlatformManager::get_mouse_wheel() const
+    template<class Twindow, class Tinput, class Tcontext>
+    inline i16 PlatformManager<Twindow, Tinput, Tcontext>::get_mouse_wheel() const
     { return input->get_mouse_wheel(); }
 
-    inline void PlatformManager::close_window()
+    template<class Twindow, class Tinput, class Tcontext>
+    inline void PlatformManager<Twindow, Tinput, Tcontext>::close_window()
     { window->close(); }
 
-    inline std::unique_ptr<Window>& PlatformManager::get_window()
+    template<class Twindow, class Tinput, class Tcontext>
+    inline std::unique_ptr<Twindow>& PlatformManager<Twindow, Tinput, Tcontext>::get_window()
 	{ return window; }
 }
 

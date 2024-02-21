@@ -9,14 +9,15 @@
 
 namespace joj
 {
+    template<class Twindow>
     class JAPI GraphicsContext
     {
     public:
         GraphicsContext();
         virtual ~GraphicsContext();
 
-        virtual b8 create(std::unique_ptr<Window>& window) = 0;
-        virtual void make_current(std::unique_ptr<Window>& window) = 0;
+        virtual b8 create(std::unique_ptr<Twindow>& window) = 0;
+        virtual void make_current(std::unique_ptr<Twindow>& window) = 0;
         virtual void destroy() = 0;
           
     protected:
