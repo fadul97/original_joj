@@ -8,6 +8,7 @@
 #include "renderer/opengl/renderer_gl.h"
 #elif JPLATFORM_WINDOWS
 #include "joj/platform/win32/window_win32.h"
+#include "joj/platform/win32/input_win32.h"
 #include "joj/joj.h"
 #endif
 
@@ -39,6 +40,7 @@ int main()
     w.set_mode(joj::WindowMode::WINDOWED);
     w.set_color(60, 60, 60);
     w.create();
+    joj::Win32Input i{};
     MSG msg = { 0 };
     while (msg.message != WM_QUIT)
     {
@@ -48,6 +50,20 @@ int main()
             DispatchMessage(&msg);
         }
         
+        if (i.is_key_pressed(joj::KEY_ESCAPE))
+            msg.message = WM_QUIT;
+        
+        if (i.is_key_pressed(joj::KEY_LEFT))
+            std::cout << "LEFT ARROW\n";
+        
+        if (i.is_key_pressed(joj::KEY_RIGHT))
+            std::cout << "RIGHT ARROW\n";
+        
+        if (i.is_key_pressed(joj::KEY_UP))
+            std::cout << "UP ARROW\n";
+        
+        if (i.is_key_pressed(joj::KEY_DOWN))
+            std::cout << "DOWN ARROW\n";
     }
     
     w.shutdown();
