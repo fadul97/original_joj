@@ -16,4 +16,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/..)
 
 if(LINUX)
     add_subdirectory(x11)
+elseif(WIN32)
+    add_subdirectory(win32)
 endif()
