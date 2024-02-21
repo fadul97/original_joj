@@ -22,7 +22,7 @@ b8 joj::X11GLContext::create(std::unique_ptr<X11Window>& window)
     // Check GLX version
     int major_glx = 0;
     int minor_glx = 0;
-    glXQueryVersion(static_cast<Display*>(window->get_display()), &major_glx, &minor_glx);
+    glXQueryVersion(window->get_display(), &major_glx, &minor_glx);
     if(major_glx <= 1 && minor_glx < 2)
     {
         // TODO: use own logger and return value
@@ -31,13 +31,13 @@ b8 joj::X11GLContext::create(std::unique_ptr<X11Window>& window)
     }
 
     printf("Current GLX version: %d.%d\n", major_glx, minor_glx);
-    printf("GLX client version: %s\n", glXGetClientString(static_cast<Display*>(window->get_display()), GLX_VERSION));
-    printf("GLX client vendor: %s\n", glXGetClientString(static_cast<Display*>(window->get_display()), GLX_VENDOR));
-    // printf("GLX client extensions: %s\t", glXGetClientString(static_cast<Display*>(window->get_display()), GLX_EXTENSIONS));
+    printf("GLX client version: %s\n", glXGetClientString(window->get_display(), GLX_VERSION));
+    printf("GLX client vendor: %s\n", glXGetClientString(window->get_display(), GLX_VENDOR));
+    // printf("GLX client extensions: %s\t", glXGetClientString(window->get_display(), GLX_EXTENSIONS));
 
-    printf("GLX server version: %s\n", glXQueryServerString(static_cast<Display*>(window->get_display()), window->get_screen_id(), GLX_VERSION));
-    printf("GLX server vendor: %s\n", glXQueryServerString(static_cast<Display*>(window->get_display()), window->get_screen_id(), GLX_VENDOR));
-    // printf("GLX server extensions: %s\t ", glXQueryServerString(static_cast<Display*>(window->get_display()), static_cast<Display*>(window->get_screen_id)(), GLX_EXTENSIONS));
+    printf("GLX server version: %s\n", glXQueryServerString(window->get_display(), window->get_screen_id(), GLX_VERSION));
+    printf("GLX server vendor: %s\n", glXQueryServerString(window->get_display(), window->get_screen_id(), GLX_VENDOR));
+    // printf("GLX server extensions: %s\t ", glXQueryServerString(window->get_display(), window->get_screen_id(), GLX_EXTENSIONS));
 
     // GLX, create XVisualInfo, this is the minimum visuals we want for a Modern OpenGL context
     GLint glx_attribs[] = {
@@ -56,7 +56,7 @@ b8 joj::X11GLContext::create(std::unique_ptr<X11Window>& window)
     };
     
     int fb_count;
-	GLXFBConfig* fbc = glXChooseFBConfig(static_cast<Display*>(window->get_display()), window->get_screen_id(), glx_attribs, &fb_count);
+	GLXFBConfig* fbc = glXChooseFBConfig(window->get_display(), window->get_screen_id(), glx_attribs, &fb_count);
 	if(fbc == 0)
     {
         // TODO: use own logger and return value
@@ -70,14 +70,14 @@ b8 joj::X11GLContext::create(std::unique_ptr<X11Window>& window)
 	int best_fbc = -1, worst_fbc = -1, best_num_samp = -1, worst_num_samp = 999;
 	for (int i = 0; i < fb_count; ++i)
     {
-		XVisualInfo *temp_vi = glXGetVisualFromFBConfig(static_cast<Display*>(window->get_display()), fbc[i] );
+		XVisualInfo *temp_vi = glXGetVisualFromFBConfig(window->get_display(), fbc[i] );
 		if (temp_vi != 0)
         {
 			int samp_buf;
             int samples;
 
-            glXGetFBConfigAttrib(static_cast<Display*>(window->get_display()), fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf);
-			glXGetFBConfigAttrib(static_cast<Display*>(window->get_display()), fbc[i], GLX_SAMPLES       , &samples);
+            glXGetFBConfigAttrib(window->get_display(), fbc[i], GLX_SAMPLE_BUFFERS, &samp_buf);
+			glXGetFBConfigAttrib(window->get_display(), fbc[i], GLX_SAMPLES       , &samples);
 
             //std::cout << "  Matching fbconfig " << i << ", SAMPLE_BUFFERS = " << samp_buf << ", SAMPLES = " << samples << ".";
 
@@ -99,7 +99,7 @@ b8 joj::X11GLContext::create(std::unique_ptr<X11Window>& window)
     fb_config = fbc[best_fbc];
     XFree(fbc);
 
-    window->set_visual(glXGetVisualFromFBConfig(static_cast<Display*>(window->get_display()), fb_config));
+    window->set_visual(glXGetVisualFromFBConfig(window->get_display(), fb_config));
     if(window->get_visual() == 0)
     {
         // TODO: use own logger and return value
@@ -107,10 +107,10 @@ b8 joj::X11GLContext::create(std::unique_ptr<X11Window>& window)
         return false;
     }
 
-    if(window->get_screen_id() != static_cast<XVisualInfo*>(window->get_visual())->screen)
+    if(window->get_screen_id() != window->get_visual()->screen)
     {
         // TODO: use own logger and return value
-		printf("screen_id(%d) does not match visual->screen(%d).\n", window->get_screen_id(), static_cast<XVisualInfo*>(window->get_visual())->screen);
+		printf("screen_id(%d) does not match visual->screen(%d).\n", window->get_screen_id(), window->get_visual()->screen);
 		return false;
 	}
 
@@ -123,7 +123,7 @@ void joj::X11GLContext::make_current(std::unique_ptr<X11Window>& window)
     glXCreateContextAttribsARBProc glXCreateContextAttribsARB = 0;
 	glXCreateContextAttribsARB = (glXCreateContextAttribsARBProc) glXGetProcAddressARB((const GLubyte *) "glXCreateContextAttribsARB");
 
-    const char *glx_exts = glXQueryExtensionsString(static_cast<Display*>(window->get_display()), window->get_screen_id());
+    const char *glx_exts = glXQueryExtensionsString(window->get_display(), window->get_screen_id());
 	// printf("Late extensions: %s\t", glx_exts);
 	if(glXCreateContextAttribsARB == 0)
 		printf("glXCreateContextAttribsARB() not found.");
@@ -138,23 +138,23 @@ void joj::X11GLContext::make_current(std::unique_ptr<X11Window>& window)
     context = { 0 };
     if(!is_extension_supported(glx_exts, "GLX_ARB_create_context"))
     {
-		context = glXCreateNewContext(static_cast<Display*>(window->get_display()), fb_config, GLX_RGBA_TYPE, 0, True);
+		context = glXCreateNewContext(window->get_display(), fb_config, GLX_RGBA_TYPE, 0, True);
     } 
     else
     {
-		context = glXCreateContextAttribsARB(static_cast<Display*>(window->get_display()), fb_config, 0, TRUE, context_attribs);
+		context = glXCreateContextAttribsARB(window->get_display(), fb_config, 0, TRUE, context_attribs);
     }
-	XSync(static_cast<Display*>(window->get_display()), False);
+	XSync(window->get_display(), False);
 
     // Verifying that context is a direct context
-	if(!glXIsDirect(static_cast<Display*>(window->get_display()), context)) {
+	if(!glXIsDirect(window->get_display(), context)) {
 		printf("Indirect GLX rendering context obtained\n");
 	}
 	else {
 		printf("Direct GLX rendering context obtained\n");
 	}
 
-    glXMakeCurrent(static_cast<Display*>(window->get_display()), window->get_id(), context);
+    glXMakeCurrent(window->get_display(), window->get_id(), context);
 
 	// int version = gladLoadGL((GLADloadfunc) glXGetProcAddress);
     // printf("Current GL loaded: %d.%d\n", GLAD_VERSION_MAJOR(version), GLAD_VERSION_MINOR(version));
