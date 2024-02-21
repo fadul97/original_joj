@@ -1,3 +1,4 @@
+// FIXME: Main file doesn't need to define JOJ_ENGINE_IMPLEMENTATION
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "joj/defines.h"
 #include <iostream>
