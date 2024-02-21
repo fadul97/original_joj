@@ -101,14 +101,14 @@ STATIC_ASSERT(sizeof(b32) == 4, "Expected f64 to be 4 bytes.");
 #endif
 
 // Dynamic libraries
-#if defined(_MSC_VER)
+#ifdef JPLATFORM_WINDOWS
 #ifdef JOJ_ENGINE_IMPLEMENTATION
 #define JAPI __declspec(dllexport)
 #else
 #define JAPI __declspec(dllimport)
 #endif
-#elif defined(__GNUC__)
-#define JAPI __attribute__((visibility("default")))
+// #elif defined(__GNUC__)
+// #define JAPI __attribute__((visibility("default")))
 #else
 #define JAPI
 #endif
