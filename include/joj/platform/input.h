@@ -1,6 +1,7 @@
 #ifndef JOJ_INPUT_H
 #define JOJ_INPUT_H
 
+#define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
 #include "keys.h"
