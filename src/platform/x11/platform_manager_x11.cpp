@@ -56,10 +56,10 @@ b8 joj::X11PlatformManager::create_window()
     context->make_current(window);
 
     // Redirect close
-    delete_msg = XInternAtom(static_cast<Display*>(window->get_display()), "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(static_cast<Display*>(window->get_display()), window->get_id(), &delete_msg, 1);
+    delete_msg = XInternAtom(window->get_display(), "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(window->get_display(), window->get_id(), &delete_msg, 1);
 
-    XAutoRepeatOff(static_cast<Display*>(window->get_display()));
+    XAutoRepeatOff(window->get_display());
 
     window->show();
 
@@ -79,10 +79,10 @@ b8 joj::X11PlatformManager::create_simple_window(i16 width, i16 height, std::str
     }
 
     // Redirect close
-    delete_msg = XInternAtom(static_cast<Display*>(window->get_display()), "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(static_cast<Display*>(window->get_display()), window->get_id(), &delete_msg, 1);
+    delete_msg = XInternAtom(window->get_display(), "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(window->get_display(), window->get_id(), &delete_msg, 1);
 
-    XAutoRepeatOff(static_cast<Display*>(window->get_display()));
+    XAutoRepeatOff(window->get_display());
 
     window->show();
 
@@ -95,9 +95,9 @@ void joj::X11PlatformManager::process_events()
     char str[25];
     KeySym keysym;
 
-    if (XPending(static_cast<Display*>(window->get_display())) > 0)
+    if (XPending(window->get_display()) > 0)
     {
-        XNextEvent(static_cast<Display*>(window->get_display()), &ev);
+        XNextEvent(window->get_display(), &ev);
 
         switch (ev.type)
         {
@@ -179,12 +179,12 @@ void joj::X11PlatformManager::process_events()
 
 void joj::X11PlatformManager::swap_buffers()
 {
-    glXSwapBuffers(static_cast<Display*>(window->get_display()), window->get_id());
+    glXSwapBuffers(window->get_display(), window->get_id());
 }
 
 void joj::X11PlatformManager::shutdown()
 {
-    XAutoRepeatOn(static_cast<Display*>(window->get_display()));
+    XAutoRepeatOn(window->get_display());
     window->shutdown();
 }
 
@@ -214,8 +214,8 @@ void joj::X11PlatformManager::set_window_icon(i32 count, IconImage& image)
             }
         }
 
-        XChangeProperty(static_cast<Display*>(window->get_display()), window->get_id(),
-                        XInternAtom(static_cast<Display*>(window->get_display()), "_NET_WM_ICON", False),
+        XChangeProperty(window->get_display(), window->get_id(),
+                        XInternAtom(window->get_display(), "_NET_WM_ICON", False),
                         XA_CARDINAL, 32,
                         PropModeReplace,
                         (unsigned char*) icon,
@@ -225,11 +225,11 @@ void joj::X11PlatformManager::set_window_icon(i32 count, IconImage& image)
     }
     else
     {
-        XDeleteProperty(static_cast<Display*>(window->get_display()), window->get_id(),
-                        XInternAtom(static_cast<Display*>(window->get_display()), "_NET_WM_ICON", False));
+        XDeleteProperty(window->get_display(), window->get_id(),
+                        XInternAtom(window->get_display(), "_NET_WM_ICON", False));
     }
 
-    XFlush(static_cast<Display*>(window->get_display()));
+    XFlush(window->get_display());
 }
 
 #endif // JPLATFORM_LINUX
