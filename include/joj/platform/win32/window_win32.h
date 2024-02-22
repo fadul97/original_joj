@@ -20,6 +20,7 @@ namespace joj
 
         HWND get_id() const override;
         HDC get_device_context() const;
+        COLORREF get_color() const;
         
         void hide_cursor(b8 hide) override;
         void set_mode(WindowMode mode) override;
@@ -62,6 +63,9 @@ namespace joj
     
     inline HDC Win32Window::get_device_context() const
     { return m_hdc; }
+    
+    inline COLORREF Win32Window::get_color() const
+    { return m_color; }
 }
 
 #endif // JPLATFORM_WINDOWS

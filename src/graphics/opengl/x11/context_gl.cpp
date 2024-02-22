@@ -1,4 +1,4 @@
-#include "graphics/x11/context_gl.h"
+#include "graphics/opengl/x11/context_gl.h"
 
 #if JPLATFORM_LINUX
 

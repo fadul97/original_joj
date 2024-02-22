@@ -11,15 +11,25 @@ target_include_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../../include/joj
 )
 
+add_subdirectory(opengl)
+
 if(LINUX)
-    add_subdirectory(x11)
     target_link_directories(
         jojGraphics 
         PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/../platform
-        ${CMAKE_CURRENT_SOURCE_DIR}/x11
+        ${CMAKE_CURRENT_SOURCE_DIR}/opengl/x11
     )
 
     target_link_libraries(jojGraphics PUBLIC jojPlatform jojX11GLGraphics)
+elseif(WIN32)
+    target_link_directories(
+        jojGraphics 
+        PUBLIC 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../platform
+        ${CMAKE_CURRENT_SOURCE_DIR}/opengl/win32
+    )
+
+    target_link_libraries(jojGraphics PUBLIC jojPlatform jojWin32GLGraphics)
 endif()
 
