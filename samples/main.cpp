@@ -9,6 +9,7 @@
 #elif JPLATFORM_WINDOWS
 #include "joj/platform/win32/window_win32.h"
 #include "joj/platform/win32/input_win32.h"
+#include "joj/platform/win32/timer_win32.h"
 #include "joj/joj.h"
 #endif
 
