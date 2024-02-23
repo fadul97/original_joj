@@ -50,6 +50,7 @@ int main()
     joj::Win32GLContext c{};
     if (!c.create(w))
         std::cout << "Failed to create OpenGL context.\n";
+    c.make_current(w);
     
     b8 r = true;
     MSG msg = { 0 };

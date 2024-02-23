@@ -62,10 +62,10 @@ joj::Win32GLContext::Win32GLContext()
     m_gl_version_major = 4;
     m_gl_version_minor = 6;
 
-    const int ctx_attribs[] =
+    const i32 ctx_attribs[] =
     {
-      WGL_CONTEXT_MAJOR_VERSION_ARB, m_gl_version_major,
-      WGL_CONTEXT_MINOR_VERSION_ARB, m_gl_version_minor,
+      WGL_CONTEXT_MAJOR_VERSION_ARB, static_cast<i32>(m_gl_version_major),
+      WGL_CONTEXT_MINOR_VERSION_ARB, static_cast<i32>(m_gl_version_minor),
       WGL_CONTEXT_FLAGS_ARB,
 #ifdef _DEBUG
       WGL_CONTEXT_DEBUG_BIT_ARB |
@@ -219,6 +219,12 @@ b8 joj::Win32GLContext::create(std::unique_ptr<Win32Window>& window)
         return false;
     }
 
+    return true;
+}
+
+// FIXME: make_current method only loads opengl functions (mainly)
+void joj::Win32GLContext::make_current(std::unique_ptr<Win32Window>& window)
+{
     load_opengl_functions();
 
     COLORREF c = window->get_color();
@@ -235,13 +241,6 @@ b8 joj::Win32GLContext::create(std::unique_ptr<Win32Window>& window)
 #if _DEBUG
     log_hardware_info();
 #endif // _DEBUG
-
-    return true;
-}
-
-void joj::Win32GLContext::make_current(std::unique_ptr<Win32Window>& window)
-{
-    printf("TODO()!\n");
 }
 
 void joj::Win32GLContext::log_hardware_info()
