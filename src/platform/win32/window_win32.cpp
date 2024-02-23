@@ -54,7 +54,7 @@ b8 joj::Win32Window::init()
 {
     // TODO: use own logger and return value
     printf("TODO()!\n");
-    return false;
+    return true;
 }
 
 b8 joj::Win32Window::create()
@@ -160,8 +160,17 @@ b8 joj::Win32Window::create()
         printf("Failed to get client area size.\n");
         return false;
     }
+
+    if (!m_id)
+    {
+        // TODO: Use own logger and return value
+        printf("Failed to create window ID.\n");
+        return false;
+    }
     
-    return (m_id ? true : false);
+    show();
+
+    return true;
 }
 
 b8 joj::Win32Window::create_simple_window()
@@ -173,7 +182,7 @@ b8 joj::Win32Window::create_simple_window()
 
 void joj::Win32Window::show()
 {
-    
+    running = true;
 }
 
 void joj::Win32Window::shutdown()

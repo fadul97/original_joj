@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojWin32Platform STATIC window_win32.cpp input_win32.cpp timer_win32.cpp)
+add_library(jojWin32Platform STATIC window_win32.cpp input_win32.cpp timer_win32.cpp platform_manager_win32.cpp)
 
 target_link_directories(
     jojWin32Platform 
