@@ -4,9 +4,8 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#if JPLATFORM_LINUX
-#include "graphics/x11/joj_gl_x11.h"
-#endif // JPLATFORM_LINUX
+#define JOJ_GL_DEFINE_EXTERN
+#include "graphics/opengl/joj_gl.h"
 
 #include <vector>
 #include "texture_gl.h"

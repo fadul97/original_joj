@@ -1,17 +1,17 @@
 #ifndef JOJ_GL_VAO_H
 #define JOJ_GL_VAO_H
 
-#include <vector>
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#if JPLATFORM_LINUX
-
+#include <vector>
 #include "vbo.h"
 #include "ebo.h"
 #include "resources/geometry/vertex.h"
 #include "resources/geometry/geometry.h"
-#include "graphics/x11/joj_gl_x11.h"
+
+#define JOJ_GL_DEFINE_EXTERN
+#include "graphics/opengl/joj_gl.h"
 
 namespace joj
 {
@@ -56,7 +56,5 @@ namespace joj
         u32 texture_location;
     };
 }
-
-#endif // JPLATFORM_LINUX
 
 #endif // JOJ_GL_VAO_H

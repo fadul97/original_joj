@@ -1,5 +1,4 @@
 #include "renderer/opengl/ebo.h"
-#include "graphics/x11/joj_gl_x11.h"
 
 joj::EBO::EBO()
 {

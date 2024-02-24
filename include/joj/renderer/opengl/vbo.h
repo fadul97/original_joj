@@ -4,10 +4,9 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#if JPLATFORM_LINUX
-
 #include "resources/geometry/vertex.h"
-#include "graphics/x11/joj_gl_x11.h"
+#define JOJ_GL_DEFINE_EXTERN
+#include "graphics/opengl/joj_gl.h"
 
 namespace joj
 {
@@ -32,7 +31,5 @@ namespace joj
         u32 color_location;
     };
 }
-
-#endif // JPLATFORM_LINUX
 
 #endif // JOJ_GL_VBO_H

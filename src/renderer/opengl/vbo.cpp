@@ -1,5 +1,7 @@
 #include "renderer/opengl/vbo.h"
-#include "graphics/x11/joj_gl_x11.h"
+
+#define JOJ_GL_DEFINE_EXTERN
+#include "graphics/opengl/joj_gl.h"
 
 joj::VBO::VBO()
 {

@@ -1,7 +1,8 @@
 #include "renderer/opengl/texture_gl.h"
 
 #include "vendor/stb/stb_image.h"
-#include <GL/glext.h>
+#define JOJ_GL_DEFINE_EXTERN
+#include "graphics/opengl/joj_gl.h"
 #include <iostream>
 
 joj::GLTexture::GLTexture()
