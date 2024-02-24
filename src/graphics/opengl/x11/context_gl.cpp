@@ -2,7 +2,7 @@
 
 #if JPLATFORM_LINUX
 
-#include "graphics/x11/joj_gl_x11.h"
+#include "graphics/opengl/joj_gl.h"
 #include <string.h>
 
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);

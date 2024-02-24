@@ -1,4 +1,4 @@
-#include "graphics/x11/joj_gl_x11.h"
+#include "graphics/opengl/joj_gl.h"
 
 #if JPLATFORM_LINUX
 
