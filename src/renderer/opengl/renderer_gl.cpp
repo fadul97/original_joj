@@ -1,8 +1,8 @@
 #include "renderer/opengl/renderer_gl.h"
-#include "graphics/x11/joj_gl_x11.h"
 
+#define JOJ_GL_DEFINE_EXTERN
+#include "graphics/opengl/joj_gl.h"
 #include <iostream>
-#include <GL/gl.h>
 
 joj::GLRenderer::GLRenderer()
 {
@@ -12,7 +12,7 @@ joj::GLRenderer::~GLRenderer()
 {
 }
 
-b8 joj::GLRenderer::init(std::unique_ptr<X11Window>& window)
+b8 joj::GLRenderer::init(std::unique_ptr<JojWindow>& window)
 {
     glViewport(0, 0, window->get_width(), window->get_height());
 

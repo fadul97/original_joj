@@ -4,21 +4,35 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#if JPLATFORM_LINUX
-
 #include "renderer/renderer.h"
+
+#define JOJ_GL_DEFINE_EXTERN
+#include "graphics/opengl/joj_gl.h"
+
+#if JPLATFORM_LINUX
 #include "platform/x11/window_x11.h"
-#include "graphics/x11/joj_gl_x11.h"
+#elif JPLATFORM_WINDOWS
+#include "platform/win32/window_win32.h"
+#endif // JPLATFORM_WINDOWS
 
 namespace joj
 {
-    class JAPI GLRenderer : public Renderer<X11Window>
+#if JPLATFORM_LINUX
+    using JojWindow = X11Window;
+#elif JPLATFORM_WINDOWS
+    using JojWindow = Win32Window;
+#endif // JPLATFORM_WINDOWS
+}
+
+namespace joj
+{
+    class JAPI GLRenderer : public Renderer<JojWindow>
     {
     public:
         GLRenderer();
         ~GLRenderer();
         
-        b8 init(std::unique_ptr<X11Window>& window) override;
+        b8 init(std::unique_ptr<JojWindow>& window) override;
         void render() override;
         void clear(f32 r = 0.0f, f32 g = 0.0f, f32 b = 0.0f, f32 a = 0.0f) override;
         void shutdown() override;
@@ -31,6 +45,5 @@ namespace joj
 }
 
 
-#endif // JPLATFORM_LINUX
 
 #endif // JOJ_GL_RENDERER_H
