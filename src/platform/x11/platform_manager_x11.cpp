@@ -5,7 +5,7 @@
 #include "platform/x11/window_x11.h"
 #include "platform/x11/input_x11.h"
 #include "graphics/context.h"
-#include "graphics/x11/context_gl.h"
+#include "graphics/opengl/x11/context_gl.h"
 #include <memory>
 #include <X11/Xatom.h>
 

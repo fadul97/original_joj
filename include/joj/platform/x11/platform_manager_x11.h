@@ -9,7 +9,7 @@
 #include "platform/platform_manager.h"
 #include "platform/x11/window_x11.h"
 #include "platform/x11/input_x11.h"
-#include "graphics/x11/context_gl.h"
+#include "graphics/opengl/x11/context_gl.h"
 
 namespace joj
 {
