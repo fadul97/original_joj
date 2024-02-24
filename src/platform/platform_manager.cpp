@@ -1,7 +1,7 @@
 #include "platform/platform_manager.h"
 
 #if JPLATFORM_LINUX
-#include "graphics/x11/context_gl.h"
+#include "graphics/opengl/x11/context_gl.h"
 #include "platform/x11/input_x11.h"
 #include "platform/x11/window_x11.h"
 #elif JPLATFORM_WINDOWS
