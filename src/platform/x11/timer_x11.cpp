@@ -5,7 +5,7 @@
 
 joj::X11Timer::X11Timer()
 {
-    stopped = false;
+    m_stopped = false;
 }
 
 joj::X11Timer::~X11Timer()
