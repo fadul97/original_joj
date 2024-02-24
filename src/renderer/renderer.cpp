@@ -2,7 +2,9 @@
 
 #if JPLATFORM_LINUX
 #include "platform/x11/window_x11.h"
-#endif // JPLATFORM_LINUX
+#elif JPLATFORM_WINDOWS
+#include "platform/win32/window_win32.h"
+#endif
 
 template<class Twindow>
 joj::Renderer<Twindow>::Renderer()
@@ -16,4 +18,6 @@ joj::Renderer<Twindow>::~Renderer()
 
 #if JPLATFORM_LINUX
 template class joj::Renderer<joj::X11Window>;
-#endif // JPLATFORM_LINUX
+#elif JPLATFORM_WINDOWS
+template class joj::Renderer<joj::Win32Window>;
+#endif
