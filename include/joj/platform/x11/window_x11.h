@@ -27,6 +27,9 @@ namespace joj
         XSetWindowAttributes get_wnd_attribs() const;
 
         void hide_cursor(b8 hide) override;
+        void set_mode(WindowMode mode) override;
+        void set_color(u32 r, u32 g, u32 b) override;
+
         b8 init() override;
         b8 create() override;
         b8 create_simple_window() override;

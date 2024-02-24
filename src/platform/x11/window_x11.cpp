@@ -26,6 +26,16 @@ void joj::X11Window::hide_cursor(b8 hide)
     printf("TODO()!\n");
 }
 
+void joj::X11Window::set_mode(WindowMode mode)
+{
+    printf("TODO()!\n");
+}
+
+void joj::X11Window::set_color(u32 r, u32 g, u32 b)
+{
+    printf("TODO()!\n");
+}
+
 b8 joj::X11Window::init()
 {
     // Open display
