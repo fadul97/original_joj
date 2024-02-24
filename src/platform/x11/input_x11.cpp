@@ -13,7 +13,7 @@ joj::X11Input::~X11Input()
 {
 }
 
-Keys joj::X11Input::translate_keycode(u32 keycode)
+joj::Keys joj::X11Input::translate_keycode(u32 keycode)
 {
     switch (keycode) 
     {

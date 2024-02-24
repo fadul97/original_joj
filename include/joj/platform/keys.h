@@ -77,7 +77,7 @@ namespace joj
         KEY_SELECT = 0x29,
         KEY_PRINT = 0x2A,
         // FIXME: Compiler screams when KEY_EXECUTE
-        KEY_VK_EXECUTE = 0x2B,
+        KEY_EXECUTE = 0x2B,
     
     
         /** @brief The Print Screen key. */
