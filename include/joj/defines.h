@@ -100,6 +100,10 @@ STATIC_ASSERT(sizeof(b32) == 4, "Expected f64 to be 4 bytes.");
 #define JINLINE __forceinline
 #endif
 
+#ifdef JOJ_GL_DEFINE_EXTERN
+#define JOJ_EXTERN extern
+#endif // JOJ_GL_DEFINE_EXTERN
+
 // Dynamic libraries
 #ifdef JPLATFORM_WINDOWS
 #ifdef JOJ_ENGINE_IMPLEMENTATION
