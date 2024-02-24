@@ -4,8 +4,6 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#if JPLATFORM_LINUX
-
 #include "resources/geometry/geometry.h"
 
 namespace joj
@@ -22,7 +20,5 @@ namespace joj
         u32 ebo_id;
     };
 }
-
-#endif // JPLATFORM_LINUX
 
 #endif // JOJ_GL_RENDER_OBJECT_H
