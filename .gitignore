@@ -1,6 +1,9 @@
 # Visual Studio
 .vs/
 
+# Visual Studio Code
+.vscode/
+
 # Clion
 cmake-build-debug/
 .idea/

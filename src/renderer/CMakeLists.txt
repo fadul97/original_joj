@@ -13,11 +13,26 @@ target_include_directories(
 
 add_subdirectory(opengl)
 
-target_link_directories(
-    jojRenderer 
-    PUBLIC 
-    ${CMAKE_CURRENT_SOURCE_DIR}/../platform
-    ${CMAKE_CURRENT_SOURCE_DIR}/opengl
-)
+if(LINUX)
+    target_link_directories(
+        jojRenderer 
+        PUBLIC 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../platform
+        ${CMAKE_CURRENT_SOURCE_DIR}/opengl
+    )
 
-target_link_libraries(jojRenderer PUBLIC jojPlatform jojGLRenderer)
+    target_link_libraries(jojRenderer PUBLIC jojPlatform jojGLRenderer)
+elseif(WIN32)
+    add_subdirectory(dx11)
+    
+    target_link_directories(
+        jojRenderer 
+        PUBLIC 
+        ${CMAKE_CURRENT_SOURCE_DIR}/../platform
+        ${CMAKE_CURRENT_SOURCE_DIR}/opengl
+        ${CMAKE_CURRENT_SOURCE_DIR}/dx11
+    )
+
+    target_link_libraries(jojRenderer PUBLIC jojPlatform jojGLRenderer jojDX11Renderer)
+
+endif()
