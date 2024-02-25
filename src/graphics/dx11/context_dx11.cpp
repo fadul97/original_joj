@@ -5,7 +5,7 @@
 joj::DX11Context::DX11Context()
 {
     m_device = nullptr;
-    m_context = nullptr;
+    m_device_context = nullptr;
     m_factory = nullptr;
     m_debug = nullptr;
 }
@@ -25,7 +25,9 @@ b8 joj::DX11Context::create(std::unique_ptr<Win32Window>& window)
 
     factory_flags = DXGI_CREATE_FACTORY_DEBUG;
 
+#ifdef _DEBUG
     create_device_flags |= D3D11_CREATE_DEVICE_DEBUG;
+#endif // _DEBUG
 
     if (CreateDXGIFactory2(factory_flags, IID_PPV_ARGS(&m_factory)) != S_OK)
     {
@@ -47,12 +49,12 @@ b8 joj::DX11Context::create(std::unique_ptr<Win32Window>& window)
         D3D11_SDK_VERSION,         // Direct3D SDK version
         &m_device,                 // Stores D3D device created
         &feature_level,            // Current Direct3D version in use,
-        &m_context)                // D3D context device
+        &m_device_context)         // D3D context device
         != S_OK)
     {
         if (D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP,
             NULL, create_device_flags, NULL, 0, D3D11_SDK_VERSION,
-            &m_device, &feature_level, &m_context) != S_OK)
+            &m_device, &feature_level, &m_device_context) != S_OK)
         {
             // TODO: Use own logger and return value
             printf("Failed to create device, using WARP Adapter.\n");
@@ -112,7 +114,7 @@ b8 joj::DX11Context::create(std::unique_ptr<Win32Window>& window)
 
 void joj::DX11Context::make_current(std::unique_ptr<Win32Window>& window)
 {
-    
+    printf("TODO()!\n");
 }
 
 void joj::DX11Context::destroy()
