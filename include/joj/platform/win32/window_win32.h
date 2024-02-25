@@ -25,6 +25,8 @@ namespace joj
         void hide_cursor(b8 hide) override;
         void set_mode(WindowMode mode) override;
         void set_color(u32 r, u32 g, u32 b) override;
+
+        void close();
         
         b8 init() override;
         b8 create() override;
@@ -66,6 +68,9 @@ namespace joj
     
     inline COLORREF Win32Window::get_color() const
     { return m_color; }
+    
+    inline void Win32Window::close()
+    { running = false; DestroyWindow(m_id); }
 }
 
 #endif // JPLATFORM_WINDOWS
