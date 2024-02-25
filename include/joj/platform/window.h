@@ -26,6 +26,7 @@ namespace joj
         i16 get_ycenter() const;
         f32 get_aspect_ratio() const;
         b8 is_running() const;
+        WindowMode get_mode() const;
         
         void set_width(i16 width);
         void set_height(i16 height);
@@ -79,6 +80,10 @@ namespace joj
     template<typename Tid>
     inline b8 Window<Tid>::is_running() const
     { return running; }
+
+    template<typename Tid>
+    inline WindowMode Window<Tid>::get_mode() const
+    { return m_mode; }
     
     template<typename Tid>
     inline void Window<Tid>::set_width(i16 width)
