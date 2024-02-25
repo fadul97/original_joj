@@ -13,6 +13,7 @@
 #include "joj/platform/win32/platform_manager_win32.h"
 #include "joj/graphics/opengl/win32/context_gl.h"
 #include "joj/graphics/dx11/context_dx11.h"
+#include "joj/renderer/dx11/renderer_dx11.h"
 #endif
 
 int main()
@@ -29,11 +30,14 @@ int main()
         return -1;
     }
     
-    if (!pm->create_context(joj::BackendRender::DX11))
+    joj::DX11Renderer r{};
+    if (!r.init(pm->get_window()))
     {
-        std::cout << "Failed to create Dx11 context.\n";
+        std::cout << "Failed to initialize renderer.\n";
         return -1;
     }
+
+    std::cout << "Running!\n";
     
     while (pm->is_running())
     {
@@ -42,7 +46,9 @@ int main()
         if (pm->is_key_pressed(joj::KEY_ESCAPE))
             pm->close_window();
 
-        pm->swap_buffers();
+        r.clear(1, 0, 0, 1);
+
+        r.swap_buffers();
     }
     
     pm->shutdown();
