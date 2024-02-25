@@ -29,7 +29,7 @@ namespace joj
         ID3D11DeviceContext* m_context;
 
         IDXGIFactory6* m_factory;
-        ID3D11Debug* debug;
+        ID3D11Debug* m_debug;
 
         void log_hardware_info() override;
     };
