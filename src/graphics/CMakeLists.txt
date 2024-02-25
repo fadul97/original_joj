@@ -23,6 +23,7 @@ if(LINUX)
 
     target_link_libraries(jojGraphics PUBLIC jojPlatform jojX11GLGraphics)
 elseif(WIN32)
+    add_subdirectory(dx11)
     target_link_directories(
         jojGraphics 
         PUBLIC 
