@@ -8,6 +8,7 @@ joj::Win32PlatformManager::Win32PlatformManager()
     input = nullptr;
     context = nullptr;
     msg = { 0 };
+    m_dx11_context = nullptr;
 }
 
 joj::Win32PlatformManager::~Win32PlatformManager()
@@ -36,19 +37,8 @@ b8 joj:: Win32PlatformManager::create_window()
     
     // ATTENTION: input must be initialized after window creation
     input = std::make_unique<Win32Input>();
-
-    context = std::make_unique<Win32GLContext>();
     
-    if (!context->create(window))
-    {
-        // TODO: use own logger and return value, cleanup?
-        printf("Failed to initialize GLContext.\n");
-        return false;
-    }
-
-    // FIXME: Check make_current method
-    context->make_current(window);
-
+    // TODO: Use own return value
     return true;
 }
 
@@ -57,6 +47,65 @@ b8 joj::Win32PlatformManager::create_simple_window(i16 width, i16 height, std::s
     // TODO: use own logger and return value
     printf("TODO()!\n");
     return true;
+}
+
+b8 joj::Win32PlatformManager::create_context(joj::BackendRender backend_renderer)
+{
+    switch (backend_renderer)
+    {
+    case joj::BackendRender::OPENGL:
+        context = std::make_unique<Win32GLContext>();
+    
+        if (!context->create(window))
+        {
+            // TODO: use own logger and return value, cleanup?
+            printf("Failed to initialize GLContext.\n");
+            return false;
+        }
+
+        // FIXME: Check make_current method
+        context->make_current(window);
+
+        // TODO: Use own return value
+        return true;
+
+    case joj::BackendRender::DX11:
+        m_dx11_context = std::make_unique<DX11Context>();
+        
+        if (!m_dx11_context->create(window))
+        {
+            // TODO: use own logger and return value
+            printf("Failed to initialize DX11Context.\n");
+            return false;
+        }
+
+        // FIXME: Check make_current method
+        m_dx11_context->make_current(window);
+        
+        // TODO: Use own return value
+        return true;
+
+    case joj::BackendRender::DX12:
+        printf("TODO()!\n");
+        return false;
+
+    // Use OpenGL as default renderer
+    default:
+        context = std::make_unique<Win32GLContext>();
+    
+        if (!context->create(window))
+        {
+            // TODO: use own logger and return value, cleanup?
+            printf("Failed to initialize GLContext.\n");
+            return false;
+        }
+
+        // FIXME: Check make_current method
+        context->make_current(window);
+
+        // TODO: Use own return value
+        return true;
+    }
 }
 
 void joj::Win32PlatformManager::process_events()
