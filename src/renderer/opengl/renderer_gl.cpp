@@ -34,6 +34,12 @@ void joj::GLRenderer::clear(f32 r, f32 g, f32 b, f32 a)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
+void joj::GLRenderer::swap_buffers()
+{
+    std::cout << "TODO()!\n";
+    // glXSwapBuffers(window->get_display(), window->get_id());
+}
+
 void joj::GLRenderer::shutdown()
 {
     std::cout << "TODO()!\n";
