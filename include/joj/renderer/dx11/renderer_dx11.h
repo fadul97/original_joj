@@ -4,6 +4,8 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
+#if JPLATFORM_WINDOWS
+
 #include "renderer/renderer.h"
 #include "platform/win32/window_win32.h"
 #include <memory>
@@ -53,6 +55,6 @@ namespace joj
     { m_device_context->IASetPrimitiveTopology(topology); }
 }
 
-
+#endif // JPLATFORM_WINDOWS
 
 #endif // JOJ_DX11_RENDERER_H
