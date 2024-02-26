@@ -60,7 +60,7 @@ joj::Keys joj::X11Input::translate_keycode(u32 keycode)
         case XK_Print:
             return KEY_PRINT;
         case XK_Execute:
-            return KEY_EXECUTE;
+            return KEY_VK_EXECUTE;
         case XK_Insert:
             return KEY_INSERT;
         case XK_Delete:
