@@ -1,10 +1,12 @@
 // FIXME: Main file doesn't need to define JOJ_ENGINE_IMPLEMENTATION
+#include "platform/platform_manager.h"
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "joj/defines.h"
 #include <iostream>
 
 #if JPLATFORM_LINUX  
 #include "joj/platform/x11/platform_manager_x11.h"
+#include "joj/renderer/opengl/renderer_gl.h"
 #elif JPLATFORM_WINDOWS
 #include <memory>
 #include "joj/platform/win32/window_win32.h"
@@ -30,7 +32,12 @@ int main()
         return -1;
     }
     
+#if JPLATFORM_LINUX  
+    joj::GLRenderer r{};
+#else
     joj::DX11Renderer r{};
+#endif 
+
     if (!r.init(pm->get_window()))
     {
         std::cout << "Failed to initialize renderer.\n";
@@ -48,7 +55,11 @@ int main()
 
         r.clear(1, 0, 0, 1);
 
+#if JPLATFORM_LINUX  
+        pm->swap_buffers();
+#else
         r.swap_buffers();
+#endif 
     }
     
     pm->shutdown();
