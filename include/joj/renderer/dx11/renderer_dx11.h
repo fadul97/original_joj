@@ -39,14 +39,14 @@ namespace joj
          */
 
         u32 m_antialiasing;                            // Number of samples for each pixel on the screen
-		u32 m_quality;                                 // Antialiasing sampling quality
-		b8 m_vsync;                                    // Vertical sync 
-		IDXGISwapChain* m_swap_chain;                  // Swap chain
-		ID3D11RenderTargetView* m_render_target_view;  // Backbuffer render target view
-		ID3D11DepthStencilView* m_depth_stencil_view;  // Depth/Stencil view
-		D3D11_VIEWPORT m_viewport;                     // Viewport
-		ID3D11BlendState* m_blend_state;               // Color mix settings
-		ID3D11RasterizerState* m_rasterizer_state;     // Rasterizer state
+        u32 m_quality;                                 // Antialiasing sampling quality
+        b8 m_vsync;                                    // Vertical sync 
+        IDXGISwapChain* m_swap_chain;                  // Swap chain
+        ID3D11RenderTargetView* m_render_target_view;  // Backbuffer render target view
+        ID3D11DepthStencilView* m_depth_stencil_view;  // Depth/Stencil view
+        D3D11_VIEWPORT m_viewport;                     // Viewport
+        ID3D11BlendState* m_blend_state;               // Color mix settings
+        ID3D11RasterizerState* m_rasterizer_state;     // Rasterizer state
     };
 
     inline void DX11Renderer::set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY topology) const

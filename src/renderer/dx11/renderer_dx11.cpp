@@ -10,7 +10,7 @@ joj::DX11Renderer::DX11Renderer()
     m_device = nullptr;
     m_device_context = nullptr;
     
-    m_antialiasing = 1;             // No antialising
+	m_antialiasing = 1;             // No antialising
 	m_quality = 0;                  // Default quality
 	m_vsync = false;                // No vertical sync
 	m_swap_chain = nullptr;         // Swap chain
@@ -29,7 +29,7 @@ joj::DX11Renderer::DX11Renderer()
 
 joj::DX11Renderer::~DX11Renderer()
 {
-    // Release rasterizer state
+	// Release rasterizer state
 	if (m_rasterizer_state)
 		m_rasterizer_state->Release();
 
@@ -52,25 +52,6 @@ joj::DX11Renderer::~DX11Renderer()
 		m_swap_chain->SetFullscreenState(false, NULL);
 		m_swap_chain->Release();
 	}
-
-	/*
-	//  Release graphics device context
-	if (m_device_context)
-	{
-		// Restore to original state
-		m_device_context->ClearState();
-		m_device_context->Flush();
-		m_device_context->Release();
-		m_device_context = nullptr;
-	}
-
-	// Release graphics device
-	if (m_device)
-	{
-		m_device->Release();
-		m_device = nullptr;
-	}
-	*/
 
 	m_context->get_debug()->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 	printf("\n");
