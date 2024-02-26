@@ -12,6 +12,9 @@ joj::DX11Context::DX11Context()
 
 joj::DX11Context::~DX11Context()
 {
+    // Release factory
+    if (m_factory)
+        m_factory->Release();
 }
 
 b8 joj::DX11Context::create(std::unique_ptr<Win32Window>& window)
@@ -69,7 +72,6 @@ b8 joj::DX11Context::create(std::unique_ptr<Win32Window>& window)
     }
 #endif // _DEBUG
 
-
     IDXGIDevice* dxgi_device = nullptr;
     if (m_device->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgi_device) != S_OK)
     {
@@ -96,18 +98,13 @@ b8 joj::DX11Context::create(std::unique_ptr<Win32Window>& window)
         return false;
     }
 
-
 #ifdef _DEBUG
     log_hardware_info();
 #endif 
 
-
     dxgi_device->Release();
     dxgi_adapter->Release();
     dxgi_factory->Release();
-
-
-
 
     return true;
 }
