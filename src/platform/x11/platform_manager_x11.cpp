@@ -89,6 +89,22 @@ b8 joj::X11PlatformManager::create_simple_window(i16 width, i16 height, std::str
     return true;
 }
 
+b8 joj::X11PlatformManager::create_context(BackendRender backend_renderer)
+{
+    switch (backend_renderer)
+    {
+    default:
+        if (!context->create(window))
+        {
+            // TODO: use own logger and return value, cleanup?
+            printf("Failed to initialize GLContext.\n");
+            return false;
+        }
+
+        return true;
+    }
+}
+
 void joj::X11PlatformManager::process_events()
 {
     XEvent ev;

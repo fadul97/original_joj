@@ -22,6 +22,7 @@ namespace joj
         b8 init(i16 width = 800, i16 height = 600, std::string title = std::string{ "Joj X11PlatformManager" }) override;
         b8 create_window() override;
         b8 create_simple_window(i16 width = 800, i16 height = 600, std::string title = std::string{ "Joj X11PlatformManager" }) override;
+        b8 create_context(BackendRender backend_renderer) override;
         void process_events() override;
         void swap_buffers() override;
         void shutdown() override;
