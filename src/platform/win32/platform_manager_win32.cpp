@@ -21,7 +21,6 @@ b8 joj::Win32PlatformManager::init(i16 width, i16 height, std::string title)
     
     window->set_mode(joj::WindowMode::WINDOWED);
     window->set_color(60, 60, 60);
-    window->create();
     
     return true;
 }
