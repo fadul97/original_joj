@@ -8,7 +8,7 @@
 
 template<typename Tid>
 joj::Window<Tid>::Window(i16 width, i16 height, std::string title)
-    : width(width), height(height), title(title), running(false)
+    : width(width), height(height), title(title), running(false), m_mode(WindowMode::WINDOWED)
 {
 }
 
