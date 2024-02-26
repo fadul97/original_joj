@@ -43,21 +43,21 @@ b8 joj::DX11Context::create(std::unique_ptr<Win32Window>& window)
     D3D_FEATURE_LEVEL feature_level = D3D_FEATURE_LEVEL_11_0;
 
     if (D3D11CreateDevice(
-        NULL,                      // Default adapter
-        D3D_DRIVER_TYPE_HARDWARE,  // D3D driver type (Hardware, Reference or Software)
-        NULL,                      // Pointer to software rasterizer - No software device
-        create_device_flags,       // Debug or Normal Mode
-        NULL,                      // Default feature level (NULL = max supported)
-        0,                         // Size of feature level array
-        D3D11_SDK_VERSION,         // Direct3D SDK version
-        &m_device,                 // Stores D3D device created
-        &feature_level,            // Current Direct3D version in use,
-        &m_device_context)         // D3D context device
+        NULL,                            // Default adapter
+        D3D_DRIVER_TYPE_HARDWARE,        // D3D driver type (Hardware, Reference or Software)
+        NULL,                            // Pointer to software rasterizer - No software device
+        create_device_flags,             // Debug or Normal Mode
+        NULL,                            // Default feature level (NULL = max supported)
+        0,                               // Size of feature level array
+        D3D11_SDK_VERSION,               // Direct3D SDK version
+        m_device.GetAddressOf(),         // Stores D3D device created
+        &feature_level,                  // Current Direct3D version in use,
+        m_device_context.GetAddressOf()) // D3D context device
         != S_OK)
     {
         if (D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP,
             NULL, create_device_flags, NULL, 0, D3D11_SDK_VERSION,
-            &m_device, &feature_level, &m_device_context) != S_OK)
+            m_device.GetAddressOf(), &feature_level, m_device_context.GetAddressOf()) != S_OK)
         {
             // TODO: Use own logger and return value
             printf("Failed to create device, using WARP Adapter.\n");

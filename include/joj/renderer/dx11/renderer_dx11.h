@@ -30,8 +30,8 @@ namespace joj
 
         f32 bg_color[4];
 
-        ID3D11Device* m_device;
-        ID3D11DeviceContext* m_device_context;
+        Microsoft::WRL::ComPtr<ID3D11Device> m_device;
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_device_context;
 
         /**
          * @brief Pipeline  members

@@ -11,6 +11,7 @@
 #include <dxgi1_6.h>
 #include <d3d11.h>
 #include <dxgidebug.h>
+#include <wrl/client.h> // Include the ComPtr header
 
 namespace joj
 {
@@ -20,8 +21,8 @@ namespace joj
         DX11Context();
         ~DX11Context();
 
-        ID3D11Device* get_device() const;
-        ID3D11DeviceContext* get_device_context() const;
+        Microsoft::WRL::ComPtr<ID3D11Device> get_device() const;
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext> get_device_context() const;
 
         IDXGIFactory6* get_factory() const;
         ID3D11Debug* get_debug() const;
@@ -31,8 +32,8 @@ namespace joj
         void destroy() override;
           
     private:  
-        ID3D11Device* m_device;
-        ID3D11DeviceContext* m_device_context;
+        Microsoft::WRL::ComPtr<ID3D11Device> m_device;
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext> m_device_context;
 
         IDXGIFactory6* m_factory;
         ID3D11Debug* m_debug;
@@ -40,10 +41,10 @@ namespace joj
         void log_hardware_info() override;
     };
     
-    inline ID3D11Device* DX11Context::get_device() const
+    inline Microsoft::WRL::ComPtr<ID3D11Device> DX11Context::get_device() const
     { return m_device; }
     
-    inline ID3D11DeviceContext* DX11Context::get_device_context() const
+    inline Microsoft::WRL::ComPtr<ID3D11DeviceContext> DX11Context::get_device_context() const
     { return m_device_context; }
 
     inline IDXGIFactory6* DX11Context::get_factory() const

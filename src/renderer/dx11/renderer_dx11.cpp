@@ -53,6 +53,7 @@ joj::DX11Renderer::~DX11Renderer()
 		m_swap_chain->Release();
 	}
 
+	/*
 	//  Release graphics device context
 	if (m_device_context)
 	{
@@ -69,6 +70,7 @@ joj::DX11Renderer::~DX11Renderer()
 		m_device->Release();
 		m_device = nullptr;
 	}
+	*/
 
 	m_context->get_debug()->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 	printf("\n");
@@ -123,7 +125,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	swap_chain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;							// Use Back buffer size for Fullscreen
 
 	// Create Swap Chain
-	if (m_context->get_factory()->CreateSwapChain(m_device, &swap_chain_desc, &m_swap_chain) != S_OK)
+	if (m_context->get_factory()->CreateSwapChain(m_device.Get(), &swap_chain_desc, &m_swap_chain) != S_OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateSwapChain.\n");
