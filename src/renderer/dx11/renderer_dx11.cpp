@@ -204,7 +204,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	blend_desc.RenderTarget[0].RenderTargetWriteMask = 0x0F;                 // Components of each pixel that can be overwritten
 
 	// Create blend state
-	if (m_device->CreateBlendState(&blend_desc, &m_blend_state) != S_OK)
+	if (create_blend_state(&blend_desc, &m_blend_state) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateBlendState.\n");
@@ -212,7 +212,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	}
 
 	// Bind blend state to the Output Merger stage
-	m_device_context->OMSetBlendState(m_blend_state, nullptr, 0xffffffff);
+	set_blend_state(m_blend_state);
 
 	// ---------------------------------------------------
 	// Rasterizer
@@ -352,4 +352,22 @@ void joj::DX11Renderer::set_render_targets(ID3D11RenderTargetView* const* rtv, I
 void joj::DX11Renderer::set_viewport(const D3D11_VIEWPORT* viewport)
 {
 	m_device_context->RSSetViewports(1, viewport);
+}
+
+joj::ErrorCode joj::DX11Renderer::create_blend_state(const D3D11_BLEND_DESC* blend_state_desc, ID3D11BlendState** blend_state)
+{
+	if (FAILED(m_device->CreateBlendState(blend_state_desc, blend_state)))
+	{
+		// TODO: Use own logger
+		const char* err_str = error_to_string(ErrorCode::ERR_BLEND_STATE_CREATION);
+		printf("[%s]: Failed to CreateBlendState.\n", err_str);
+		return ErrorCode::ERR_BLEND_STATE_CREATION;
+	}
+
+	return ErrorCode::OK;
+}
+
+void joj::DX11Renderer::set_blend_state(ID3D11BlendState* blend_state)
+{
+	m_device_context->OMSetBlendState(blend_state, nullptr, 0xffffffff);
 }

@@ -34,6 +34,8 @@ namespace joj
         ErrorCode create_dsv(ID3D11Resource* depthstencil_buffer, ID3D11DepthStencilView** dsv);
         void set_render_targets(ID3D11RenderTargetView* const* rtv, ID3D11DepthStencilView* dsv);
         void set_viewport(const D3D11_VIEWPORT* viewport);
+        ErrorCode create_blend_state(const D3D11_BLEND_DESC* blend_state_desc, ID3D11BlendState** blend_state);
+        void set_blend_state(ID3D11BlendState* blend_state);
 
         void set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY topology) const;
 

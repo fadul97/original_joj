@@ -36,6 +36,7 @@ namespace joj
         ERR_RENDER_TARGET_VIEW_CREATION,
         ERR_RENDERER_TEXTURE2D_CREATION,
         ERR_DEPTHSTENCIL_VIEW_CREATION,
+        ERR_BLEND_STATE_CREATION,
     };
 
     const char* error_to_string(ErrorCode e);
