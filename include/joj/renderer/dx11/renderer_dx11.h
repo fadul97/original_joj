@@ -33,6 +33,7 @@ namespace joj
         ErrorCode create_texture2D(const D3D11_TEXTURE2D_DESC& depthstencil_desc, ID3D11Texture2D** depthstencil_buffer);
         ErrorCode create_dsv(ID3D11Resource* depthstencil_buffer, ID3D11DepthStencilView** dsv);
         void set_render_targets(ID3D11RenderTargetView* const* rtv, ID3D11DepthStencilView* dsv);
+        void set_viewport(const D3D11_VIEWPORT* viewport);
 
         void set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY topology) const;
 

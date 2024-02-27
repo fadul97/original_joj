@@ -184,7 +184,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	m_viewport.MaxDepth = 1.0f;
 
 	// Set Viewport
-	m_device_context->RSSetViewports(1, &m_viewport);
+	set_viewport(&m_viewport);
 
     // ---------------------------------------------
 	// Blend State
@@ -347,4 +347,9 @@ joj::ErrorCode joj::DX11Renderer::create_dsv(ID3D11Resource* depthstencil_buffer
 void joj::DX11Renderer::set_render_targets(ID3D11RenderTargetView* const* rtv, ID3D11DepthStencilView* dsv)
 {
 	m_device_context->OMSetRenderTargets(1, rtv, dsv);
+}
+
+void joj::DX11Renderer::set_viewport(const D3D11_VIEWPORT* viewport)
+{
+	m_device_context->RSSetViewports(1, viewport);
 }
