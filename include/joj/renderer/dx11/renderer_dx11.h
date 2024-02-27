@@ -10,6 +10,8 @@
 #include "platform/win32/window_win32.h"
 #include <memory>
 #include "graphics/dx11/context_dx11.h"
+#include "swapchain_dx11.h"
+#include "error.h"
 
 namespace joj
 {
@@ -24,6 +26,10 @@ namespace joj
         void clear(f32 r = 0.0f, f32 g = 0.0f, f32 b = 0.0f, f32 a = 0.0f) override;
         void swap_buffers() override;
         void shutdown() override;
+
+        ErrorCode create_swapchain(DXGI_SWAP_CHAIN_DESC& swapchain_desc, IDXGISwapChain** swapchain);
+        ErrorCode get_swapchain_buffer(Microsoft::WRL::ComPtr<IDXGISwapChain> swapchain, ID3D11Texture2D* buffer);
+        ErrorCode create_rtv(ID3D11Texture2D* buffer, ID3D11RenderTargetView** rtv);
 
         void set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY topology) const;
 
@@ -43,7 +49,7 @@ namespace joj
         u32 m_antialiasing;                            // Number of samples for each pixel on the screen
         u32 m_quality;                                 // Antialiasing sampling quality
         b8 m_vsync;                                    // Vertical sync 
-        IDXGISwapChain* m_swap_chain;                  // Swap chain
+        Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapchain;                  // Swap chain
         ID3D11RenderTargetView* m_render_target_view;  // Backbuffer render target view
         ID3D11DepthStencilView* m_depth_stencil_view;  // Depth/Stencil view
         D3D11_VIEWPORT m_viewport;                     // Viewport

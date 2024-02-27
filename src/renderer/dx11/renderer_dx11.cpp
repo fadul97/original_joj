@@ -13,7 +13,7 @@ joj::DX11Renderer::DX11Renderer()
 	m_antialiasing = 1;             // No antialising
 	m_quality = 0;                  // Default quality
 	m_vsync = false;                // No vertical sync
-	m_swap_chain = nullptr;         // Swap chain
+	m_swapchain = nullptr;         // Swap chain
 	m_render_target_view = nullptr; // Backbuffer render target view
 	m_depth_stencil_view = nullptr; // Depth/Stencil view
 	m_viewport = { 0 };             // Viewport
@@ -46,12 +46,12 @@ joj::DX11Renderer::~DX11Renderer()
 		m_render_target_view->Release();
 
 	// Release swap chain
-	if (m_swap_chain)
-	{
-		// Direct3D is unable to close when full screen
-		m_swap_chain->SetFullscreenState(false, NULL);
-		m_swap_chain->Release();
-	}
+	// if (m_swap_chain)
+	// {
+	// 	// Direct3D is unable to close when full screen
+	// 	m_swap_chain->SetFullscreenState(false, NULL);
+	// 	m_swap_chain->Release();
+	// }
 
 	m_context->get_debug()->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 	printf("\n");
@@ -87,26 +87,35 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
     //                                          PIPELINE SETUP
     // ------------------------------------------------------------------------------------------------------
 
-    // Describe Swap Chain
-	DXGI_SWAP_CHAIN_DESC swap_chain_desc = { 0 };
-	swap_chain_desc.BufferDesc.Width = u32(window->get_width());							// Back buffer width
-	swap_chain_desc.BufferDesc.Height = u32(window->get_height());							// Back buffer height
-	swap_chain_desc.BufferDesc.RefreshRate.Numerator = 60;									// Refresh rate in hertz 
-	swap_chain_desc.BufferDesc.RefreshRate.Numerator = 1;									// Numerator is an int
-	swap_chain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;							// Color format - RGBA 8 bits
-	swap_chain_desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;		// Default value for Flags
-	swap_chain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;						// Default mode for scaling
-	swap_chain_desc.SampleDesc.Count = m_antialiasing;										// Samples per pixel (antialiasing)
-	swap_chain_desc.SampleDesc.Quality = m_quality;											// Level of image quality
-	swap_chain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;							// Use surface as Render Target
-	swap_chain_desc.BufferCount = 2;														// Number of buffers (Front + Back)
-	swap_chain_desc.OutputWindow = window->get_id();										// Window ID
-	swap_chain_desc.Windowed = (window->get_mode() == joj::WindowMode::WINDOWED);           // Fullscreen or windowed 
-	swap_chain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;								// Discard surface after presenting
-	swap_chain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;							// Use Back buffer size for Fullscreen
-
+	// Describe swap chain
+	DXGI_SWAP_CHAIN_DESC swapchain_desc = { 0 };
+	swapchain_desc.BufferDesc.Width = u32(window->get_width());                          // Back buffer width
+	swapchain_desc.BufferDesc.Height = u32(window->get_height());                        // Back buffer height
+	swapchain_desc.BufferDesc.RefreshRate.Numerator = 60;                                // Refresh rate in hertz 
+	swapchain_desc.BufferDesc.RefreshRate.Numerator = 1;                                 // Numerator is an int
+	swapchain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;                       // Color format - RGBA 8 bits
+	swapchain_desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;   // Default value for Flags
+	swapchain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;                   // Default mode for scaling
+	swapchain_desc.SampleDesc.Count = m_antialiasing;                                    // Samples per pixel (antialiasing)
+	swapchain_desc.SampleDesc.Quality = m_quality;                                       // Level of image quality
+	swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;                        // Use surface as Render Target
+	swapchain_desc.BufferCount = 2;                                                      // Number of buffers (Front + Back)
+	swapchain_desc.OutputWindow = window->get_id();                                      // Window ID
+	swapchain_desc.Windowed = (window->get_mode() == joj::WindowMode::WINDOWED);         // Fullscreen or windowed 
+	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;                           // Discard surface after presenting
+	swapchain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;                       // Use Back buffer size for Fullscreen
+	
 	// Create Swap Chain
-	if (m_context->get_factory()->CreateSwapChain(m_device.Get(), &swap_chain_desc, &m_swap_chain) != S_OK)
+	//if (FAILED(m_context->get_factory()->CreateSwapChain(m_device.Get(), &swapchain_desc, m_swapchain->get_swapchain().GetAddressOf())))
+	//{
+	//	// TODO: Use own logger and return value
+	//	printf("Failed to CreateSwapChain.\n");
+	//	return false;
+	//}
+
+	printf("SwapChain created!\n");
+	
+	if (m_context->get_factory()->CreateSwapChain(m_device.Get(), &swapchain_desc, m_swapchain.GetAddressOf()) != S_OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateSwapChain.\n");
@@ -119,7 +128,8 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 
     // Get backbuffer surface of a Swap Chain
 	ID3D11Texture2D* backbuffer = nullptr;
-	if (m_swap_chain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backbuffer)) != S_OK)
+	//if (m_swapchain->get_swapchain()->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backbuffer)) != S_OK)
+	if (m_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backbuffer)) != S_OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to Get backbuffer surface of a Swap Chain.\n");
@@ -270,11 +280,50 @@ void joj::DX11Renderer::clear(f32 r, f32 g, f32 b, f32 a)
 
 void joj::DX11Renderer::swap_buffers()
 {
-    m_swap_chain->Present(m_vsync, NULL);
+	m_swapchain->Present(m_vsync, NULL);
 	m_device_context->OMSetRenderTargets(1, &m_render_target_view, m_depth_stencil_view);
 }
 
 void joj::DX11Renderer::shutdown()
 {
     
+}
+
+joj::ErrorCode joj::DX11Renderer::create_swapchain(DXGI_SWAP_CHAIN_DESC& swapchain_desc, IDXGISwapChain** swapchain)
+{
+	if (FAILED(m_context->get_factory()->CreateSwapChain(m_device.Get(), &swapchain_desc, swapchain)))
+	{
+		// TODO: Use own logger
+		const char* err_str = error_to_string(ErrorCode::ERR_SWAPCHAIN_CREATE);
+		printf("[%s]: Failed to CreateSwapChain.\n", err_str);
+		return ErrorCode::ERR_SWAPCHAIN_CREATE;
+	}
+
+	return ErrorCode::OK;
+}
+
+joj::ErrorCode joj::DX11Renderer::get_swapchain_buffer(Microsoft::WRL::ComPtr<IDXGISwapChain> swapchain, ID3D11Texture2D* buffer)
+{
+	if (FAILED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer))))
+	{
+		// TODO: Use own logger
+		const char* err_str = error_to_string(ErrorCode::ERR_SWAPCHAIN_GET_BUFFER);
+		printf("[%s]: Failed to get buffer surface of Swap Chain.\n", err_str);
+		return ErrorCode::ERR_SWAPCHAIN_GET_BUFFER;
+	}
+
+	return ErrorCode::OK;
+}
+
+joj::ErrorCode joj::DX11Renderer::create_rtv(ID3D11Texture2D* buffer, ID3D11RenderTargetView** rtv)
+{
+	if (FAILED(m_device->CreateRenderTargetView(buffer, NULL, rtv)))
+	{
+		// TODO: Use own logger
+		const char* err_str = error_to_string(ErrorCode::ERR_RENDER_TARGET_VIEW_CREATION);
+		printf("[%s]: Failed to CreateRenderTargetView.\n", err_str);
+		return ErrorCode::ERR_RENDER_TARGET_VIEW_CREATION;
+	}
+
+	return ErrorCode::OK;
 }
