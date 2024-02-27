@@ -7,11 +7,11 @@ const char* joj::error_to_string(joj::ErrorCode e)
         case ErrorCode::OK: return "OK";
         case ErrorCode::FAILED: return "FAILED";
         case ErrorCode::ERR_WINDOW_INIT: return "ERR_WINDOW_INIT";
-        case ErrorCode::ERR_WINDOW_CREATE: return "ERR_WINDOW_CREATE";
+        case ErrorCode::ERR_WINDOW_CREATION: return "ERR_WINDOW_CREATION";
         case ErrorCode::ERR_WINDOW_ID_CREATION: return "ERR_WINDOW_ID_CREATION";
         case ErrorCode::ERR_WINDOW_DISPLAY: return "ERR_WINDOW_DISPLAY";
         case ErrorCode::ERR_CONTEXT_INIT: return "ERR_CONTEXT_INIT";
-        case ErrorCode::ERR_CONTEXT_CREATE: return "ERR_CONTEXT_CREATE";
+        case ErrorCode::ERR_CONTEXT_CREATION: return "ERR_CONTEXT_CREATION";
         case ErrorCode::ERR_CONTEXT_GLX_VERSION: return "ERR_CONTEXT_GLX_VERSION";
         case ErrorCode::ERR_CONTEXT_FB_UNMATCH: return "ERR_CONTEXT_FB_UNMATCH";
         case ErrorCode::ERR_CONTEXT_VISUAL_CREATION: return "ERR_CONTEXT_VISUAL_CREATION";

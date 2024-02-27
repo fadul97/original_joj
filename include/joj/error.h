@@ -11,7 +11,7 @@ namespace joj
         
         // General Window error codes
         ERR_WINDOW_INIT,
-        ERR_WINDOW_CREATE,
+        ERR_WINDOW_CREATION,
         ERR_WINDOW_ID_CREATION,
 
         // X11Window error codes
@@ -21,7 +21,7 @@ namespace joj
         
         // General GraphicsContext error codes
         ERR_CONTEXT_INIT,
-        ERR_CONTEXT_CREATE,
+        ERR_CONTEXT_CREATION,
         
         // X11GLContext error codes
         ERR_CONTEXT_GLX_VERSION,
@@ -29,6 +29,11 @@ namespace joj
         ERR_CONTEXT_VISUAL_CREATION,
         ERR_CONTEXT_SCREEN_UNMATCH,
         ERR_CONTEXT_EXTENSION_STR,
+
+        // X11Renderer error codes
+        ERR_SWAPCHAIN_CREATE,
+        ERR_SWAPCHAIN_GET_BUFFER,
+        ERR_RENDER_TARGET_VIEW_CREATION,
     };
 
     const char* error_to_string(ErrorCode e);
