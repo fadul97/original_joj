@@ -105,17 +105,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;                           // Discard surface after presenting
 	swapchain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;                       // Use Back buffer size for Fullscreen
 	
-	// Create Swap Chain
-	//if (FAILED(m_context->get_factory()->CreateSwapChain(m_device.Get(), &swapchain_desc, m_swapchain->get_swapchain().GetAddressOf())))
-	//{
-	//	// TODO: Use own logger and return value
-	//	printf("Failed to CreateSwapChain.\n");
-	//	return false;
-	//}
-
-	printf("SwapChain created!\n");
-	
-	if (m_context->get_factory()->CreateSwapChain(m_device.Get(), &swapchain_desc, m_swapchain.GetAddressOf()) != S_OK)
+	if (create_swapchain(swapchain_desc, m_swapchain.GetAddressOf()) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateSwapChain.\n");
@@ -128,8 +118,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 
     // Get backbuffer surface of a Swap Chain
 	ID3D11Texture2D* backbuffer = nullptr;
-	//if (m_swapchain->get_swapchain()->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backbuffer)) != S_OK)
-	if (m_swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&backbuffer)) != S_OK)
+	if (get_swapchain_buffer(m_swapchain.Get(), reinterpret_cast<void**>(&backbuffer)) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to Get backbuffer surface of a Swap Chain.\n");
@@ -137,7 +126,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	}
 
 	// Create render target view for backbuffer
-	if (m_device->CreateRenderTargetView(backbuffer, NULL, &m_render_target_view) != S_OK)
+	if (create_rtv(backbuffer, &m_render_target_view) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateRenderTargetView.\n");
@@ -302,9 +291,10 @@ joj::ErrorCode joj::DX11Renderer::create_swapchain(DXGI_SWAP_CHAIN_DESC& swapcha
 	return ErrorCode::OK;
 }
 
-joj::ErrorCode joj::DX11Renderer::get_swapchain_buffer(Microsoft::WRL::ComPtr<IDXGISwapChain> swapchain, ID3D11Texture2D* buffer)
+// FIXME: buffer remains NULL after method
+joj::ErrorCode joj::DX11Renderer::get_swapchain_buffer(Microsoft::WRL::ComPtr<IDXGISwapChain> swapchain, void** buffer)
 {
-	if (FAILED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&buffer))))
+	if (FAILED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), buffer)))
 	{
 		// TODO: Use own logger
 		const char* err_str = error_to_string(ErrorCode::ERR_SWAPCHAIN_GET_BUFFER);
