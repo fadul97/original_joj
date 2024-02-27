@@ -169,7 +169,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	}
 
 	// Bind render target and depth stencil to the Output Merger stage
-	m_device_context->OMSetRenderTargets(1, &m_render_target_view, m_depth_stencil_view);
+	set_render_targets(& m_render_target_view, m_depth_stencil_view);
 
     // ---------------------------------------------------
 	// Viewport
@@ -342,4 +342,9 @@ joj::ErrorCode joj::DX11Renderer::create_dsv(ID3D11Resource* depthstencil_buffer
 	}
 
 	return ErrorCode::OK;
+}
+
+void joj::DX11Renderer::set_render_targets(ID3D11RenderTargetView* const* rtv, ID3D11DepthStencilView* dsv)
+{
+	m_device_context->OMSetRenderTargets(1, rtv, dsv);
 }
