@@ -1,5 +1,6 @@
 #include "error.h"
 
+// TODO: Check all cases
 const char* joj::error_to_string(joj::ErrorCode e)
 {
     switch (e)
