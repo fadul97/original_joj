@@ -161,7 +161,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	}
 
 	// Create Depth/Stencil View
-	if (m_device->CreateDepthStencilView(depth_stencil_buffer, 0, &m_depth_stencil_view) != S_OK)
+	if (create_dsv(depth_stencil_buffer, &m_depth_stencil_view) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateDepthStencilView.\n");
@@ -326,6 +326,19 @@ joj::ErrorCode joj::DX11Renderer::create_texture2D(const D3D11_TEXTURE2D_DESC& d
 		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_TEXTURE2D_CREATION);
 		printf("[%s]: Failed to CreateTexture2D.\n", err_str);
 		return ErrorCode::ERR_RENDERER_TEXTURE2D_CREATION;
+	}
+
+	return ErrorCode::OK;
+}
+
+joj::ErrorCode joj::DX11Renderer::create_dsv(ID3D11Resource* depthstencil_buffer, ID3D11DepthStencilView** dsv)
+{
+	if (FAILED(m_device->CreateDepthStencilView(depthstencil_buffer, 0, &m_depth_stencil_view)))
+	{
+		// TODO: Use own logger
+		const char* err_str = error_to_string(ErrorCode::ERR_DEPTHSTENCIL_VIEW_CREATION);
+		printf("[%s]: Failed to CreateDepthStencilView.\n", err_str);
+		return ErrorCode::ERR_DEPTHSTENCIL_VIEW_CREATION;
 	}
 
 	return ErrorCode::OK;
