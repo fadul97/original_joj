@@ -152,8 +152,8 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	depth_stencil_desc.MiscFlags = 0;							// Optional flags
 
 	// Create Depth/Stencil Buffer
-	ID3D11Texture2D* depth_stencil_buffer;
-	if (m_device->CreateTexture2D(&depth_stencil_desc, 0, &depth_stencil_buffer) != S_OK)
+	ID3D11Texture2D* depth_stencil_buffer = nullptr;
+	if (create_texture2D(depth_stencil_desc, &depth_stencil_buffer) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateTexture2D.\n");
@@ -313,6 +313,19 @@ joj::ErrorCode joj::DX11Renderer::create_rtv(ID3D11Texture2D* buffer, ID3D11Rend
 		const char* err_str = error_to_string(ErrorCode::ERR_RENDER_TARGET_VIEW_CREATION);
 		printf("[%s]: Failed to CreateRenderTargetView.\n", err_str);
 		return ErrorCode::ERR_RENDER_TARGET_VIEW_CREATION;
+	}
+
+	return ErrorCode::OK;
+}
+
+joj::ErrorCode joj::DX11Renderer::create_texture2D(const D3D11_TEXTURE2D_DESC& depthstencil_desc, ID3D11Texture2D** depthstencil_buffer)
+{
+	if (FAILED(m_device->CreateTexture2D(&depthstencil_desc, 0, depthstencil_buffer)))
+	{
+		// TODO: Use own logger
+		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_TEXTURE2D_CREATION);
+		printf("[%s]: Failed to CreateTexture2D.\n", err_str);
+		return ErrorCode::ERR_RENDERER_TEXTURE2D_CREATION;
 	}
 
 	return ErrorCode::OK;

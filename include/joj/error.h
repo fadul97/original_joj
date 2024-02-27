@@ -34,6 +34,7 @@ namespace joj
         ERR_SWAPCHAIN_CREATE,
         ERR_SWAPCHAIN_GET_BUFFER,
         ERR_RENDER_TARGET_VIEW_CREATION,
+        ERR_RENDERER_TEXTURE2D_CREATION,
     };
 
     const char* error_to_string(ErrorCode e);

@@ -30,6 +30,7 @@ namespace joj
         ErrorCode create_swapchain(DXGI_SWAP_CHAIN_DESC& swapchain_desc, IDXGISwapChain** swapchain);
         ErrorCode get_swapchain_buffer(Microsoft::WRL::ComPtr<IDXGISwapChain> swapchain, void** buffer);
         ErrorCode create_rtv(ID3D11Texture2D* buffer, ID3D11RenderTargetView** rtv);
+        ErrorCode create_texture2D(const D3D11_TEXTURE2D_DESC& depthstencil_desc, ID3D11Texture2D** depthstencil_buffer);
 
         void set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY topology) const;
 
