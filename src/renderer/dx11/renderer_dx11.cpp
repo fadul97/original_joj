@@ -228,8 +228,8 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	//rasterizer_desc.CullMode = D3D11_CULL_NONE;
 	rasterizer_desc.DepthClipEnable = true;
 
-	// Create rasterizer state
-	if (m_device->CreateRasterizerState(&rasterizer_desc, &m_rasterizer_state) != S_OK)
+	// Create rasterizer state(
+	if (create_rasterizer_state(&rasterizer_desc, &m_rasterizer_state) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateRasterizerState.\n");
@@ -237,7 +237,7 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	}
 
 	// Set rasterizer state
-	m_device_context->RSSetState(m_rasterizer_state);
+	set_rasterizer_state(m_rasterizer_state);
 
 	// ---------------------------------------------------
 	//	Release Resources
@@ -283,9 +283,9 @@ joj::ErrorCode joj::DX11Renderer::create_swapchain(DXGI_SWAP_CHAIN_DESC& swapcha
 	if (FAILED(m_context->get_factory()->CreateSwapChain(m_device.Get(), &swapchain_desc, swapchain)))
 	{
 		// TODO: Use own logger
-		const char* err_str = error_to_string(ErrorCode::ERR_SWAPCHAIN_CREATE);
+		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_SWAPCHAIN_CREATE);
 		printf("[%s]: Failed to CreateSwapChain.\n", err_str);
-		return ErrorCode::ERR_SWAPCHAIN_CREATE;
+		return ErrorCode::ERR_RENDERER_SWAPCHAIN_CREATE;
 	}
 
 	return ErrorCode::OK;
@@ -297,9 +297,9 @@ joj::ErrorCode joj::DX11Renderer::get_swapchain_buffer(Microsoft::WRL::ComPtr<ID
 	if (FAILED(swapchain->GetBuffer(0, __uuidof(ID3D11Texture2D), buffer)))
 	{
 		// TODO: Use own logger
-		const char* err_str = error_to_string(ErrorCode::ERR_SWAPCHAIN_GET_BUFFER);
+		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_SWAPCHAIN_GET_BUFFER);
 		printf("[%s]: Failed to get buffer surface of Swap Chain.\n", err_str);
-		return ErrorCode::ERR_SWAPCHAIN_GET_BUFFER;
+		return ErrorCode::ERR_RENDERER_SWAPCHAIN_GET_BUFFER;
 	}
 
 	return ErrorCode::OK;
@@ -336,9 +336,9 @@ joj::ErrorCode joj::DX11Renderer::create_dsv(ID3D11Resource* depthstencil_buffer
 	if (FAILED(m_device->CreateDepthStencilView(depthstencil_buffer, 0, &m_depth_stencil_view)))
 	{
 		// TODO: Use own logger
-		const char* err_str = error_to_string(ErrorCode::ERR_DEPTHSTENCIL_VIEW_CREATION);
+		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_DEPTHSTENCIL_VIEW_CREATION);
 		printf("[%s]: Failed to CreateDepthStencilView.\n", err_str);
-		return ErrorCode::ERR_DEPTHSTENCIL_VIEW_CREATION;
+		return ErrorCode::ERR_RENDERER_DEPTHSTENCIL_VIEW_CREATION;
 	}
 
 	return ErrorCode::OK;
@@ -359,9 +359,9 @@ joj::ErrorCode joj::DX11Renderer::create_blend_state(const D3D11_BLEND_DESC* ble
 	if (FAILED(m_device->CreateBlendState(blend_state_desc, blend_state)))
 	{
 		// TODO: Use own logger
-		const char* err_str = error_to_string(ErrorCode::ERR_BLEND_STATE_CREATION);
+		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_BLEND_STATE_CREATION);
 		printf("[%s]: Failed to CreateBlendState.\n", err_str);
-		return ErrorCode::ERR_BLEND_STATE_CREATION;
+		return ErrorCode::ERR_RENDERER_BLEND_STATE_CREATION;
 	}
 
 	return ErrorCode::OK;
@@ -370,4 +370,22 @@ joj::ErrorCode joj::DX11Renderer::create_blend_state(const D3D11_BLEND_DESC* ble
 void joj::DX11Renderer::set_blend_state(ID3D11BlendState* blend_state)
 {
 	m_device_context->OMSetBlendState(blend_state, nullptr, 0xffffffff);
+}
+
+joj::ErrorCode joj::DX11Renderer::create_rasterizer_state(const D3D11_RASTERIZER_DESC* rasterizer_desc, ID3D11RasterizerState** rasterizer_state)
+{
+	if (FAILED(m_device->CreateRasterizerState(rasterizer_desc, rasterizer_state)))
+	{
+		// TODO: Use own logger
+		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_RASTERIZER_CREATION);
+		printf("[%s]: Failed to CreateRasterizerState.\n", err_str);
+		return ErrorCode::ERR_RENDERER_RASTERIZER_CREATION;
+	}
+
+	return ErrorCode::OK;
+}
+
+void joj::DX11Renderer::set_rasterizer_state(ID3D11RasterizerState* rasterizer_state)
+{
+	m_device_context->RSSetState(rasterizer_state);
 }

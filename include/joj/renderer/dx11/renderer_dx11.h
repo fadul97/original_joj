@@ -36,6 +36,8 @@ namespace joj
         void set_viewport(const D3D11_VIEWPORT* viewport);
         ErrorCode create_blend_state(const D3D11_BLEND_DESC* blend_state_desc, ID3D11BlendState** blend_state);
         void set_blend_state(ID3D11BlendState* blend_state);
+        ErrorCode create_rasterizer_state(const D3D11_RASTERIZER_DESC* rasterizer_desc, ID3D11RasterizerState** rasterizer_state);
+        void set_rasterizer_state(ID3D11RasterizerState* rasterizer_state);
 
         void set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY topology) const;
 
