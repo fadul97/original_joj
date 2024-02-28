@@ -12,6 +12,7 @@
 #include "graphics/dx11/context_dx11.h"
 #include "swapchain_dx11.h"
 #include "error.h"
+#include "swapchain_dx11.h"
 
 namespace joj
 {
@@ -43,6 +44,7 @@ namespace joj
 
     private:
         std::unique_ptr<DX11Context> m_context;
+        std::unique_ptr<DX11SwapChain> m_swapchain;
 
         f32 bg_color[4];
 
@@ -57,7 +59,7 @@ namespace joj
         u32 m_antialiasing;                            // Number of samples for each pixel on the screen
         u32 m_quality;                                 // Antialiasing sampling quality
         b8 m_vsync;                                    // Vertical sync 
-        Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapchain;                  // Swap chain
+        //Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapchain;                  // Swap chain
         ID3D11RenderTargetView* m_render_target_view;  // Backbuffer render target view
         ID3D11DepthStencilView* m_depth_stencil_view;  // Depth/Stencil view
         D3D11_VIEWPORT m_viewport;                     // Viewport
