@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojRenderer STATIC renderer.cpp shader.cpp)
+add_library(jojRenderer STATIC renderer.cpp shader.cpp viewport.cpp)
 
 # Specify include directories for jojRenderer
 target_include_directories(
