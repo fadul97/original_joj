@@ -22,7 +22,8 @@ namespace joj
         DX11SwapChain();
         ~DX11SwapChain();
 
-        Microsoft::WRL::ComPtr<IDXGISwapChain> get_swapchain() const;
+        Microsoft::WRL::ComPtr<IDXGISwapChain>& get_swapchain();
+        const Microsoft::WRL::ComPtr<IDXGISwapChain>& get_swapchain_const() const;
         DXGI_SWAP_CHAIN_DESC& get_swapchain_desc();
         
         void describe(std::unique_ptr<Win32Window>& window);
@@ -33,12 +34,15 @@ namespace joj
         u32 m_antialiasing;
         u32 m_quality;
     };
-    
+
+    inline Microsoft::WRL::ComPtr<IDXGISwapChain>& DX11SwapChain::get_swapchain()
+    { return m_swapchain; }
+
+    inline const Microsoft::WRL::ComPtr<IDXGISwapChain>& DX11SwapChain::get_swapchain_const() const
+    { return m_swapchain; }
+
     inline DXGI_SWAP_CHAIN_DESC& DX11SwapChain::get_swapchain_desc()
     { return m_swapchain_desc; }
-    
-    inline Microsoft::WRL::ComPtr<IDXGISwapChain> DX11SwapChain::get_swapchain() const
-    { return m_swapchain; }
 }
 
 #endif // JPLATFORM_WINDOWS
