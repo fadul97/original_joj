@@ -64,7 +64,6 @@ namespace joj
         //Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapchain;                  // Swap chain
         ID3D11RenderTargetView* m_render_target_view;  // Backbuffer render target view
         ID3D11DepthStencilView* m_depth_stencil_view;  // Depth/Stencil view
-        D3D11_VIEWPORT m_viewport;                     // Viewport
         ID3D11BlendState* m_blend_state;               // Color mix settings
         ID3D11RasterizerState* m_rasterizer_state;     // Rasterizer state
     };

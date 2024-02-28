@@ -1,7 +1,7 @@
 // FIXME: Main file doesn't need to define JOJ_ENGINE_IMPLEMENTATION
-#include "platform/platform_manager.h"
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "joj/defines.h"
+
 #include <iostream>
 
 #if JPLATFORM_LINUX  
@@ -57,7 +57,7 @@ int main()
         if (pm->is_key_pressed(joj::KEY_ESCAPE))
             pm->close_window();
 
-        r.clear(1, 1, 0, 1);
+        r.clear(0, 1, 0, 1);
 
 #if JPLATFORM_LINUX  
         pm->swap_buffers();

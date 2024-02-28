@@ -1,9 +1,8 @@
-#include "renderer\dx11\renderer_dx11.h"
+#include "renderer/dx11/renderer_dx11.h"
 
 #include <dxgi.h>
 #include <d3dcompiler.h>
-
-#include <comdef.h>
+#include "renderer/dx11/viewport_dx11.h"
 
 joj::DX11Renderer::DX11Renderer()
 {
@@ -16,10 +15,8 @@ joj::DX11Renderer::DX11Renderer()
 	m_antialiasing = 1;             // No antialising
 	m_quality = 0;                  // Default quality
 	m_vsync = false;                // No vertical sync
-	//m_swapchain = nullptr;         // Swap chain
 	m_render_target_view = nullptr; // Backbuffer render target view
 	m_depth_stencil_view = nullptr; // Depth/Stencil view
-	m_viewport = { 0 };             // Viewport
 	m_blend_state = nullptr;        // Color mix settings
 	m_rasterizer_state = nullptr;   // Rasterizer state
 
@@ -47,14 +44,6 @@ joj::DX11Renderer::~DX11Renderer()
 	// Release render target view
 	if (m_render_target_view)
 		m_render_target_view->Release();
-
-	// Release swap chain
-	// if (m_swap_chain)
-	// {
-	// 	// Direct3D is unable to close when full screen
-	// 	m_swap_chain->SetFullscreenState(false, NULL);
-	// 	m_swap_chain->Release();
-	// }
 
 	m_context->get_debug()->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 	printf("\n");
@@ -122,25 +111,12 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 	//                                          PIPELINE SETUP
 	// ------------------------------------------------------------------------------------------------------
 
+	// ---------------------------------------------------
+	// Swap Chain
+	// ---------------------------------------------------
+
 	// Describe swap chain
 	m_swapchain->describe(window);
-
-	DXGI_SWAP_CHAIN_DESC swapchain_desc = { 0 };
-	swapchain_desc.BufferDesc.Width = u32(window->get_width());                          // Back buffer width
-	swapchain_desc.BufferDesc.Height = u32(window->get_height());                        // Back buffer height
-	swapchain_desc.BufferDesc.RefreshRate.Numerator = 60;                                // Refresh rate in hertz 
-	swapchain_desc.BufferDesc.RefreshRate.Numerator = 1;                                 // Numerator is an int
-	swapchain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;                       // Color format - RGBA 8 bits
-	swapchain_desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;   // Default value for Flags
-	swapchain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;                   // Default mode for scaling
-	swapchain_desc.SampleDesc.Count = m_antialiasing;                                    // Samples per pixel (antialiasing)
-	swapchain_desc.SampleDesc.Quality = m_quality;                                       // Level of image quality
-	swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;                        // Use surface as Render Target
-	swapchain_desc.BufferCount = 2;                                                      // Number of buffers (Front + Back)
-	swapchain_desc.OutputWindow = window->get_id();                                      // Window ID
-	swapchain_desc.Windowed = (window->get_mode() == joj::WindowMode::WINDOWED);         // Fullscreen or windowed 
-	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;                           // Discard surface after presenting
-	swapchain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;                       // Use Back buffer size for Fullscreen
 
 	// Create swap chain
 	if (create_swapchain(m_swapchain->get_swapchain_desc(), m_swapchain->get_swapchain().GetAddressOf()) != ErrorCode::OK)
@@ -214,15 +190,11 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 	// ---------------------------------------------------
 
 	// Describe Viewport
-	m_viewport.TopLeftY = 0.0f;
-	m_viewport.TopLeftX = 0.0f;
-	m_viewport.Width = static_cast<f32>(window->get_width());
-	m_viewport.Height = static_cast<f32>(window->get_height());
-	m_viewport.MinDepth = 0.0f;
-	m_viewport.MaxDepth = 1.0f;
+	DX11Viewport viewport{ 0.0f, 0.0f, static_cast<u16>(window->get_width()), static_cast<u16>(window->get_height()), 0.0f, 1.0f };
+	D3D11_VIEWPORT vp = viewport.get_viewport();
 
 	// Set Viewport
-	set_viewport(&m_viewport);
+	set_viewport(&vp);
 
 	// ---------------------------------------------
 	// Blend State
