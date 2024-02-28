@@ -13,7 +13,7 @@ namespace joj
         Viewport(f32 xtop_left, f32 ytop_left, u16 width, u16 height, f32 min_depth, f32 max_depth);
         ~Viewport();
 
-    private:
+    protected:
         f32 m_xtop_left;
         f32 m_ytop_left;
         u16 m_width;
