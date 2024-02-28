@@ -86,174 +86,6 @@ b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 	m_device = m_context->get_device();
 	m_device_context = m_context->get_device_context();
 
-    // ------------------------------------------------------------------------------------------------------
-    //                                          PIPELINE SETUP
-    // ------------------------------------------------------------------------------------------------------
-
-	// Describe swap chain
-	m_swapchain->describe(window);
-
-	DXGI_SWAP_CHAIN_DESC swapchain_desc = { 0 };
-	swapchain_desc.BufferDesc.Width = u32(window->get_width());                          // Back buffer width
-	swapchain_desc.BufferDesc.Height = u32(window->get_height());                        // Back buffer height
-	swapchain_desc.BufferDesc.RefreshRate.Numerator = 60;                                // Refresh rate in hertz 
-	swapchain_desc.BufferDesc.RefreshRate.Numerator = 1;                                 // Numerator is an int
-	swapchain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;                       // Color format - RGBA 8 bits
-	swapchain_desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;   // Default value for Flags
-	swapchain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;                   // Default mode for scaling
-	swapchain_desc.SampleDesc.Count = m_antialiasing;                                    // Samples per pixel (antialiasing)
-	swapchain_desc.SampleDesc.Quality = m_quality;                                       // Level of image quality
-	swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;                        // Use surface as Render Target
-	swapchain_desc.BufferCount = 2;                                                      // Number of buffers (Front + Back)
-	swapchain_desc.OutputWindow = window->get_id();                                      // Window ID
-	swapchain_desc.Windowed = (window->get_mode() == joj::WindowMode::WINDOWED);         // Fullscreen or windowed 
-	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;                           // Discard surface after presenting
-	swapchain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;                       // Use Back buffer size for Fullscreen
-	
-	// Create swap chain
-	if (create_swapchain(m_swapchain->get_swapchain_desc(), m_swapchain->get_swapchain().GetAddressOf()) != ErrorCode::OK)
-	{
-		// TODO: Use own logger and return value
-		printf("Failed to CreateSwapChain.\n");
-		return false;
-	}
-
-    // ---------------------------------------------------
-	// Render Target View
-	// ---------------------------------------------------
-
-    // Get backbuffer surface of a Swap Chain
-	ID3D11Texture2D* backbuffer = nullptr;
-	if (get_swapchain_buffer(m_swapchain->get_swapchain(), reinterpret_cast<void**>(&backbuffer)) != ErrorCode::OK)
-	{
-		// TODO: Use own logger and return value
-		printf("Failed to Get backbuffer surface of a Swap Chain.\n");
-		return false;
-	}
-
-	// Create render target view for backbuffer
-	if (create_rtv(backbuffer, &m_render_target_view) != ErrorCode::OK)
-	{
-		// TODO: Use own logger and return value
-		printf("Failed to CreateRenderTargetView.\n");
-		return false;
-	}
-
-    // ---------------------------------------------------
-	// Depth/Stencil View
-	// ---------------------------------------------------
-
-	// Describe Depth/Stencil Buffer Desc
-	D3D11_TEXTURE2D_DESC depth_stencil_desc = { 0 };
-	depth_stencil_desc.Width = u32(window->get_width());		// Depth/Stencil buffer width
-	depth_stencil_desc.Height = u32(window->get_height());		// Depth/Stencil buffer height
-	depth_stencil_desc.MipLevels = 0;							// Number of mipmap levels
-	depth_stencil_desc.ArraySize = 1;							// Number of textures in array
-	depth_stencil_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;	// Color format - Does it need to be the same format of swapChainDesc?
-	depth_stencil_desc.SampleDesc.Count = m_antialiasing;			// Samples per pixel (antialiasing)
-	depth_stencil_desc.SampleDesc.Quality = m_quality;			// Level of image quality
-	depth_stencil_desc.Usage = D3D11_USAGE_DEFAULT;				// Default - GPU will both read and write to the resource
-	depth_stencil_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;	// Where resource will be bound to the pipeline
-	depth_stencil_desc.CPUAccessFlags = 0;						// CPU will not read not write to the Depth/Stencil buffer
-	depth_stencil_desc.MiscFlags = 0;							// Optional flags
-
-	// Create Depth/Stencil Buffer
-	ID3D11Texture2D* depth_stencil_buffer = nullptr;
-	if (create_texture2D(depth_stencil_desc, &depth_stencil_buffer) != ErrorCode::OK)
-	{
-		// TODO: Use own logger and return value
-		printf("Failed to CreateTexture2D.\n");
-		return false;
-	}
-
-	// Create Depth/Stencil View
-	if (create_dsv(depth_stencil_buffer, &m_depth_stencil_view) != ErrorCode::OK)
-	{
-		// TODO: Use own logger and return value
-		printf("Failed to CreateDepthStencilView.\n");
-		return false;
-	}
-
-	// Bind render target and depth stencil to the Output Merger stage
-	set_render_targets(& m_render_target_view, m_depth_stencil_view);
-
-    // ---------------------------------------------------
-	// Viewport
-	// ---------------------------------------------------
-
-	// Describe Viewport
-	m_viewport.TopLeftY = 0.0f;
-	m_viewport.TopLeftX = 0.0f;
-	m_viewport.Width = static_cast<f32>(window->get_width());
-	m_viewport.Height = static_cast<f32>(window->get_height());
-	m_viewport.MinDepth = 0.0f;
-	m_viewport.MaxDepth = 1.0f;
-
-	// Set Viewport
-	set_viewport(&m_viewport);
-
-    // ---------------------------------------------
-	// Blend State
-	// ---------------------------------------------
-
-	// Describe blend state
-	D3D11_BLEND_DESC blend_desc = { };
-	blend_desc.AlphaToCoverageEnable = false;                                // Highlight the silhouette of sprites
-	blend_desc.IndependentBlendEnable = false;                               // Use the same mix for all render targets
-	blend_desc.RenderTarget[0].BlendEnable = true;                           // Enable blending
-	blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;             // Source mixing factor
-	blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;        // Target of RGB mixing is inverted alpha
-	blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;                 // Addition operation in color mixing
-	blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;        // Alpha blend source is the alpha of the pixel shader
-	blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;   // Fate of Alpha mixture is inverted alpha
-	blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;            // Addition operation in color mixing
-	blend_desc.RenderTarget[0].RenderTargetWriteMask = 0x0F;                 // Components of each pixel that can be overwritten
-
-	// Create blend state
-	if (create_blend_state(&blend_desc, &m_blend_state) != ErrorCode::OK)
-	{
-		// TODO: Use own logger and return value
-		printf("Failed to CreateBlendState.\n");
-		return false;
-	}
-
-	// Bind blend state to the Output Merger stage
-	set_blend_state(m_blend_state);
-
-	// ---------------------------------------------------
-	// Rasterizer
-	// ---------------------------------------------------
-
-	// TODO: comment specifications on rasterizer
-	// Describe rasterizer
-	D3D11_RASTERIZER_DESC rasterizer_desc = {};
-	ZeroMemory(&rasterizer_desc, sizeof(rasterizer_desc));
-	//rasterizer_desc.FillMode = D3D11_FILL_SOLID;
-	rasterizer_desc.FillMode = D3D11_FILL_WIREFRAME;
-	rasterizer_desc.CullMode = D3D11_CULL_BACK;
-	//rasterizer_desc.CullMode = D3D11_CULL_NONE;
-	rasterizer_desc.DepthClipEnable = true;
-
-	// Create rasterizer state(
-	if (create_rasterizer_state(&rasterizer_desc, &m_rasterizer_state) != ErrorCode::OK)
-	{
-		// TODO: Use own logger and return value
-		printf("Failed to CreateRasterizerState.\n");
-		return false;
-	}
-
-	// Set rasterizer state
-	set_rasterizer_state(m_rasterizer_state);
-
-	// ---------------------------------------------------
-	//	Release Resources
-	// ---------------------------------------------------
-
-	backbuffer->Release();
-	depth_stencil_buffer->Release();
-
-    printf("DX11Renderer initialized.\n");
-
 	// TODO: Use own return value
 	return true;
 }
@@ -284,20 +116,193 @@ void joj::DX11Renderer::shutdown()
     
 }
 
+joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Window>& window)
+{
+	// ------------------------------------------------------------------------------------------------------
+	//                                          PIPELINE SETUP
+	// ------------------------------------------------------------------------------------------------------
+
+	// Describe swap chain
+	m_swapchain->describe(window);
+
+	DXGI_SWAP_CHAIN_DESC swapchain_desc = { 0 };
+	swapchain_desc.BufferDesc.Width = u32(window->get_width());                          // Back buffer width
+	swapchain_desc.BufferDesc.Height = u32(window->get_height());                        // Back buffer height
+	swapchain_desc.BufferDesc.RefreshRate.Numerator = 60;                                // Refresh rate in hertz 
+	swapchain_desc.BufferDesc.RefreshRate.Numerator = 1;                                 // Numerator is an int
+	swapchain_desc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;                       // Color format - RGBA 8 bits
+	swapchain_desc.BufferDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;   // Default value for Flags
+	swapchain_desc.BufferDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;                   // Default mode for scaling
+	swapchain_desc.SampleDesc.Count = m_antialiasing;                                    // Samples per pixel (antialiasing)
+	swapchain_desc.SampleDesc.Quality = m_quality;                                       // Level of image quality
+	swapchain_desc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;                        // Use surface as Render Target
+	swapchain_desc.BufferCount = 2;                                                      // Number of buffers (Front + Back)
+	swapchain_desc.OutputWindow = window->get_id();                                      // Window ID
+	swapchain_desc.Windowed = (window->get_mode() == joj::WindowMode::WINDOWED);         // Fullscreen or windowed 
+	swapchain_desc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;                           // Discard surface after presenting
+	swapchain_desc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;                       // Use Back buffer size for Fullscreen
+
+	// Create swap chain
+	if (create_swapchain(m_swapchain->get_swapchain_desc(), m_swapchain->get_swapchain().GetAddressOf()) != ErrorCode::OK)
+	{
+		// TODO: Use own logger and return value
+		printf("Failed to CreateSwapChain.\n");
+		return ErrorCode::ERR_RENDERER_SWAPCHAIN_CREATION;
+	}
+
+	// ---------------------------------------------------
+	// Render Target View
+	// ---------------------------------------------------
+
+	// Get backbuffer surface of a Swap Chain
+	ID3D11Texture2D* backbuffer = nullptr;
+	if (get_swapchain_buffer(m_swapchain->get_swapchain(), reinterpret_cast<void**>(&backbuffer)) != ErrorCode::OK)
+	{
+		// TODO: Use own logger and return value
+		printf("Failed to Get backbuffer surface of a Swap Chain.\n");
+		return ErrorCode::ERR_RENDERER_SWAPCHAIN_GET_BUFFER;
+	}
+
+	// Create render target view for backbuffer
+	if (create_rtv(backbuffer, &m_render_target_view) != ErrorCode::OK)
+	{
+		// TODO: Use own logger and return value
+		printf("Failed to CreateRenderTargetView.\n");
+		return ErrorCode::ERR_RENDER_TARGET_VIEW_CREATION;
+	}
+
+	// ---------------------------------------------------
+	// Depth/Stencil View
+	// ---------------------------------------------------
+
+	// Describe Depth/Stencil Buffer Desc
+	D3D11_TEXTURE2D_DESC depth_stencil_desc = { 0 };
+	depth_stencil_desc.Width = u32(window->get_width());		// Depth/Stencil buffer width
+	depth_stencil_desc.Height = u32(window->get_height());		// Depth/Stencil buffer height
+	depth_stencil_desc.MipLevels = 0;							// Number of mipmap levels
+	depth_stencil_desc.ArraySize = 1;							// Number of textures in array
+	depth_stencil_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;	// Color format - Does it need to be the same format of swapChainDesc?
+	depth_stencil_desc.SampleDesc.Count = m_antialiasing;			// Samples per pixel (antialiasing)
+	depth_stencil_desc.SampleDesc.Quality = m_quality;			// Level of image quality
+	depth_stencil_desc.Usage = D3D11_USAGE_DEFAULT;				// Default - GPU will both read and write to the resource
+	depth_stencil_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;	// Where resource will be bound to the pipeline
+	depth_stencil_desc.CPUAccessFlags = 0;						// CPU will not read not write to the Depth/Stencil buffer
+	depth_stencil_desc.MiscFlags = 0;							// Optional flags
+
+	// Create Depth/Stencil Buffer
+	ID3D11Texture2D* depth_stencil_buffer = nullptr;
+	if (create_texture2D(depth_stencil_desc, &depth_stencil_buffer) != ErrorCode::OK)
+	{
+		// TODO: Use own logger and return value
+		printf("Failed to CreateTexture2D.\n");
+		return ErrorCode::ERR_RENDERER_TEXTURE2D_CREATION;
+	}
+
+	// Create Depth/Stencil View
+	if (create_dsv(depth_stencil_buffer, &m_depth_stencil_view) != ErrorCode::OK)
+	{
+		// TODO: Use own logger and return value
+		printf("Failed to CreateDepthStencilView.\n");
+		return ErrorCode::ERR_RENDERER_DEPTHSTENCIL_VIEW_CREATION;
+	}
+
+	// Bind render target and depth stencil to the Output Merger stage
+	set_render_targets(&m_render_target_view, m_depth_stencil_view);
+
+	// ---------------------------------------------------
+	// Viewport
+	// ---------------------------------------------------
+
+	// Describe Viewport
+	m_viewport.TopLeftY = 0.0f;
+	m_viewport.TopLeftX = 0.0f;
+	m_viewport.Width = static_cast<f32>(window->get_width());
+	m_viewport.Height = static_cast<f32>(window->get_height());
+	m_viewport.MinDepth = 0.0f;
+	m_viewport.MaxDepth = 1.0f;
+
+	// Set Viewport
+	set_viewport(&m_viewport);
+
+	// ---------------------------------------------
+	// Blend State
+	// ---------------------------------------------
+
+	// Describe blend state
+	D3D11_BLEND_DESC blend_desc = { };
+	blend_desc.AlphaToCoverageEnable = false;                                // Highlight the silhouette of sprites
+	blend_desc.IndependentBlendEnable = false;                               // Use the same mix for all render targets
+	blend_desc.RenderTarget[0].BlendEnable = true;                           // Enable blending
+	blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;             // Source mixing factor
+	blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;        // Target of RGB mixing is inverted alpha
+	blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;                 // Addition operation in color mixing
+	blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;        // Alpha blend source is the alpha of the pixel shader
+	blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;   // Fate of Alpha mixture is inverted alpha
+	blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;            // Addition operation in color mixing
+	blend_desc.RenderTarget[0].RenderTargetWriteMask = 0x0F;                 // Components of each pixel that can be overwritten
+
+	// Create blend state
+	if (create_blend_state(&blend_desc, &m_blend_state) != ErrorCode::OK)
+	{
+		// TODO: Use own logger and return value
+		printf("Failed to CreateBlendState.\n");
+		return ErrorCode::ERR_RENDERER_BLEND_STATE_CREATION;
+	}
+
+	// Bind blend state to the Output Merger stage
+	set_blend_state(m_blend_state);
+
+	// ---------------------------------------------------
+	// Rasterizer
+	// ---------------------------------------------------
+
+	// TODO: comment specifications on rasterizer
+	// Describe rasterizer
+	D3D11_RASTERIZER_DESC rasterizer_desc = {};
+	ZeroMemory(&rasterizer_desc, sizeof(rasterizer_desc));
+	//rasterizer_desc.FillMode = D3D11_FILL_SOLID;
+	rasterizer_desc.FillMode = D3D11_FILL_WIREFRAME;
+	rasterizer_desc.CullMode = D3D11_CULL_BACK;
+	//rasterizer_desc.CullMode = D3D11_CULL_NONE;
+	rasterizer_desc.DepthClipEnable = true;
+
+	// Create rasterizer state(
+	if (create_rasterizer_state(&rasterizer_desc, &m_rasterizer_state) != ErrorCode::OK)
+	{
+		// TODO: Use own logger and return value
+		printf("Failed to CreateRasterizerState.\n");
+		return ErrorCode::ERR_RENDERER_RASTERIZER_CREATION;
+	}
+
+	// Set rasterizer state
+	set_rasterizer_state(m_rasterizer_state);
+
+	// ---------------------------------------------------
+	//	Release Resources
+	// ---------------------------------------------------
+
+	backbuffer->Release();
+	depth_stencil_buffer->Release();
+
+	// TODO: Use own return value
+	return ErrorCode::OK;
+}
+
 joj::ErrorCode joj::DX11Renderer::create_swapchain(DXGI_SWAP_CHAIN_DESC& swapchain_desc, IDXGISwapChain** swapchain)
 {
+	/*
 	HRESULT hr = m_context->get_factory()->CreateSwapChain(m_device.Get(), &swapchain_desc, swapchain);
 	_com_error err(hr);
 	LPCTSTR errMsg = err.ErrorMessage();
 	printf("errMsg = %s\n", errMsg);
+	*/
 
-	//if (FAILED(m_context->get_factory()->CreateSwapChain(m_device.Get(), &swapchain_desc, swapchain)))
-	if (FAILED(hr))
+	if (FAILED(m_context->get_factory()->CreateSwapChain(m_device.Get(), &swapchain_desc, swapchain)))
 	{
 		// TODO: Use own logger
-		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_SWAPCHAIN_CREATE);
+		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_SWAPCHAIN_CREATION);
 		printf("[%s]: Failed to CreateSwapChain.\n", err_str);
-		return ErrorCode::ERR_RENDERER_SWAPCHAIN_CREATE;
+		return ErrorCode::ERR_RENDERER_SWAPCHAIN_CREATION;
 	}
 
 	return ErrorCode::OK;

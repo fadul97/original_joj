@@ -28,6 +28,8 @@ namespace joj
         void swap_buffers() override;
         void shutdown() override;
 
+        ErrorCode setup_default_pipeline(std::unique_ptr<Win32Window>& window);
+
         ErrorCode create_swapchain(DXGI_SWAP_CHAIN_DESC& swapchain_desc, IDXGISwapChain** swapchain);
         ErrorCode get_swapchain_buffer(Microsoft::WRL::ComPtr<IDXGISwapChain> swapchain, void** buffer);
         ErrorCode create_rtv(ID3D11Texture2D* buffer, ID3D11RenderTargetView** rtv);

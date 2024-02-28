@@ -44,8 +44,12 @@ int main()
         return -1;
     }
 
-    std::cout << "Running!\n";
-    
+    if (r.setup_default_pipeline(pm->get_window()) != joj::ErrorCode::OK)
+    {
+        std::cout << "Failed to setup renderer pipeline.\n";
+        return -1;
+    }
+
     while (pm->is_running())
     {
         pm->process_events();
@@ -53,7 +57,7 @@ int main()
         if (pm->is_key_pressed(joj::KEY_ESCAPE))
             pm->close_window();
 
-        r.clear(1, 0, 0, 1);
+        r.clear(1, 1, 0, 1);
 
 #if JPLATFORM_LINUX  
         pm->swap_buffers();
