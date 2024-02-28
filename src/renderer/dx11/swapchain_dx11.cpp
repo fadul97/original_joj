@@ -14,7 +14,7 @@ joj::DX11SwapChain::~DX11SwapChain()
 		m_swapchain->SetFullscreenState(false, NULL);
 }
 
-void joj::DX11SwapChain::describe(std::unique_ptr<Win32Window>& window)
+void joj::DX11SwapChain::describe_default(std::unique_ptr<Win32Window>& window)
 {
 	// Describe Swap Chain
 	m_swapchain_desc.BufferDesc.Width = u32(window->get_width());                          // Back buffer width

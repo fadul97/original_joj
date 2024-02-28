@@ -26,7 +26,7 @@ namespace joj
         const Microsoft::WRL::ComPtr<IDXGISwapChain>& get_swapchain_const() const;
         DXGI_SWAP_CHAIN_DESC& get_swapchain_desc();
         
-        void describe(std::unique_ptr<Win32Window>& window);
+        void describe_default(std::unique_ptr<Win32Window>& window);
         
     private:
     	DXGI_SWAP_CHAIN_DESC m_swapchain_desc;

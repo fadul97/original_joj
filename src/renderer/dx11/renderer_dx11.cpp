@@ -116,7 +116,7 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 	// ---------------------------------------------------
 
 	// Describe swap chain
-	m_swapchain->describe(window);
+	m_swapchain->describe_default(window);
 
 	// Create swap chain
 	if (create_swapchain(m_swapchain->get_swapchain_desc(), m_swapchain->get_swapchain().GetAddressOf()) != ErrorCode::OK)
