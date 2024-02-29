@@ -3,7 +3,6 @@
 joj::DX11DepthStencilManager::DX11DepthStencilManager()
 {
     m_depthstencil_view = nullptr;
-    m_depthstencil_buffer = nullptr;
     m_depthstencil_view_desc = { 0 };
 }
 
@@ -12,7 +11,7 @@ joj::DX11DepthStencilManager::~DX11DepthStencilManager()
 
 }
 
-joj::DX11DepthStencilManager::describe_default(u32 width, u32 height, u32 antialising, u32 quality)
+void joj::DX11DepthStencilManager::describe_default(u32 width, u32 height, u32 antialising, u32 quality)
 {
 	m_depthstencil_view_desc.Width = width;                           // Depth/Stencil buffer width
 	m_depthstencil_view_desc.Height = height;                         // Depth/Stencil buffer height
