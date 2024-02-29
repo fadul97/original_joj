@@ -13,6 +13,7 @@
 #include "swapchain_dx11.h"
 #include "error.h"
 #include "depth_stencil_manager_dx11.h"
+#include "blend_state_dx11.h"
 
 namespace joj
 {
@@ -48,6 +49,7 @@ namespace joj
         std::unique_ptr<DX11Context> m_context;
         std::unique_ptr<DX11SwapChain> m_swapchain;
         std::unique_ptr<DX11DepthStencilManager> m_ds_manager;
+        std::unique_ptr<DX11BlendState> m_blend;
 
         f32 bg_color[4];
 
@@ -62,9 +64,7 @@ namespace joj
         u32 m_antialiasing;                            // Number of samples for each pixel on the screen
         u32 m_quality;                                 // Antialiasing sampling quality
         b8 m_vsync;                                    // Vertical sync 
-        //Microsoft::WRL::ComPtr<IDXGISwapChain> m_swapchain;                  // Swap chain
         ID3D11RenderTargetView* m_render_target_view;  // Backbuffer render target view
-        ID3D11BlendState* m_blend_state;               // Color mix settings
         ID3D11RasterizerState* m_rasterizer_state;     // Rasterizer state
     };
 

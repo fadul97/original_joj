@@ -9,6 +9,7 @@ joj::DX11Renderer::DX11Renderer()
     m_context = std::make_unique<DX11Context>();
 	m_swapchain = std::make_unique<DX11SwapChain>();
 	m_ds_manager = std::make_unique<DX11DepthStencilManager>();
+	m_blend = std::make_unique<DX11BlendState>();
 
     m_device = nullptr;
     m_device_context = nullptr;
@@ -17,7 +18,6 @@ joj::DX11Renderer::DX11Renderer()
 	m_quality = 0;                  // Default quality
 	m_vsync = false;                // No vertical sync
 	m_render_target_view = nullptr; // Backbuffer render target view
-	m_blend_state = nullptr;        // Color mix settings
 	m_rasterizer_state = nullptr;   // Rasterizer state
 
     // Background color
@@ -32,10 +32,6 @@ joj::DX11Renderer::~DX11Renderer()
 	// Release rasterizer state
 	if (m_rasterizer_state)
 		m_rasterizer_state->Release();
-
-	// Release blend state
-	if (m_blend_state)
-		m_blend_state->Release();
 
 	// Release render target view
 	if (m_render_target_view)
@@ -190,20 +186,10 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 	// ---------------------------------------------
 
 	// Describe blend state
-	D3D11_BLEND_DESC blend_desc = { };
-	blend_desc.AlphaToCoverageEnable = false;                                // Highlight the silhouette of sprites
-	blend_desc.IndependentBlendEnable = false;                               // Use the same mix for all render targets
-	blend_desc.RenderTarget[0].BlendEnable = true;                           // Enable blending
-	blend_desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;             // Source mixing factor
-	blend_desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;        // Target of RGB mixing is inverted alpha
-	blend_desc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;                 // Addition operation in color mixing
-	blend_desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;        // Alpha blend source is the alpha of the pixel shader
-	blend_desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;   // Fate of Alpha mixture is inverted alpha
-	blend_desc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;            // Addition operation in color mixing
-	blend_desc.RenderTarget[0].RenderTargetWriteMask = 0x0F;                 // Components of each pixel that can be overwritten
+	m_blend->describe_default();
 
 	// Create blend state
-	if (create_blend_state(&blend_desc, &m_blend_state) != ErrorCode::OK)
+	if (create_blend_state(&m_blend->get_blend_desc(), m_blend->get_blend_state().GetAddressOf()) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateBlendState.\n");
@@ -211,7 +197,7 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 	}
 
 	// Bind blend state to the Output Merger stage
-	set_blend_state(m_blend_state);
+	set_blend_state(m_blend->get_blend_state().Get());
 
 	// ---------------------------------------------------
 	// Rasterizer
