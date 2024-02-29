@@ -8,6 +8,7 @@ joj::DX11Renderer::DX11Renderer()
 {
     m_context = std::make_unique<DX11Context>();
 	m_swapchain = std::make_unique<DX11SwapChain>();
+	m_ds_manager = std::make_unique<DX11DepthStencilManager>();
 
     m_device = nullptr;
     m_device_context = nullptr;
@@ -16,7 +17,6 @@ joj::DX11Renderer::DX11Renderer()
 	m_quality = 0;                  // Default quality
 	m_vsync = false;                // No vertical sync
 	m_render_target_view = nullptr; // Backbuffer render target view
-	m_depth_stencil_view = nullptr; // Depth/Stencil view
 	m_blend_state = nullptr;        // Color mix settings
 	m_rasterizer_state = nullptr;   // Rasterizer state
 
@@ -37,10 +37,6 @@ joj::DX11Renderer::~DX11Renderer()
 	if (m_blend_state)
 		m_blend_state->Release();
 
-	// Release depth stencil view
-	if (m_depth_stencil_view)
-		m_depth_stencil_view->Release();
-
 	// Release render target view
 	if (m_render_target_view)
 		m_render_target_view->Release();
@@ -48,7 +44,6 @@ joj::DX11Renderer::~DX11Renderer()
 	m_context->get_debug()->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL);
 	printf("\n");
 }
-
 
 b8 joj::DX11Renderer::init(std::unique_ptr<Win32Window>& window)
 {
@@ -91,13 +86,13 @@ void joj::DX11Renderer::clear(f32 r, f32 g, f32 b, f32 a)
     bg_color[2] = b;
     bg_color[3] = a;
     m_device_context->ClearRenderTargetView(m_render_target_view, bg_color);
-	m_device_context->ClearDepthStencilView(m_depth_stencil_view, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	m_device_context->ClearDepthStencilView(m_ds_manager->get_depthstencil_view().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
 void joj::DX11Renderer::swap_buffers()
 {
 	m_swapchain->get_swapchain()->Present(m_vsync, NULL);
-	m_device_context->OMSetRenderTargets(1, &m_render_target_view, m_depth_stencil_view);
+	m_device_context->OMSetRenderTargets(1, &m_render_target_view, m_ds_manager->get_depthstencil_view().Get());
 }
 
 void joj::DX11Renderer::shutdown()
@@ -152,22 +147,16 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 	// ---------------------------------------------------
 
 	// Describe Depth/Stencil Buffer Desc
-	D3D11_TEXTURE2D_DESC depth_stencil_desc = { 0 };
-	depth_stencil_desc.Width = u32(window->get_width());		// Depth/Stencil buffer width
-	depth_stencil_desc.Height = u32(window->get_height());		// Depth/Stencil buffer height
-	depth_stencil_desc.MipLevels = 0;							// Number of mipmap levels
-	depth_stencil_desc.ArraySize = 1;							// Number of textures in array
-	depth_stencil_desc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;	// Color format - Does it need to be the same format of swapChainDesc?
-	depth_stencil_desc.SampleDesc.Count = m_antialiasing;			// Samples per pixel (antialiasing)
-	depth_stencil_desc.SampleDesc.Quality = m_quality;			// Level of image quality
-	depth_stencil_desc.Usage = D3D11_USAGE_DEFAULT;				// Default - GPU will both read and write to the resource
-	depth_stencil_desc.BindFlags = D3D11_BIND_DEPTH_STENCIL;	// Where resource will be bound to the pipeline
-	depth_stencil_desc.CPUAccessFlags = 0;						// CPU will not read not write to the Depth/Stencil buffer
-	depth_stencil_desc.MiscFlags = 0;							// Optional flags
+	m_ds_manager->describe_default(
+		static_cast<u32>(window->get_width()),
+		static_cast<u32>(window->get_height()),
+		m_antialiasing,
+		m_quality
+	);
 
 	// Create Depth/Stencil Buffer
 	ID3D11Texture2D* depth_stencil_buffer = nullptr;
-	if (create_texture2D(depth_stencil_desc, &depth_stencil_buffer) != ErrorCode::OK)
+	if (create_texture2D(m_ds_manager->get_dsv_desc(), &depth_stencil_buffer) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateTexture2D.\n");
@@ -175,7 +164,7 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 	}
 
 	// Create Depth/Stencil View
-	if (create_dsv(depth_stencil_buffer, &m_depth_stencil_view) != ErrorCode::OK)
+	if (create_dsv(depth_stencil_buffer, m_ds_manager->get_depthstencil_view().GetAddressOf()) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateDepthStencilView.\n");
@@ -183,7 +172,7 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 	}
 
 	// Bind render target and depth stencil to the Output Merger stage
-	set_render_targets(&m_render_target_view, m_depth_stencil_view);
+	set_render_targets(&m_render_target_view, m_ds_manager->get_depthstencil_view().Get());
 
 	// ---------------------------------------------------
 	// Viewport
@@ -322,7 +311,7 @@ joj::ErrorCode joj::DX11Renderer::create_texture2D(const D3D11_TEXTURE2D_DESC& d
 
 joj::ErrorCode joj::DX11Renderer::create_dsv(ID3D11Resource* depthstencil_buffer, ID3D11DepthStencilView** dsv)
 {
-	if (FAILED(m_device->CreateDepthStencilView(depthstencil_buffer, 0, &m_depth_stencil_view)))
+	if (FAILED(m_device->CreateDepthStencilView(depthstencil_buffer, 0, dsv)))
 	{
 		// TODO: Use own logger
 		const char* err_str = error_to_string(ErrorCode::ERR_RENDERER_DEPTHSTENCIL_VIEW_CREATION);
