@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojDX11Renderer STATIC renderer_dx11.cpp swapchain_dx11.cpp viewport_dx11.cpp depth_stencil_manager_dx11.cpp blend_state_dx11.cpp)
+add_library(jojDX11Renderer STATIC renderer_dx11.cpp swapchain_dx11.cpp viewport_dx11.cpp depth_stencil_manager_dx11.cpp blend_state_dx11.cpp rasterizer_dx11.cpp)
 
 target_link_directories(
     jojDX11Renderer
