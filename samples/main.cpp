@@ -57,7 +57,7 @@ int main()
         if (pm->is_key_pressed(joj::KEY_ESCAPE))
             pm->close_window();
 
-        r.clear(0.3, 0.3, 0.3, 1.0);
+        r.clear(0.5, 0.7, 0.3, 1.0);
 
 #if JPLATFORM_LINUX  
         pm->swap_buffers();

@@ -14,6 +14,7 @@
 #include "error.h"
 #include "depth_stencil_manager_dx11.h"
 #include "blend_state_dx11.h"
+#include "rasterizer_dx11.h"
 
 namespace joj
 {
@@ -50,6 +51,7 @@ namespace joj
         std::unique_ptr<DX11SwapChain> m_swapchain;
         std::unique_ptr<DX11DepthStencilManager> m_ds_manager;
         std::unique_ptr<DX11BlendState> m_blend;
+        std::unique_ptr<DX11Rasterizer> m_rasterizer;
 
         f32 bg_color[4];
 
@@ -65,7 +67,6 @@ namespace joj
         u32 m_quality;                                 // Antialiasing sampling quality
         b8 m_vsync;                                    // Vertical sync 
         ID3D11RenderTargetView* m_render_target_view;  // Backbuffer render target view
-        ID3D11RasterizerState* m_rasterizer_state;     // Rasterizer state
     };
 
     inline void DX11Renderer::set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY topology) const

@@ -10,6 +10,7 @@ joj::DX11Renderer::DX11Renderer()
 	m_swapchain = std::make_unique<DX11SwapChain>();
 	m_ds_manager = std::make_unique<DX11DepthStencilManager>();
 	m_blend = std::make_unique<DX11BlendState>();
+	m_rasterizer = std::make_unique<DX11Rasterizer>();
 
     m_device = nullptr;
     m_device_context = nullptr;
@@ -18,7 +19,6 @@ joj::DX11Renderer::DX11Renderer()
 	m_quality = 0;                  // Default quality
 	m_vsync = false;                // No vertical sync
 	m_render_target_view = nullptr; // Backbuffer render target view
-	m_rasterizer_state = nullptr;   // Rasterizer state
 
     // Background color
 	bg_color[0] = 0.0f;		// Red
@@ -29,10 +29,6 @@ joj::DX11Renderer::DX11Renderer()
 
 joj::DX11Renderer::~DX11Renderer()
 {
-	// Release rasterizer state
-	if (m_rasterizer_state)
-		m_rasterizer_state->Release();
-
 	// Release render target view
 	if (m_render_target_view)
 		m_render_target_view->Release();
@@ -205,16 +201,10 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 
 	// TODO: comment specifications on rasterizer
 	// Describe rasterizer
-	D3D11_RASTERIZER_DESC rasterizer_desc = {};
-	ZeroMemory(&rasterizer_desc, sizeof(rasterizer_desc));
-	//rasterizer_desc.FillMode = D3D11_FILL_SOLID;
-	rasterizer_desc.FillMode = D3D11_FILL_WIREFRAME;
-	rasterizer_desc.CullMode = D3D11_CULL_BACK;
-	//rasterizer_desc.CullMode = D3D11_CULL_NONE;
-	rasterizer_desc.DepthClipEnable = true;
+	m_rasterizer->describe_default();
 
 	// Create rasterizer state(
-	if (create_rasterizer_state(&rasterizer_desc, &m_rasterizer_state) != ErrorCode::OK)
+	if (create_rasterizer_state(&m_rasterizer->get_rasterizer_desc(), m_rasterizer->get_rasterizer_state().GetAddressOf()) != ErrorCode::OK)
 	{
 		// TODO: Use own logger and return value
 		printf("Failed to CreateRasterizerState.\n");
@@ -222,7 +212,7 @@ joj::ErrorCode joj::DX11Renderer::setup_default_pipeline(std::unique_ptr<Win32Wi
 	}
 
 	// Set rasterizer state
-	set_rasterizer_state(m_rasterizer_state);
+	set_rasterizer_state(m_rasterizer->get_rasterizer_state().Get());
 
 	// ---------------------------------------------------
 	//	Release Resources
