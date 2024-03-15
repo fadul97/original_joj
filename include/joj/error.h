@@ -8,6 +8,13 @@ namespace joj
         UNKNOWN,
         OK,
         FAILED,
+
+        // General Engine error codes
+        ERR_ENGINE_INIT,
+
+        // General PlatformManager error codes
+        ERR_PLATFORM_MANAGER_INIT,
+        ERR_PLATFORM_MANAGER_CREATION,
         
         // General Window error codes
         ERR_WINDOW_INIT,
@@ -18,6 +25,10 @@ namespace joj
         ERR_WINDOW_DISPLAY,
 
         // TODO: Win32Window error codes
+
+        // General Renderer error codes
+        ERR_RENDERER_INIT,
+        ERR_RENDERER_PIPELINE_ERROR,
         
         // General GraphicsContext error codes
         ERR_CONTEXT_INIT,
