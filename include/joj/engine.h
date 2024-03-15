@@ -5,6 +5,7 @@
 #include "defines.h"
 
 #include "error.h"
+#include "app.h"
 
 #if JPLATFORM_LINUX  
 #include "platform/x11/platform_manager_x11.h"
@@ -23,14 +24,15 @@ namespace joj
         ~Engine();
 
         ErrorCode init();
-        ErrorCode run();
+        ErrorCode run(App* app);
         void shutdown();
 
-    private:
+        Win32PlatformManager* get_platform_manager() const;
 
 #if JPLATFORM_WINDOWS  
-        Win32PlatformManager* platform_manager;
-        DX11Renderer* renderer;
+        // TODO: static members?
+        static Win32PlatformManager* platform_manager;
+        static DX11Renderer* renderer;
 #endif // JPLATFORM_WINDOWS
     };
 } // namespace joj

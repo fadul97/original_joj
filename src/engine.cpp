@@ -2,6 +2,9 @@
 
 #include <iostream>
 
+joj::Win32PlatformManager* joj::Engine::platform_manager = nullptr;
+joj::DX11Renderer* joj::Engine::renderer = nullptr;
+
 joj::Engine::Engine()
 {
     platform_manager = new Win32PlatformManager();
@@ -46,13 +49,17 @@ joj::ErrorCode joj::Engine::init()
     return ErrorCode::OK;
 }
 
-joj::ErrorCode joj::Engine::run()
+joj::ErrorCode joj::Engine::run(App* app)
 {
     if (init() != ErrorCode::OK)
     {
         std::cout << "Failed to initialize engine.\n";
         return ErrorCode::ERR_ENGINE_INIT;
     }
+
+    app->init();
+
+    f32 dt = 1.0f;
 
     while (platform_manager->is_running())
     {
@@ -61,7 +68,8 @@ joj::ErrorCode joj::Engine::run()
         if (platform_manager->is_key_pressed(joj::KEY_ESCAPE))
             platform_manager->close_window();
 
-        renderer->clear(0, 0, 1, 1);
+        app->update(dt);
+        app->draw();
 
         renderer->swap_buffers();
     }
