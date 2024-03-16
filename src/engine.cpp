@@ -74,6 +74,8 @@ joj::ErrorCode joj::Engine::run(App* app)
         renderer->swap_buffers();
     }
 
+    app->shutdown();
+
     shutdown();
 
     return ErrorCode::OK;
