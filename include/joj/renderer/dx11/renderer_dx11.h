@@ -46,6 +46,9 @@ namespace joj
 
         void set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY topology) const;
 
+        Microsoft::WRL::ComPtr<ID3D11Device>& get_device();
+        Microsoft::WRL::ComPtr<ID3D11DeviceContext>& get_device_context();
+
     private:
         std::unique_ptr<DX11Context> m_context;
         std::unique_ptr<DX11SwapChain> m_swapchain;
@@ -68,6 +71,12 @@ namespace joj
         b8 m_vsync;                                    // Vertical sync 
         ID3D11RenderTargetView* m_render_target_view;  // Backbuffer render target view
     };
+
+    inline Microsoft::WRL::ComPtr<ID3D11Device>& DX11Renderer::get_device()
+    { return m_device; }
+
+    inline Microsoft::WRL::ComPtr<ID3D11DeviceContext>& DX11Renderer::get_device_context()
+    { return m_device_context; }
 
     inline void DX11Renderer::set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY topology) const
     { m_device_context->IASetPrimitiveTopology(topology); }
