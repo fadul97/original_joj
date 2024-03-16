@@ -28,6 +28,9 @@ namespace joj
         b8 is_key_pressed(Keys key) const;
         b8 is_key_up(Keys key) const;
 
+        b8 is_button_down(Buttons button) const;
+        b8 is_button_up(Buttons button) const;
+
         i16 get_xmouse() const;
         i16 get_ymouse() const;
         i16 get_mouse_wheel() const;
@@ -67,6 +70,14 @@ namespace joj
     template<class Twindow, class Tinput, class Tcontext>
     inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_up(Keys key) const
     { return input->is_key_up(key); }
+
+    template<class Twindow, class Tinput, class Tcontext>
+    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_button_down(Buttons button) const
+    { return input->is_button_down(button); }
+
+    template<class Twindow, class Tinput, class Tcontext>
+    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_button_up(Buttons button) const
+    { return input->is_button_up(button); }
 
     template<class Twindow, class Tinput, class Tcontext>
     inline i16 PlatformManager<Twindow, Tinput, Tcontext>::get_xmouse() const
