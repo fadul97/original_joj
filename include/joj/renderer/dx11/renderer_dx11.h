@@ -26,7 +26,8 @@ namespace joj
         
         b8 init(std::unique_ptr<Win32Window>& window) override;
         void render() override;
-        void clear(f32 r = 0.0f, f32 g = 0.0f, f32 b = 0.0f, f32 a = 0.0f) override;
+        void clear(f32 r, f32 g, f32 b, f32) override;
+        void clear();
         void swap_buffers() override;
         void shutdown() override;
 

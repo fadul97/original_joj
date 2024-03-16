@@ -81,6 +81,12 @@ void joj::DX11Renderer::clear(f32 r, f32 g, f32 b, f32 a)
 	m_device_context->ClearDepthStencilView(m_ds_manager->get_depthstencil_view().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 }
 
+void joj::DX11Renderer::clear()
+{
+	m_device_context->ClearRenderTargetView(m_render_target_view, bg_color);
+	m_device_context->ClearDepthStencilView(m_ds_manager->get_depthstencil_view().Get(), D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+}
+
 void joj::DX11Renderer::swap_buffers()
 {
 	m_swapchain->get_swapchain()->Present(m_vsync, NULL);
