@@ -10,4 +10,4 @@ target_link_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-target_link_libraries(jojDX11Renderer PUBLIC jojRenderer dxgi.lib d3d11.lib)
+target_link_libraries(jojDX11Renderer PUBLIC jojRenderer dxgi.lib d3d11.lib D3DCompiler.lib)
