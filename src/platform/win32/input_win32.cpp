@@ -39,33 +39,39 @@ LRESULT CALLBACK joj::Win32Input::InputProc(HWND hWnd, UINT msg, WPARAM wParam, 
     case WM_LBUTTONDOWN:
     case WM_LBUTTONDBLCLK:
         m_keyboard.keys[VK_LBUTTON] = true;
+        m_mouse.buttons[BUTTON_LEFT] = true;
         return 0;
 
     // Middle mouse button pressed
     case WM_MBUTTONDOWN:
     case WM_MBUTTONDBLCLK:
         m_keyboard.keys[VK_MBUTTON] = true;
+        m_mouse.buttons[BUTTON_MIDDLE] = true;
         return 0;
 
         // Right mouse button pressed
     case WM_RBUTTONDOWN:
     case WM_RBUTTONDBLCLK:
         m_keyboard.keys[VK_RBUTTON] = true;
+        m_mouse.buttons[BUTTON_RIGHT] = true;
         return 0;
 
     // Left mouse button released
     case WM_LBUTTONUP:
         m_keyboard.keys[VK_LBUTTON] = false;
+        m_mouse.buttons[BUTTON_LEFT] = false;
         return 0;
 
     // Middle mouse button released
     case WM_MBUTTONUP:
         m_keyboard.keys[VK_MBUTTON] = false;
+        m_mouse.buttons[BUTTON_MIDDLE] = false;
         return 0;
 
     // Right mouse button released
     case WM_RBUTTONUP:
         m_keyboard.keys[VK_RBUTTON] = false;
+        m_mouse.buttons[BUTTON_RIGHT] = false;
         return 0;
     }
 
