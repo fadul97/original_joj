@@ -18,6 +18,9 @@ namespace joj
         b8 is_key_pressed(Keys key);
         b8 is_key_up(Keys key) const;
 
+        b8 is_button_down(Buttons button) const;
+        b8 is_button_up(Buttons button) const;
+
         i16 get_xmouse() const;
         i16 get_ymouse() const;
         i16 get_mouse_wheel() const;
@@ -64,6 +67,12 @@ namespace joj
 
         inline void Input::release_button(Buttons button)
         { m_mouse.buttons[button] = false; }
+
+        inline b8 Input::is_button_down(Buttons button) const
+        { return m_mouse.buttons[button]; }
+
+        inline b8 Input::is_button_up(Buttons button) const
+        { return !m_mouse.buttons[button]; }
 }
 
 #endif // JOJ_INPUT_H
