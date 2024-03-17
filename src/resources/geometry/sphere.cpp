@@ -1,5 +1,7 @@
 #include "resources/geometry/sphere.h"
 
+#include "math/jmath.h"
+
 joj::Sphere::Sphere()
 {
     type = GeometryType::SPHERE;

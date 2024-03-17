@@ -1,5 +1,7 @@
 #include "resources/geometry/cylinder.h"
 
+#include "math/jmath.h"
+
 joj::Cylinder::Cylinder()
 {
     type = GeometryType::CYLINDER;
