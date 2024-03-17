@@ -10,6 +10,9 @@
 #include "renderer/shader.h"
 
 #include "texture_rect_gl.h"
+#include "math/vector3.h"
+#include "math/vector4.h"
+#include "math/matrix4.h"
 
 namespace joj
 {
@@ -22,14 +25,14 @@ namespace joj
         GLShader(const char* vertex_path, const char* fragment_path);
         ~GLShader();
         
-        b8 compile_shaders(const char* vertex_shader, const char* fragment_shader) override;
+        b8 compile_shaders(const char* vertex_shader, const char* fragment_shader);
         void use() const override;
         void set_int(const std::string name, const i32 value) const;
         void set_float(const std::string name, const f32 value) const;
-        void set_vec3(const std::string name, const Vector3 v) const override;
+        void set_vec3(const std::string name, const Vector3 v) const;
         void set_vec4(const std::string name, const GLTextureRect r) const;
-        void set_vec4(const std::string name, const Vector4 v) const override;
-        void set_mat4(const std::string name, const Matrix4 m) const override;
+        void set_vec4(const std::string name, const Vector4 v) const;
+        void set_mat4(const std::string name, const Matrix4 m) const;
         void destroy() override;
 
     private:
@@ -55,8 +58,18 @@ namespace joj
     inline void GLShader::set_vec4(const std::string name, const Vector4 v) const
     { glUniform4f(glGetUniformLocation(id, name.c_str()), v.x, v.y, v.z, v.w); }
 
+#if JPLATFORM_WINDOWS
+    inline void GLShader::set_mat4(const std::string name, const Matrix4 m) const
+    { 
+        // Convert DirectX::XMMATRIX to a compatible format
+        float mat_array[16];
+        memcpy(mat_array, &m, sizeof(float) * 16);
+        glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, mat_array);
+    }
+#else
     inline void GLShader::set_mat4(const std::string name, const Matrix4 m) const
     { glUniformMatrix4fv(glGetUniformLocation(id, name.c_str()), 1, GL_FALSE, m.data); }
+#endif
 
     inline void GLShader::destroy()
     { glDeleteProgram(id); }
