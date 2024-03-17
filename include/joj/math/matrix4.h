@@ -4,7 +4,14 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-// #if JPLATFORM_LINUX
+#if JPLATFORM_WINDOWS
+#include <DirectXMath.h>
+namespace joj
+{
+    using Matrix4 = DirectX::XMMATRIX;
+}
+
+#else
 
 #include <string>
 #include <sstream>
@@ -124,6 +131,6 @@ namespace joj
     };
 }
 
-// #endif // JPLATFORM_LINUX
+#endif // JPLATFORM_LINUX
 
 #endif // JOJ_MATRIX_H

@@ -4,7 +4,14 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-// #if JPLATFORM_LINUX
+#if JPLATFORM_WINDOWS
+#include <DirectXMath.h>
+namespace joj
+{
+    using Vector4 = DirectX::XMFLOAT4;
+}
+
+#else
 
 #include <cmath>
 #include <string>
@@ -109,6 +116,6 @@ namespace joj
     };
 }
 
-// #endif // JPLATFORM_LINUX
+#endif // JPLATFORM_LINUX
 
 #endif // JOJ_VECTOR4_H

@@ -4,7 +4,11 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-// #if JPLATFORM_LINUX
+#if JPLATFORM_WINDOWS
+#include <DirectXMath.h>
+#define J_PI DirectX::XM_PI
+
+#else
 
 #include "vector3.h"
 #include "vector4.h"
@@ -163,6 +167,6 @@ namespace joj
     }
 }
 
-// #endif // JPLATFORM_LINUX
+#endif // JPLATFORM_LINUX
 
 #endif // JOJ_MATH_H
