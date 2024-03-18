@@ -16,14 +16,15 @@
 #include "joj/renderer/dx11/vertex_buffer_dx11.h"
 #include "joj/renderer/dx11/index_buffer_dx11.h"
 #include "joj/renderer/dx11/obj_const_buffer_dx11.h"
+#include "joj/systems/camera.h"
 
 class MyApp : public joj::App
 {
 public:
     //joj::Cube geo = joj::Cube(3.0f, 3.0f, 3.0f);
-    joj::Cylinder geo = joj::Cylinder(1.0f, 0.5f, 3.0f, 20, 10);
+    //joj::Cylinder geo = joj::Cylinder(1.0f, 0.5f, 3.0f, 20, 10);
     //joj::GeoSphere geo = joj::GeoSphere(1.0f, 3);
-    //joj::Grid geo = joj::Grid(100.0f, 100.0f, 20, 20);
+    joj::Grid geo = joj::Grid(100.0f, 100.0f, 20, 20);
     //joj::Quad geo = joj::Quad(3.0f, 1.0f);
     //joj::Sphere geo = joj::Sphere(1.0f, 40, 40, joj::Vector4(0, 1, 0, 1));
     joj::DX11Shader shader{};
@@ -36,24 +37,55 @@ public:
     DirectX::XMFLOAT4X4 View = {};
     DirectX::XMFLOAT4X4 Proj = {};
 
-    f32 theta = 0;
-    f32 phi = 0;
-    f32 radius = 0;
+    joj::Camera camera = joj::Camera{ joj::Vector3{ 0.0f, 0.0f, -6.0f } };
 
-    f32 last_xmouse = 0;
-    f32 last_ymouse = 0;
+    float lastX = 800 / 2.0f;
+    float lastY = 600 / 2.0f;
+    b8 firstMouse = true;
+    b8 firstPerson = true;
+    b8 hideCursor = false;
+    i32 centerX = 400;
+    i32 centerY = 300;
+    i32 cmouseX = 0;
+    i32 cmouseY = 0;
+
+    void process_input_for_camera(f32 dt)
+    {
+        if (joj::Engine::platform_manager->is_key_down(joj::KEY_W))
+            camera.process_keyboard(joj::CameraMovement::FORWARD, dt);
+
+        if (joj::Engine::platform_manager->is_key_down(joj::KEY_S))
+            camera.process_keyboard(joj::CameraMovement::BACKWARD, dt);
+
+        if (joj::Engine::platform_manager->is_key_down(joj::KEY_A))
+            camera.process_keyboard(joj::CameraMovement::LEFT, dt);
+
+        if (joj::Engine::platform_manager->is_key_down(joj::KEY_D))
+            camera.process_keyboard(joj::CameraMovement::RIGHT, dt);
+    }
+
+    void mouse_callback(f64 xposIn, f64 yposIn)
+    {
+        float xpos = static_cast<float>(xposIn);
+        float ypos = static_cast<float>(yposIn);
+        if (firstMouse)
+        {
+            lastX = xpos;
+            lastY = ypos;
+            firstMouse = false;
+        }
+
+        float xoffset = xpos - lastX;
+        float yoffset = lastY - ypos; // reversed since y-coordinates go from bottom to top
+
+        lastX = xpos;
+        lastY = ypos;
+
+        camera.process_mouse_movement(xoffset, yoffset);
+    }
 
     void init()
     {
-        // Control geometry rotation
-        theta = DirectX::XM_PIDIV4;
-        phi = DirectX::XM_PIDIV4;
-        radius = 10.0f;
-
-        // Get last mouse position
-        last_xmouse = (f32)joj::Engine::platform_manager->get_xmouse();
-        last_ymouse = (f32)joj::Engine::platform_manager->get_ymouse();
-
         World = View =
         {
             1.0f, 0.0f, 0.0f, 0.0f,
@@ -65,24 +97,21 @@ public:
         XMStoreFloat4x4(&Proj, DirectX::XMMatrixPerspectiveFovLH(
             DirectX::XMConvertToRadians(45.0f),
             joj::Engine::platform_manager->get_window()->get_aspect_ratio(),
-            1.0f, 100.0f));
+            1.0f, 1000.0f));
 
         // World Matrix
-        DirectX::XMMATRIX S = DirectX::XMMatrixScaling(1.0f, 1.0f, 1.0f);
+        DirectX::XMMATRIX S = DirectX::XMMatrixScaling(30.0f, 30.0f, 30.0f);
         DirectX::XMMATRIX Ry = DirectX::XMMatrixRotationY(DirectX::XMConvertToRadians(30));
         DirectX::XMMATRIX Rx = DirectX::XMMatrixRotationX(DirectX::XMConvertToRadians(-30));
         DirectX::XMMATRIX T = DirectX::XMMatrixTranslation(0, 0, 0);
         DirectX::XMMATRIX w = S * Ry * Rx * T;
 
         // View Matrix
-        DirectX::XMVECTOR pos = DirectX::XMVectorSet(0, 0, -6, 1);
-        DirectX::XMVECTOR target = DirectX::XMVectorZero();
-        DirectX::XMVECTOR up = DirectX::XMVectorSet(0, 1, 0, 0);
-        DirectX::XMMATRIX v = DirectX::XMMatrixLookAtLH(pos, target, up);
+        DirectX::XMMATRIX v = camera.get_view_mat();
 
         // Projection Matrix
         DirectX::XMMATRIX p = DirectX::XMMatrixPerspectiveFovLH(
-            DirectX::XMConvertToRadians(45),
+            DirectX::XMConvertToRadians(camera.m_zoom),
             joj::Engine::platform_manager->get_window()->get_aspect_ratio(),
             1.0f, 100.0f);
 
@@ -156,59 +185,55 @@ public:
 
         // Tell how Direct3D will form geometric primitives from vertex data
         joj::Engine::renderer->set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+
+        mouse_callback(joj::Engine::platform_manager->get_xmouse(), joj::Engine::platform_manager->get_ymouse());
+        
+        centerX = joj::Engine::platform_manager->get_window()->get_xcenter();
+        centerY = joj::Engine::platform_manager->get_window()->get_ycenter();
+
+        joj::Engine::platform_manager->get_window()->hide_cursor(true);
+
+        cmouseX = joj::Engine::platform_manager->get_xmouse();
+        cmouseY = joj::Engine::platform_manager->get_ymouse();
     }
 
     void update(f32 dt)
     {
-        using namespace joj;
-
-        f32 xmouse = (f32)joj::Engine::platform_manager->get_xmouse();
-        f32 ymouse = (f32)joj::Engine::platform_manager->get_ymouse();
-
-        if (joj::Engine::platform_manager->is_button_down(joj::BUTTON_LEFT))
+        if (joj::Engine::platform_manager->is_key_pressed(joj::KEY_TAB))
         {
-            // Every pixel equals 1/4 degree
-            f32 dx = DirectX::XMConvertToRadians(0.4f * (xmouse - last_xmouse));
-            f32 dy = DirectX::XMConvertToRadians(0.4f * (ymouse - last_ymouse));
-
-            // Update angles based on mouse offset to orbit camera around geometry
-            theta += dx;
-            phi += dy;
-
-            // Restricts the angle of phi ]0-180[ degrees
-            phi = phi < 0.1f ? 0.1f : (phi > (DirectX::XM_PI - 0.1f) ? DirectX::XM_PI - 0.1f : phi);
-        }
-        else if (joj::Engine::platform_manager->is_button_down(joj::BUTTON_RIGHT))
-        {
-            // Every pixel equals 0.5 unities
-            f32 dx = 0.05f * (xmouse - last_xmouse);
-            f32 dy = 0.05f * (ymouse - last_ymouse);
-
-            // Update camera radius based on mouse offset
-            radius += dx - dy;
-
-            // Restricts radius (3 to 15 unities)
-            radius = radius < 3.0f ? 3.0f : (radius > 15.0f ? 15.0f : radius);
+            firstPerson = !firstPerson;
+            hideCursor = !hideCursor;
+            ShowCursor(hideCursor);
         }
 
-        last_xmouse = xmouse;
-        last_ymouse = ymouse;
+        if (firstPerson)
+        {
+            // Now read the mouse position
+            POINT cursorPos;
+            GetCursorPos(&cursorPos);  // Get the current cursor position
+            // Rotate freely inside window
+            SetCursorPos(centerX, centerY);
 
-        // Converts spherical coordinates to Cartesian coordinates
-        f32 x = radius * sinf(phi) * cosf(theta);
-        f32 z = radius * sinf(phi) * sinf(theta);
-        f32 y = radius * cosf(phi);
+            // Calculate the mouse movement
+            int xoffset = cursorPos.x - centerX;
+            int yoffset = centerY - cursorPos.y;
 
+            //mouse_callback(JojEngine::Engine::pm->get_xmouse(), JojEngine::Engine::pm->get_ymouse());
+            camera.process_mouse_movement(xoffset, yoffset);
+            process_input_for_camera(0.01f);
+        }
+
+        // Transformations
+        DirectX::XMMATRIX world = XMLoadFloat4x4(&World);
+        
         // Constructs the Camera Matrix (View Matrix)
-        DirectX::XMVECTOR pos = DirectX::XMVectorSet(x, y, z, 1.0f);
-        DirectX::XMVECTOR target = DirectX::XMVectorZero();
-        DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
-        DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(pos, target, up);
+        DirectX::XMMATRIX view = camera.get_view_mat();
         XMStoreFloat4x4(&View, view);
 
-        // Constructs Combined Matrix (World x View x Proj)
-        DirectX::XMMATRIX world = XMLoadFloat4x4(&World);
+        // Projection Matrix
         DirectX::XMMATRIX proj = XMLoadFloat4x4(&Proj);
+
+        // Constructs Combined Matrix (World x View x Proj)
         DirectX::XMMATRIX WorldViewProj = world * view * proj;
 
         // Update constant buffer with combined matrix (Word-View-Projection Matrix)
