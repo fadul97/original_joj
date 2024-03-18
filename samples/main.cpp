@@ -66,12 +66,12 @@ public:
 
     void init()
     {
-        // controla rotação do cubo
+        // Control geometry rotation
         theta = DirectX::XM_PIDIV4;
         phi = DirectX::XM_PIDIV4;
         radius = 10.0f;
 
-        // pega última posição do mouse
+        // Get last mouse position
         last_xmouse = (f32)joj::Engine::platform_manager->get_xmouse();
         last_ymouse = (f32)joj::Engine::platform_manager->get_ymouse();
 
@@ -142,14 +142,6 @@ public:
             std::cout << "Failed to create vertex buffer.\n";
         }
 
-        /*
-        // 4) Bind vertex buffer to input slot of the device when drawing...
-        u32 stride = sizeof(Vertex1);
-        u32 offset = 0;
-        joj::Engine::renderer->get_device_context()->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
-        */
-
-
         // ---------------------------------
         // INDICES AND INDEX BUFFERS
         // ---------------------------------
@@ -165,11 +157,6 @@ public:
         {
             std::cout << "Failed to create index buffer.\n";
         }
-
-        /*
-        // 4) Bind index buffer to input slot of the device when drawing...
-        joj::Engine::renderer->get_device_context()->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
-        */
 
         // ---------------------------------
         // SHADERS
@@ -189,7 +176,6 @@ public:
 
         // Tell how Direct3D will form geometric primitives from vertex data
         joj::Engine::renderer->set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
     }
 
     void update(f32 dt)
@@ -201,47 +187,46 @@ public:
 
         if (joj::Engine::platform_manager->is_button_down(joj::BUTTON_LEFT))
         {
-            // cada pixel corresponde a 1/4 de grau
+            // Every pixel equals 1/4 degree
             f32 dx = DirectX::XMConvertToRadians(0.4f * (xmouse - last_xmouse));
             f32 dy = DirectX::XMConvertToRadians(0.4f * (ymouse - last_ymouse));
 
-            // atualiza ângulos com base no deslocamento do mouse 
-            // para orbitar a câmera ao redor da caixa
+            // Update angles based on mouse offset to orbit camera around geometry
             theta += dx;
             phi += dy;
 
-            // restringe o ângulo de phi ]0-180[ graus
+            // Restricts the angle of phi ]0-180[ degrees
             phi = phi < 0.1f ? 0.1f : (phi > (DirectX::XM_PI - 0.1f) ? DirectX::XM_PI - 0.1f : phi);
         }
         else if (joj::Engine::platform_manager->is_button_down(joj::BUTTON_RIGHT))
         {
-            // cada pixel corresponde a 0.05 unidades
+            // Every pixel equals 0.5 unities
             f32 dx = 0.05f * (xmouse - last_xmouse);
             f32 dy = 0.05f * (ymouse - last_ymouse);
 
-            // atualiza o raio da câmera com base no deslocamento do mouse 
+            // Update camera radius based on mouse offset
             radius += dx - dy;
 
-            // restringe o raio (3 a 15 unidades)
+            // Restricts radius (3 to 15 unities)
             radius = radius < 3.0f ? 3.0f : (radius > 15.0f ? 15.0f : radius);
         }
 
         last_xmouse = xmouse;
         last_ymouse = ymouse;
 
-        // converte coordenadas esféricas para cartesianas
+        // Converts spherical coordinates to Cartesian coordinates
         f32 x = radius * sinf(phi) * cosf(theta);
         f32 z = radius * sinf(phi) * sinf(theta);
         f32 y = radius * cosf(phi);
 
-        // constrói a matriz da câmera (view matrix)
+        // Constructs the Camera Matrix (View Matrix)
         DirectX::XMVECTOR pos = DirectX::XMVectorSet(x, y, z, 1.0f);
         DirectX::XMVECTOR target = DirectX::XMVectorZero();
         DirectX::XMVECTOR up = DirectX::XMVectorSet(0.0f, 1.0f, 0.0f, 0.0f);
         DirectX::XMMATRIX view = DirectX::XMMatrixLookAtLH(pos, target, up);
         XMStoreFloat4x4(&View, view);
 
-        // constrói matriz combinada (world x view x proj)
+        // Constructs Combined Matrix (World x View x Proj)
         DirectX::XMMATRIX world = XMLoadFloat4x4(&World);
         DirectX::XMMATRIX proj = XMLoadFloat4x4(&Proj);
         DirectX::XMMATRIX WorldViewProj = world * view * proj;
