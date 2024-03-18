@@ -147,10 +147,10 @@ b8 joj::DX11Shader::compile_shaders(LPCWSTR vertex_path, LPCWSTR pixel_path, Mic
         return false;
     }
 
+    // TODO: Find a better way to abstract the input layout - Should it be in the Shader class?
     // ---------------------------------
     // INPUT ASSEMBLER
     // ---------------------------------
-
 
     // Create the vertex input layout.
     D3D11_INPUT_ELEMENT_DESC input_desc[2] =

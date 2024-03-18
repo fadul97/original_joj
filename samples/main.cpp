@@ -12,6 +12,8 @@
 #include "joj/resources/geometry/grid.h"
 #include "joj/resources/geometry/quad.h"
 #include "joj/resources/geometry/sphere.h"
+#include "joj/renderer/dx11/shader_dx11.h"
+#include "joj/renderer/dx11/vertex_buffer_dx11.h"
 
 /*
 struct Vertex1
@@ -40,17 +42,15 @@ public:
     //joj::GeoSphere geo = joj::GeoSphere(1.0f, 3);
     //joj::Grid geo = joj::Grid(100.0f, 100.0f, 20, 20);
     //joj::Quad geo = joj::Quad(3.0f, 1.0f);
-    joj::Sphere geo = joj::Sphere(1.0f, 40, 40, joj::Vector4(0, 1, 1, 1));
+    joj::Sphere geo = joj::Sphere(1.0f, 40, 40, joj::Vector4(0, 1, 0, 1));
+    joj::DX11Shader shader{};
 
-    ID3D11Buffer* vertex_buffer = nullptr;
+    joj::DX11VertexBuffer vertex_buffer{};
     ID3D11Buffer* index_buffer = nullptr;
 
     ID3D11Buffer* constant_buffer = nullptr;
     D3D11_SUBRESOURCE_DATA constant_data = { 0 };
     D3D11_BUFFER_DESC const_buffer_desc = { 0 };
-
-    ID3D11VertexShader* vertex_shader = nullptr;
-    ID3D11PixelShader* pixel_shader = nullptr;
 
     DirectX::XMFLOAT4X4 World = {};
     DirectX::XMFLOAT4X4 View = {};
@@ -129,20 +129,14 @@ public:
         // VERTEX BUFFERS
         // ---------------------------------
         
-        // 1) Buffer to store vertices, describe how data will be accessed and where it will be bound to the rendering pipeline
-        D3D11_BUFFER_DESC vbd;
-        vbd.Usage = D3D11_USAGE_IMMUTABLE;
-        vbd.ByteWidth = sizeof(joj::Vertex) * geo.get_vertex_count();
-        vbd.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-        vbd.CPUAccessFlags = 0;
-        vbd.MiscFlags = 0;
-        vbd.StructureByteStride = 0;
+        // Build vertex buffer and set initial data
+        vertex_buffer.build(sizeof(joj::Vertex) * geo.get_vertex_count(), geo.get_vertex_data());
 
-        // 2) Strcture to specify data we want to initialize the buffer contents with
-        D3D11_SUBRESOURCE_DATA vert_init_data{ geo.get_vertex_data(), 0, 0 };
-
-        // 3) Create buffer with ID3D11Device::CreateBuffer
-        if FAILED(joj::Engine::renderer->get_device()->CreateBuffer(&vbd, &vert_init_data, &vertex_buffer))
+        // Create buffer with ID3D11Device::CreateBuffer
+        if FAILED(joj::Engine::renderer->get_device()->CreateBuffer(
+            vertex_buffer.get_buffer_desc(),
+            vertex_buffer.get_subdata(),
+            vertex_buffer.get_buffer().GetAddressOf()))
         {
             std::cout << "Failed to create vertex buffer.\n";
         }
@@ -186,65 +180,22 @@ public:
         // ---------------------------------
         // SHADERS
         // ---------------------------------
-        DWORD shader_flags = 0;
-#if defined(DEBUG) || defined(_DEBUG)
-        shader_flags |= D3D10_SHADER_DEBUG;
-        shader_flags |= D3D10_SHADER_SKIP_OPTIMIZATION;
-        std::cout << "[DEBUG MODE]" << std::endl;
-#endif
 
-        ID3DBlob* vs_blob = nullptr;
-        ID3D10Blob* compilation_msgs = 0;
-        
-        LPCWSTR filepath = L"../../../../samples/shaders/vert.hlsl";
-        if FAILED(D3DCompileFromFile(filepath, nullptr, nullptr, "main", "vs_5_0", shader_flags, NULL, &vs_blob, &compilation_msgs))
-        {
-            wprintf(L"Failed to compile vertex shader from path '%s'\n", filepath);
-        }
-
-        if FAILED(joj::Engine::renderer->get_device()->CreateVertexShader(vs_blob->GetBufferPointer(), vs_blob->GetBufferSize(), nullptr, &vertex_shader))
-        {
-            std::cout << "Failed to create vertex shader.\n";
-        }
-
-        ID3DBlob* compile_errors_blob;
-        ID3DBlob* ps_blob = nullptr;
-
-        filepath = L"../../../../samples/shaders/pixel.hlsl";
-        if FAILED(D3DCompileFromFile(filepath, nullptr, nullptr, "main", "ps_5_0", shader_flags, NULL, &ps_blob, &compile_errors_blob))
-            MessageBoxA(nullptr, "Failed to compile Pixel Shader.", 0, 0);
-
-        if FAILED(joj::Engine::renderer->get_device()->CreatePixelShader(ps_blob->GetBufferPointer(), ps_blob->GetBufferSize(), nullptr, &pixel_shader))
-            MessageBoxA(nullptr, "Failed to create Vertex Shader.", 0, 0);
+        LPCWSTR vertex_path = L"../../../../samples/shaders/vert.hlsl";
+        LPCWSTR pixel_path = L"../../../../samples/shaders/pixel.hlsl";
+        if (!shader.compile_shaders(vertex_path, pixel_path, joj::Engine::renderer->get_device()))
+            std::cout << "Failed to compile shaders.\n";
     
         // ---------------------------------
         // INPUT ASSEMBLER
         // ---------------------------------
         
-        // Create input layout
-        ID3D11InputLayout* input_layout = nullptr;
-
-        // Create the vertex input layout.
-        D3D11_INPUT_ELEMENT_DESC input_desc[2] =
-        {
-            { "POSITION",	0, DXGI_FORMAT_R32G32B32_FLOAT, 0,  0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-            { "COLOR",		0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 }				// 3 'floats' x 4 bytes = 12 bytes
-        };
-
-        if FAILED(joj::Engine::renderer->get_device()->CreateInputLayout(input_desc, ARRAYSIZE(input_desc), vs_blob->GetBufferPointer(), vs_blob->GetBufferSize(), &input_layout))
-        {
-            MessageBoxA(nullptr, "Failed to create Input Layout.", 0, 0);
-        }
-
         // Bind input layout to the Input Assembler Stage
-        joj::Engine::renderer->get_device_context()->IASetInputLayout(input_layout);
+        joj::Engine::renderer->get_device_context()->IASetInputLayout(shader.get_input_layout());
 
         // Tell how Direct3D will form geometric primitives from vertex data
         joj::Engine::renderer->set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        // Relase Direct3D resources
-        vs_blob->Release();
-        ps_blob->Release();
     }
 
     void update(f32 dt)
@@ -325,14 +276,14 @@ public:
         UINT offset = 0;
 
         // Bind Vertex Buffer to an input slot of the device
-        joj::Engine::renderer->get_device_context()->IASetVertexBuffers(0, 1, &vertex_buffer, &stride, &offset);
+        joj::Engine::renderer->get_device_context()->IASetVertexBuffers(0, 1, vertex_buffer.get_buffer().GetAddressOf(), &stride, &offset);
         
         // Bind index buffer to the pipeline
         joj::Engine::renderer->get_device_context()->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
 
         // Bind Vertex and Pixel Shaders
-        joj::Engine::renderer->get_device_context()->VSSetShader(vertex_shader, nullptr, 0);
-        joj::Engine::renderer->get_device_context()->PSSetShader(pixel_shader, nullptr, 0);
+        joj::Engine::renderer->get_device_context()->VSSetShader(shader.get_vertex_shader(), nullptr, 0);
+        joj::Engine::renderer->get_device_context()->PSSetShader(shader.get_pixel_shader(), nullptr, 0);
 
         // Bind constant buffer
         joj::Engine::renderer->get_device_context()->VSSetConstantBuffers(0, 1, &constant_buffer);
@@ -347,21 +298,9 @@ public:
         if (constant_buffer)
             constant_buffer->Release();
 
-        // Release Buffer resource
-        if (vertex_buffer)
-            vertex_buffer->Release();
-
         // Release Index buffer;
         if (index_buffer)
             index_buffer->Release();
-
-        // Release Vertex Shader
-        if (vertex_shader)
-            vertex_shader->Release();
-
-        // Release Pixel Shader
-        if (pixel_shader)
-            pixel_shader->Release();
     }
 };
 
