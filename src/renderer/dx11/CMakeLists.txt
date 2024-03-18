@@ -11,6 +11,7 @@ add_library(jojDX11Renderer STATIC
     rasterizer_dx11.cpp 
     shader_dx11.cpp 
     vertex_buffer_dx11.cpp
+    index_buffer_dx11.cpp
 )
 
 target_link_directories(

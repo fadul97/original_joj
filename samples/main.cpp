@@ -14,6 +14,7 @@
 #include "joj/resources/geometry/sphere.h"
 #include "joj/renderer/dx11/shader_dx11.h"
 #include "joj/renderer/dx11/vertex_buffer_dx11.h"
+#include "joj/renderer/dx11/index_buffer_dx11.h"
 
 /*
 struct Vertex1
@@ -38,15 +39,15 @@ class MyApp : public joj::App
 {
 public:
     //joj::Cube geo = joj::Cube(3.0f, 3.0f, 3.0f);
-    //joj::Cylinder geo = joj::Cylinder(1.0f, 0.5f, 3.0f, 20, 10);
+    joj::Cylinder geo = joj::Cylinder(1.0f, 0.5f, 3.0f, 20, 10);
     //joj::GeoSphere geo = joj::GeoSphere(1.0f, 3);
     //joj::Grid geo = joj::Grid(100.0f, 100.0f, 20, 20);
     //joj::Quad geo = joj::Quad(3.0f, 1.0f);
-    joj::Sphere geo = joj::Sphere(1.0f, 40, 40, joj::Vector4(0, 1, 0, 1));
+    //joj::Sphere geo = joj::Sphere(1.0f, 40, 40, joj::Vector4(0, 1, 0, 1));
     joj::DX11Shader shader{};
 
     joj::DX11VertexBuffer vertex_buffer{};
-    ID3D11Buffer* index_buffer = nullptr;
+    joj::DX11IndexBuffer index_buffer{};
 
     ID3D11Buffer* constant_buffer = nullptr;
     D3D11_SUBRESOURCE_DATA constant_data = { 0 };
@@ -153,21 +154,14 @@ public:
         // INDICES AND INDEX BUFFERS
         // ---------------------------------
 
-        // 1) Buffer to store indices, describe how data will be accessed and where it will be bound to the rendering pipeline
-        D3D11_BUFFER_DESC ibd;
-        ibd.Usage = D3D11_USAGE_IMMUTABLE;
-        ibd.ByteWidth = sizeof(u32) * geo.get_index_count();
-        ibd.BindFlags = D3D11_BIND_INDEX_BUFFER;
-        ibd.CPUAccessFlags = 0;
-        ibd.MiscFlags = 0;
-        ibd.StructureByteStride = 0;
-
-        // 2) Strcture to specify data we want to initialize the buffer contents with
-        D3D11_SUBRESOURCE_DATA index_init_data;
-        index_init_data.pSysMem = geo.get_index_data();
+        // Build index buffer and set initial data
+        index_buffer.build(sizeof(u32)* geo.get_index_count(), geo.get_index_data());
 
         // 3) Create buffer with ID3D11Device::CreateBuffer
-        if (FAILED(joj::Engine::renderer->get_device()->CreateBuffer(&ibd, &index_init_data, &index_buffer)))
+        if (FAILED(joj::Engine::renderer->get_device()->CreateBuffer(
+            index_buffer.get_buffer_desc(),
+            index_buffer.get_subdata(),
+            index_buffer.get_buffer().GetAddressOf())))
         {
             std::cout << "Failed to create index buffer.\n";
         }
@@ -279,7 +273,7 @@ public:
         joj::Engine::renderer->get_device_context()->IASetVertexBuffers(0, 1, vertex_buffer.get_buffer().GetAddressOf(), &stride, &offset);
         
         // Bind index buffer to the pipeline
-        joj::Engine::renderer->get_device_context()->IASetIndexBuffer(index_buffer, DXGI_FORMAT_R32_UINT, 0);
+        joj::Engine::renderer->get_device_context()->IASetIndexBuffer(index_buffer.get_buffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 
         // Bind Vertex and Pixel Shaders
         joj::Engine::renderer->get_device_context()->VSSetShader(shader.get_vertex_shader(), nullptr, 0);
@@ -297,10 +291,6 @@ public:
         // Release constant buffer
         if (constant_buffer)
             constant_buffer->Release();
-
-        // Release Index buffer;
-        if (index_buffer)
-            index_buffer->Release();
     }
 };
 
