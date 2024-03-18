@@ -35,9 +35,9 @@ namespace joj
         void process_mouse_movement(f32 xoffset, f32 yoffset, b8 constrain_pitch = true);
         void process_mouse_scroll(f32 yoffset);
 
-    private:
+    public:
         Vector3 m_position;
-        Vector3 m_front;
+        Vector3 m_target;
         Vector3 m_up;
         Vector3 m_right;
         Vector3 m_world_up;
@@ -54,7 +54,7 @@ namespace joj
 
     inline Matrix4 Camera::get_view_mat() const
     {
-        DirectX::XMFLOAT3 r = DirectX::XMFLOAT3{ m_position.x + m_front.x, m_position.y + m_front.y, m_position.z + m_front.z };
+        DirectX::XMFLOAT3 r = DirectX::XMFLOAT3{ m_position.x + m_target.x, m_position.y + m_target.y, m_position.z + m_target.z };
         return DirectX::XMMatrixLookAtLH(
             DirectX::XMLoadFloat3(&m_position),
             DirectX::XMLoadFloat3(&r),

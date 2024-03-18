@@ -1,7 +1,7 @@
 #include "systems/camera.h"
 
 joj::Camera::Camera(Vector3 pos, Vector3 up, f32 yaw, f32 pitch)
-    : m_front(DirectX::XMFLOAT3{ 0.0f, 0.0, -1.0f }), m_movement_speed(SPEED), m_mouse_sensitivity(SENSITIVITY), m_zoom(ZOOM)
+    : m_target(DirectX::XMFLOAT3{ 0.0f, 0.0f, 0.0f }), m_movement_speed(SPEED), m_mouse_sensitivity(SENSITIVITY), m_zoom(ZOOM)
 {
     m_position = pos;
     m_world_up = up;
@@ -25,7 +25,7 @@ void joj::Camera::process_keyboard(CameraMovement direction, f32 dt)
     {
         // Convert XMFLOAT3 to XMVECTOR
         p = DirectX::XMLoadFloat3(&m_position);
-        f = DirectX::XMLoadFloat3(&m_front);
+        f = DirectX::XMLoadFloat3(&m_target);
 
         // Perform scalar multiplication and vector addition
         r = DirectX::XMVectorAdd(p, DirectX::XMVectorScale(f, velocity));
@@ -37,7 +37,7 @@ void joj::Camera::process_keyboard(CameraMovement direction, f32 dt)
     {
         // Convert XMFLOAT3 to XMVECTOR
         p = DirectX::XMLoadFloat3(&m_position);
-        f = DirectX::XMLoadFloat3(&m_front);
+        f = DirectX::XMLoadFloat3(&m_target);
 
         // Perform scalar multiplication and vector subtraction
         r = DirectX::XMVectorSubtract(p, DirectX::XMVectorScale(f, velocity));
@@ -113,7 +113,7 @@ void joj::Camera::update_camera_vectors()
     fv = DirectX::XMVector3Normalize(fv);
 
     // Store result in front member
-    DirectX::XMStoreFloat3(&m_front, fv);
+    DirectX::XMStoreFloat3(&m_target, fv);
 
     // Calculate right and up vectors
     DirectX::XMVECTOR wupv = DirectX::XMLoadFloat3(&m_world_up);
