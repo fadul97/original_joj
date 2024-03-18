@@ -4,11 +4,16 @@
 
 joj::Win32PlatformManager::Win32PlatformManager()
 {
-    window = nullptr;
+    window = std::make_unique<Win32Window>();
+
+    // ATTENTION: input must be initialized after window creation
     input = nullptr;
+    
     context = nullptr;
     msg = { 0 };
     m_dx11_context = nullptr;
+
+    m_timer = std::make_unique<Win32Timer>();
 }
 
 joj::Win32PlatformManager::~Win32PlatformManager()
@@ -36,7 +41,7 @@ b8 joj:: Win32PlatformManager::create_window()
     
     // ATTENTION: input must be initialized after window creation
     input = std::make_unique<Win32Input>();
-    
+
     // TODO: Use own return value
     return true;
 }
@@ -88,32 +93,35 @@ b8 joj::Win32PlatformManager::create_context(joj::BackendRender backend_renderer
         printf("TODO()!\n");
         return false;
 
-    // Use OpenGL as default renderer
+    // Use DirectX 11 as default renderer
     default:
-        context = std::make_unique<Win32GLContext>();
-    
-        if (!context->create(window))
+        m_dx11_context = std::make_unique<DX11Context>();
+        
+        if (!m_dx11_context->create(window))
         {
-            // TODO: use own logger and return value, cleanup?
-            printf("Failed to initialize GLContext.\n");
+            // TODO: use own logger and return value
+            printf("Failed to initialize DX11Context.\n");
             return false;
         }
 
         // FIXME: Check make_current method
-        context->make_current(window);
-
+        m_dx11_context->make_current(window);
+        
         // TODO: Use own return value
         return true;
     }
 }
 
-void joj::Win32PlatformManager::process_events()
+b8 joj::Win32PlatformManager::process_events()
 {
     if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg);
+        return true;
     }
+
+    return false;
 }
 
 void joj::Win32PlatformManager::swap_buffers()
