@@ -24,7 +24,7 @@ public:
     //joj::Cube geo = joj::Cube(3.0f, 3.0f, 3.0f);
     //joj::Cylinder geo = joj::Cylinder(1.0f, 0.5f, 3.0f, 20, 10);
     //joj::GeoSphere geo = joj::GeoSphere(1.0f, 3);
-    joj::Grid geo = joj::Grid(100.0f, 100.0f, 20, 20);
+    joj::Grid geo = joj::Grid(10.0f, 800.0f, 10, 20);
     //joj::Quad geo = joj::Quad(3.0f, 1.0f);
     //joj::Sphere geo = joj::Sphere(1.0f, 40, 40, joj::Vector4(0, 1, 0, 1));
     joj::DX11Shader shader{};
@@ -195,10 +195,15 @@ public:
 
         cmouseX = joj::Engine::platform_manager->get_xmouse();
         cmouseY = joj::Engine::platform_manager->get_ymouse();
+
+        camera.m_movement_speed = 20.0f;
     }
 
     void update(f32 dt)
     {
+        if (joj::Engine::platform_manager->is_key_pressed(joj::KEY_ESCAPE))
+            joj::Engine::close();
+
         if (joj::Engine::platform_manager->is_key_pressed(joj::KEY_TAB))
         {
             firstPerson = !firstPerson;
@@ -220,7 +225,7 @@ public:
 
             //mouse_callback(JojEngine::Engine::pm->get_xmouse(), JojEngine::Engine::pm->get_ymouse());
             camera.process_mouse_movement(xoffset, yoffset);
-            process_input_for_camera(0.01f);
+            process_input_for_camera(dt);
         }
 
         // Transformations
@@ -262,6 +267,8 @@ public:
 
         // Draw
         joj::Engine::renderer->get_device_context()->DrawIndexedInstanced(geo.get_index_count(), 1, 0, 0, 0);
+
+        joj::Engine::renderer->swap_buffers();
     }
 
     void shutdown()
