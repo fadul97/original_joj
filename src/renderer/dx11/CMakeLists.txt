@@ -12,6 +12,7 @@ add_library(jojDX11Renderer STATIC
     shader_dx11.cpp 
     vertex_buffer_dx11.cpp
     index_buffer_dx11.cpp
+    obj_const_buffer_dx11.cpp
 )
 
 target_link_directories(

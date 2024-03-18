@@ -15,25 +15,7 @@
 #include "joj/renderer/dx11/shader_dx11.h"
 #include "joj/renderer/dx11/vertex_buffer_dx11.h"
 #include "joj/renderer/dx11/index_buffer_dx11.h"
-
-/*
-struct Vertex1
-{
-    DirectX::XMFLOAT3 pos;
-    DirectX::XMFLOAT4 color;
-};
-*/
-
-struct ObjectConstant
-{
-    DirectX::XMFLOAT4X4 world_view_proj =
-    {
-        1.0f, 0.0f, 0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f, 0.0f,
-        0.0f, 0.0f, 0.0f, 1.0f
-    };
-};
+#include "joj/renderer/dx11/obj_const_buffer_dx11.h"
 
 class MyApp : public joj::App
 {
@@ -48,10 +30,7 @@ public:
 
     joj::DX11VertexBuffer vertex_buffer{};
     joj::DX11IndexBuffer index_buffer{};
-
-    ID3D11Buffer* constant_buffer = nullptr;
-    D3D11_SUBRESOURCE_DATA constant_data = { 0 };
-    D3D11_BUFFER_DESC const_buffer_desc = { 0 };
+    joj::DX11ObjectConstantBuffer objc_buffer{};
 
     DirectX::XMFLOAT4X4 World = {};
     DirectX::XMFLOAT4X4 View = {};
@@ -114,17 +93,18 @@ public:
         // CONSTANT BUFFER
         // ---------------------------------
 
-        const_buffer_desc.ByteWidth = sizeof(DirectX::XMMATRIX);
-        const_buffer_desc.Usage = D3D11_USAGE_DYNAMIC;
-        const_buffer_desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-        const_buffer_desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+        objc_buffer.build(sizeof(DirectX::XMMATRIX), wvp);
 
-        DirectX::XMMATRIX world_view_proj = DirectX::XMMatrixTranspose(wvp);
-        constant_data.pSysMem = &world_view_proj;
+        if FAILED(joj::Engine::renderer->get_device()->CreateBuffer(
+            objc_buffer.get_const_buffer_desc(),
+            objc_buffer.get_subdata(),
+            objc_buffer.get_const_buffer().GetAddressOf()))
+        {
+            std::cout << "Failed to create object constant buffer.\n";
+        }
 
-        joj::Engine::renderer->get_device()->CreateBuffer(&const_buffer_desc, &constant_data, &constant_buffer);
-
-        joj::Engine::renderer->get_device_context()->VSSetConstantBuffers(0, 1, &constant_buffer);
+        // Set constant buffer
+        joj::Engine::renderer->get_device_context()->VSSetConstantBuffers(0, 1, objc_buffer.get_const_buffer().GetAddressOf());
 
         // ---------------------------------
         // VERTEX BUFFERS
@@ -232,19 +212,7 @@ public:
         DirectX::XMMATRIX WorldViewProj = world * view * proj;
 
         // Update constant buffer with combined matrix (Word-View-Projection Matrix)
-        ObjectConstant objc;
-        XMStoreFloat4x4(&objc.world_view_proj, DirectX::XMMatrixTranspose(WorldViewProj));
-        constant_data.pSysMem = &objc.world_view_proj;
-
-        // Get a pointer to the constant buffer data.
-        D3D11_MAPPED_SUBRESOURCE mapped_buffer = {};
-        joj::Engine::renderer->get_device_context()->Map(constant_buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &mapped_buffer);
-
-        // Copy the new data to the constant buffer data.
-        memcpy(mapped_buffer.pData, &objc, sizeof(ObjectConstant));
-
-        // Release the pointer to the constant buffer data.
-        joj::Engine::renderer->get_device_context()->Unmap(constant_buffer, 0);
+        objc_buffer.set_matrix(WorldViewProj, joj::Engine::renderer->get_device_context());
     }
 
     void draw()
@@ -265,7 +233,7 @@ public:
         joj::Engine::renderer->get_device_context()->PSSetShader(shader.get_pixel_shader(), nullptr, 0);
 
         // Bind constant buffer
-        joj::Engine::renderer->get_device_context()->VSSetConstantBuffers(0, 1, &constant_buffer);
+        joj::Engine::renderer->get_device_context()->VSSetConstantBuffers(0, 1, objc_buffer.get_const_buffer().GetAddressOf());
 
         // Draw
         joj::Engine::renderer->get_device_context()->DrawIndexedInstanced(geo.get_index_count(), 1, 0, 0, 0);
@@ -273,9 +241,6 @@ public:
 
     void shutdown()
     {
-        // Release constant buffer
-        if (constant_buffer)
-            constant_buffer->Release();
     }
 };
 
