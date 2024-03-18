@@ -10,11 +10,6 @@ joj::DX11VertexBuffer::DX11VertexBuffer()
 joj::DX11VertexBuffer::~DX11VertexBuffer()
 {
     // Release vertex buffer
-    if (m_vertex_buffer)
-    {
-        m_vertex_buffer->Release();
-        m_vertex_buffer = nullptr;
-    }
 }
 
 void joj::DX11VertexBuffer::build(u32 byte_width, const void* data)
