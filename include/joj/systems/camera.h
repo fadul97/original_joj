@@ -1,7 +1,6 @@
 #ifndef JOJ_CAMERA_H
 #define JOJ_CAMERA_H
 
-#include "math/jmath.h"
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
