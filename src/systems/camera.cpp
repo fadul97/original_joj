@@ -1,7 +1,7 @@
 #include "systems/camera.h"
 
 joj::Camera::Camera(Vector3 pos, Vector3 up, f32 yaw, f32 pitch)
-    : m_target(DirectX::XMFLOAT3{ 0.0f, 0.0f, 0.0f }), m_movement_speed(SPEED), m_mouse_sensitivity(SENSITIVITY), m_zoom(ZOOM)
+    : m_target(Vector3{ 0.0f, 0.0f, 0.0f }), m_movement_speed(SPEED), m_mouse_sensitivity(SENSITIVITY), m_zoom(ZOOM)
 {
     m_position = pos;
     m_world_up = up;
@@ -17,6 +17,7 @@ joj::Camera::~Camera()
 
 void joj::Camera::process_keyboard(CameraMovement direction, f32 dt)
 {
+#if JPLATFORM_WINDOWS
     f32 velocity = m_movement_speed * dt;
     DirectX::XMVECTOR p;
     DirectX::XMVECTOR f;
@@ -69,6 +70,8 @@ void joj::Camera::process_keyboard(CameraMovement direction, f32 dt)
         // Store the result back in the XMFLOAT3
         DirectX::XMStoreFloat3(&m_position, r);
     }
+#else
+#endif
 }
 
 void joj::Camera::process_mouse_movement(f32 xoffset, f32 yoffset, b8 constrain_pitch)
@@ -101,6 +104,7 @@ void joj::Camera::process_mouse_scroll(f32 yoffset)
 
 void joj::Camera::update_camera_vectors()
 {
+#if JPLATFORM_WINDOWS
     // TODO: Check why f.x needs to be negated, X-axis movement works correctly
     // Create f vector
     DirectX::XMFLOAT3 f = DirectX::XMFLOAT3{ 1.0f, 1.0f, 1.0f };
@@ -123,4 +127,6 @@ void joj::Camera::update_camera_vectors()
     // Store the results back in the XMFLOAT3 members
     DirectX::XMStoreFloat3(&m_right, rv);
     DirectX::XMStoreFloat3(&m_up, uv);
+#else
+#endif
 }
