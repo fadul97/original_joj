@@ -2,15 +2,16 @@
 
 #include <iostream>
 #include <sstream>
+#include "app.h"
 
-joj::Win32PlatformManager* joj::Engine::platform_manager = nullptr;
-joj::DX11Renderer* joj::Engine::renderer = nullptr;
+joj::JojPlatformManager* joj::Engine::platform_manager = nullptr;
+joj::JojRenderer* joj::Engine::renderer = nullptr;
 b8 joj::Engine::m_paused = false;
 
 joj::Engine::Engine()
 {
-    platform_manager = new Win32PlatformManager();
-    renderer = new DX11Renderer();
+    platform_manager = new JojPlatformManager();
+    renderer = new JojRenderer();
     m_frametime = 0.0f;
 }
 
@@ -43,11 +44,13 @@ joj::ErrorCode joj::Engine::init()
         return ErrorCode::ERR_PLATFORM_MANAGER_CREATION;
     }
 
+#if JPLATFORM_WINDOWS
     if (renderer->setup_default_pipeline(platform_manager->get_window()) != joj::ErrorCode::OK)
     {
         std::cout << "Failed to setup renderer pipeline.\n";
         return ErrorCode::ERR_RENDERER_PIPELINE_ERROR;
     }
+#endif
 
     return ErrorCode::OK;
 }
@@ -63,9 +66,11 @@ joj::ErrorCode joj::Engine::run(App* app)
     // Adjust sleep resolution to 1 millisecond
     platform_manager->begin_period();
 
+#if JPLATFORM_WINDOWS
     // Game pauses/resumes when losing/gaining focus
     platform_manager->set_lost_focus(pause);
     platform_manager->set_on_focus(resume);
+#endif
 
     // Start time counter
     platform_manager->start_timer();

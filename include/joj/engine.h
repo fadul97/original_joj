@@ -5,17 +5,30 @@
 #include "defines.h"
 
 #include "error.h"
-#include "app.h"
 
-#if JPLATFORM_LINUX  
-#include "platform/x11/platform_manager_x11.h"
-#else
+#if JPLATFORM_WINDOWS
 #include "platform/win32/platform_manager_win32.h"
 #include "renderer/dx11/renderer_dx11.h"
-#endif 
+#else
+#include "platform/x11/platform_manager_x11.h"
+#include "renderer/opengl/renderer_gl.h"
+#endif
 
 namespace joj
 {
+#if JPLATFORM_WINDOWS
+    using JojPlatformManager = Win32PlatformManager;
+    using JojRenderer = DX11Renderer;
+#else
+    using JojPlatformManager = X11PlatformManager;
+    using JojRenderer = GLRenderer;
+#endif
+}
+
+namespace joj
+{
+    class App;
+    
     // FIXME: Abstract default platform_manager and renderer
     class JAPI Engine
     {
@@ -27,20 +40,18 @@ namespace joj
         ErrorCode run(App* app);
         void shutdown();
 
-        Win32PlatformManager* get_platform_manager() const;
+        JojPlatformManager* get_platform_manager() const;
 
-
-#if JPLATFORM_WINDOWS  
         // TODO: static members?
-        static Win32PlatformManager* platform_manager;
-        static DX11Renderer* renderer;
+        static JojPlatformManager* platform_manager;
+        static JojRenderer* renderer;
 
         static void pause();	// Pause engine
         static void resume();	// Resume engine
 
         static void close();
         static b8 m_paused;
-#endif // JPLATFORM_WINDOWS
+
 
     private:
         f32 get_frametime();
