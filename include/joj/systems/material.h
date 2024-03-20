@@ -1,5 +1,5 @@
-#ifndef JOJ_LIGHT_H
-#define JOJ_LIGHT_H
+#ifndef JOJ_MATERIAL_H
+#define JOJ_MATERIAL_H
 
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
@@ -20,4 +20,4 @@ namespace joj
     };
 } // namespace joj
 
-#endif // JOJ_LIGHT_H
+#endif // JOJ_MATERIAL_H
