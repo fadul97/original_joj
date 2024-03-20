@@ -33,9 +33,9 @@ public:
     joj::DX11IndexBuffer index_buffer{};
     joj::DX11ObjectConstantBuffer objc_buffer{};
 
-    DirectX::XMFLOAT4X4 World = {};
-    DirectX::XMFLOAT4X4 View = {};
-    DirectX::XMFLOAT4X4 Proj = {};
+    joj::Matrix4 World = {};
+    joj::Matrix4 View = {};
+    joj::Matrix4 Proj = {};
 
     joj::Camera camera = joj::Camera{ joj::Vector3{ 0.0f, 0.0f, -6.0f } };
 
