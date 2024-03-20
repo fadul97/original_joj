@@ -105,7 +105,7 @@ b8 joj::X11PlatformManager::create_context(BackendRender backend_renderer)
     }
 }
 
-void joj::X11PlatformManager::process_events()
+b8 joj::X11PlatformManager::process_events()
 {
     XEvent ev;
     char str[25];
@@ -129,9 +129,12 @@ void joj::X11PlatformManager::process_events()
                 }
 
                 if (button != MAX_BUTTONS)
+                {
                     input->click_button(button);
+                    return true;
+                }
                 
-                return;
+                return false;
             }
             case ButtonRelease:
             {
@@ -145,9 +148,12 @@ void joj::X11PlatformManager::process_events()
                 }
 
                 if (button != MAX_BUTTONS)
+                {
                     input->release_button(button);
+                    return true;
+                }
 
-                return;
+                return false;
             }
 
             case KeyPress:
@@ -157,7 +163,7 @@ void joj::X11PlatformManager::process_events()
                 {
                     Keys key = input->translate_keycode(keysym);
                     input->press_key(key);
-                    return;
+                    return true;
 
                     // if (input->is_key_pressed(KEY_SPACE))
                     //     std::cout << "KEY_SPACE in switch!\n";
@@ -173,7 +179,7 @@ void joj::X11PlatformManager::process_events()
                 {
                     Keys key = input->translate_keycode(keysym);
                     input->release_key(key);
-                    return;
+                    return true;
                 }
             }
 
@@ -191,6 +197,8 @@ void joj::X11PlatformManager::process_events()
                 break;
         }
     }
+
+    return false;
 }
 
 void joj::X11PlatformManager::swap_buffers()
