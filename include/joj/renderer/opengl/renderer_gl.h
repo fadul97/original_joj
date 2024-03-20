@@ -34,11 +34,15 @@ namespace joj
         
         b8 init(std::unique_ptr<JojWindow>& window) override;
         void render() override;
-        void clear(f32 r = 0.0f, f32 g = 0.0f, f32 b = 0.0f, f32 a = 0.0f) override;
+        void clear(f32 r, f32 g, f32 b, f32 a) override;
+        void clear();
         void swap_buffers() override;
         void shutdown() override;
 
         void set_polygon_mode(GLenum face, GLenum mode) const;
+
+    private:
+        f32 bg_color[4];
     };
 
     inline void GLRenderer::set_polygon_mode(GLenum face, GLenum mode) const
