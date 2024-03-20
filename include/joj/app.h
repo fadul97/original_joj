@@ -4,7 +4,7 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#include "platform/win32/platform_manager_win32.h"
+#include "engine.h"
 
 namespace joj
 {
@@ -30,7 +30,7 @@ namespace joj
         virtual void on_pause() {}
     
     protected:
-        static Win32PlatformManager* platform_manager;
+        static JojPlatformManager* platform_manager;
     };
 }
 
