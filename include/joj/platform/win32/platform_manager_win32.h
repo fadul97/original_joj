@@ -31,11 +31,11 @@ namespace joj
         void swap_buffers() override;
         void shutdown() override;
 
-        void begin_period();    // Adjust sleep resolution to 1 millisecond
-        void end_period();      // Return sleep resolution to original value
-        void start_timer();     // Start/resume counting time
-        void stop_timer();      // Stop counting time
-        f32 reset_timer();      // Restarts timer counter and returns elapsed time
+        void begin_period() override;    // Adjust sleep resolution to 1 millisecond
+        void end_period() override;      // Return sleep resolution to original value
+        void start_timer() override;     // Start/resume counting time
+        void stop_timer() override;      // Stop counting time
+        f32 reset_timer() override;      // Restarts timer counter and returns elapsed time
 
         void set_on_focus(void(*func)());   // Set function to be executed when wubdiw regains focus
         void set_lost_focus(void(*func)());	// Set function to be executed when wubdiw loses focus
