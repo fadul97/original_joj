@@ -5,6 +5,11 @@ joj::Grid::Grid()
     type = GeometryType::GRID;
 }
 
+#if JPLATFORM_WINDOWS
+#include <DirectXColors.h>
+
+using namespace DirectX;
+
 joj::Grid::Grid(f32 width, f32 depth, u32 m, u32 n)
 {
     type = GeometryType::GRID;
@@ -108,7 +113,10 @@ joj::Grid::Grid(f32 width, f32 depth, u32 m, u32 n, Vector4 color)
         }
     }
 }
-/*
+
+#else
+#include "math/jmath.h"
+
 joj::Grid::Grid(f32 width, f32 depth, u32 m, u32 n)
 {
     type = GeometryType::GRID;
@@ -212,5 +220,6 @@ joj::Grid::Grid(f32 width, f32 depth, u32 m, u32 n, Vector4 color)
         }
     }
 }
-*/
+
+#endif
 

@@ -125,6 +125,8 @@ joj::GeoSphere::GeoSphere(f32 radius, u32 subdivisions, Vector4 color)
 }
 
 #else
+#include "math/jmath.h"
+
 joj::GeoSphere::GeoSphere(f32 radius, u32 subdivisions)
 {
 
