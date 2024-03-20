@@ -47,6 +47,12 @@ namespace joj
         virtual void swap_buffers() = 0;
         virtual void shutdown() = 0;
 
+        virtual void begin_period() = 0;
+        virtual void end_period() = 0;
+        virtual void start_timer() = 0;
+        virtual void stop_timer() = 0;
+        virtual f32 reset_timer() = 0;
+
         virtual void set_window_icon(i32 count, IconImage& image) = 0;
 
     protected:  
