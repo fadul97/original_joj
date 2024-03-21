@@ -104,6 +104,6 @@ namespace joj
     template<class Twindow, class Tinput, class Tcontext>
     inline std::unique_ptr<Twindow>& PlatformManager<Twindow, Tinput, Tcontext>::get_window()
 	{ return window; }
-}
+} // namespace joj
 
 #endif // JOJ_PLATFORM_MANAGER_H
