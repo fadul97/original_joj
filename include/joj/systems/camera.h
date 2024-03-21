@@ -4,6 +4,7 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
+#include "math/jmath.h"
 #include "math/vector3.h"
 #include "math/matrix4.h"
 
