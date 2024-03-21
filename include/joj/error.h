@@ -81,10 +81,10 @@ namespace joj
 #define JFAILED(x) (((joj::ErrorCode)(x)) != joj::ErrorCode::OK)
 
 #ifndef JOUTPUTFAILED
-#define JOUTPUTFAILED(x)                                                                           \
-{                                                                                                  \
-    joj::ErrorCode result = (x);                                                                   \
-    if(result != joj::ErrorCode::OK) { joj::print_error(result, __func__, __FILE__, __LINE__); }   \
+#define JOUTPUTFAILED(x)                                                                                          \
+{                                                                                                                 \
+    joj::ErrorCode result = (x);                                                                                  \
+    if(result != joj::ErrorCode::OK) { joj::print_error(result, __func__, __FILE__, __LINE__); return result; }   \
 }
 #endif
 
