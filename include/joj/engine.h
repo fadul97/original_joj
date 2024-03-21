@@ -80,11 +80,11 @@ namespace joj
 } // namespace joj
 
 #ifndef JADDERROR
-#define JADDERROR(x)                                                    \
-{                                                                       \
-    joj::ErrorCode ecode = (x);                                         \
-    joj::Error new_error = joj::Error(x, __func__, __FILE__, __LINE__); \
-    joj::Engine::errors.push_back(new_error);                           \
+#define JADDERROR(x)                                                        \
+{                                                                           \
+    joj::ErrorCode ecode = (x);                                             \
+    joj::Error new_error = joj::Error(ecode, __func__, __FILE__, __LINE__); \
+    joj::Engine::errors.push_back(new_error);                               \
 }
 #endif
 
