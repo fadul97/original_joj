@@ -8,6 +8,8 @@
 joj::JPlatformManager* joj::Engine::platform_manager = nullptr;
 joj::JRenderer* joj::Engine::renderer = nullptr;
 joj::JGLRenderer* joj::Engine::gl_renderer = nullptr;
+std::vector<joj::Error> joj::Engine::errors = std::vector<joj::Error>();
+
 b8 joj::Engine::m_paused = false;
 
 joj::Engine::Engine()
@@ -142,6 +144,9 @@ joj::ErrorCode joj::Engine::run(App* app, RendererBackend renderer_backend)
 
     app->shutdown();
 
+    if (!errors.empty())
+        ouput_log();
+
     shutdown();
 
     return ErrorCode::OK;
@@ -191,4 +196,10 @@ f32 joj::Engine::get_frametime()
 #endif
 
     return m_frametime;
+}
+
+void joj::Engine::ouput_log() const
+{
+    for (Error e : errors)
+        e.what();
 }

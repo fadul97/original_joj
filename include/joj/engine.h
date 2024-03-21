@@ -4,6 +4,7 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
+#include <vector>
 #include "error.h"
 #include "renderer/renderer.h"
 
@@ -51,6 +52,9 @@ namespace joj
         static JPlatformManager* platform_manager;
         static JRenderer* renderer;
         static JGLRenderer* gl_renderer;
+        static std::vector<Error> errors;
+
+        void ouput_log() const;
 
         static void pause();	// Pause engine
         static void resume();	// Resume engine

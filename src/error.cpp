@@ -65,7 +65,7 @@ joj::Error::Error()
 }
 
 joj::Error::Error(ErrorCode e, const std::string& func, const std::string& file, i32 line)
-    : m_ecode(ErrorCode::OK), m_line(-1), m_func_name(func), m_filename(file)
+    : m_ecode(e), m_line(line), m_func_name(func), m_filename(file)
 {
     // Position of the last slash in the file name
     size_t pos = file.find_last_of('\\');
