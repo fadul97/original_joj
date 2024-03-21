@@ -2,11 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(jojTest)
 
-if (WIN32)
-	add_executable(jojTest main_win32.cpp)
-elseif(LINUX)
-	add_executable(jojTest main_x11.cpp)
-endif()
+add_executable(jojTest main.cpp)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
 
