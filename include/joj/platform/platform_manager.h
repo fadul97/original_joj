@@ -10,42 +10,52 @@
 #include "graphics/context.h"
 #include <memory>
 #include "icon_image.h"
+#include "error.h"
 
 namespace joj
 {
-    enum class BackendRender { OPENGL, DX11, DX12 };
-    
-    template<class Twindow, class Tinput, class Tcontext>
-    class JAPI PlatformManager
+    template<class Twindow>
+    class JAPI IPlatformManager
     {
     public:
-        PlatformManager();
-        virtual ~PlatformManager();
+        IPlatformManager();
+        virtual ~IPlatformManager();
 
-        b8 is_running() const;
+        virtual b8 is_running() const = 0;
 
-        b8 is_key_down(u32 key) const;
-        b8 is_key_pressed(u32 key) const;
-        b8 is_key_up(u32 key) const;
+        virtual b8 is_key_down(u32 key) const = 0;
+        virtual b8 is_key_pressed(u32 key) const = 0;
+        virtual b8 is_key_up(u32 key) const = 0;
 
-        b8 is_button_down(Buttons button) const;
-        b8 is_button_up(Buttons button) const;
+        virtual b8 is_button_down(Buttons button) const = 0;
+        virtual b8 is_button_up(Buttons button) const = 0;
 
-        i16 get_xmouse() const;
-        i16 get_ymouse() const;
-        i16 get_mouse_wheel() const;
+        virtual i16 get_xmouse() const = 0;
+        virtual i16 get_ymouse() const = 0;
+        virtual i16 get_mouse_wheel() const = 0;
 
-        virtual std::unique_ptr<Twindow>& get_window();
+        virtual void hide_cursor(b8 hide) = 0;
 
-        void close_window();
+        virtual std::unique_ptr<Twindow>& get_window() = 0;
 
-        virtual b8 init(i16 width = 800, i16 height = 600, std::string title = std::string{ "Joj PlatformManager" }) = 0;
-        virtual b8 create_window() = 0;
-        virtual b8 create_simple_window(i16 width = 800, i16 height = 600, std::string title = std::string{ "Joj PlatformManager" }) = 0;
-        virtual b8 create_context(BackendRender backend_renderer) = 0;
+        virtual void set_window_mode(WindowMode mode) = 0;
+        virtual void set_window_color(i32 r, i32 g, i32 b) = 0;
+        virtual void set_on_focus(void(*func)()) = 0;
+        virtual void set_lost_focus(void(*func)()) = 0;
+        virtual void close_window() = 0;
+
+        virtual ErrorCode init(i16 width, i16 height, std::string title, WindowMode mode) = 0;
+        virtual ErrorCode create_window() = 0;
+        virtual ErrorCode create_simple_window(i16 width, i16 height, std::string title, WindowMode mode) = 0;
+        virtual ErrorCode create_context(BackendRenderer backend_renderer) = 0;
+        virtual ErrorCode create_window_and_context(BackendRenderer backend_renderer) = 0;
         virtual b8 process_events() = 0;
         virtual void swap_buffers() = 0;
         virtual void shutdown() = 0;
+
+        virtual f32 get_aspect_ratio() const = 0;
+        virtual f32 get_xcenter() const = 0;
+        virtual f32 get_ycenter() const = 0;
 
         virtual void begin_period() = 0;
         virtual void end_period() = 0;
@@ -54,56 +64,7 @@ namespace joj
         virtual f32 reset_timer() = 0;
 
         virtual void set_window_icon(i32 count, IconImage& image) = 0;
-
-    protected:  
-        std::unique_ptr<Twindow> window;
-        std::unique_ptr<Tinput> input;
-        std::unique_ptr<Tcontext> context;
     };
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_running() const
-    { return window->is_running(); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_down(u32 key) const
-    { return input->is_key_down(key); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_pressed(u32 key) const
-    { return input->is_key_pressed(key); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_up(u32 key) const
-    { return input->is_key_up(key); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_button_down(Buttons button) const
-    { return input->is_button_down(button); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_button_up(Buttons button) const
-    { return input->is_button_up(button); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline i16 PlatformManager<Twindow, Tinput, Tcontext>::get_xmouse() const
-    { return input->get_xmouse(); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline i16 PlatformManager<Twindow, Tinput, Tcontext>::get_ymouse() const
-    { return input->get_ymouse(); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline i16 PlatformManager<Twindow, Tinput, Tcontext>::get_mouse_wheel() const
-    { return input->get_mouse_wheel(); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline void PlatformManager<Twindow, Tinput, Tcontext>::close_window()
-    { window->close(); }
-
-    template<class Twindow, class Tinput, class Tcontext>
-    inline std::unique_ptr<Twindow>& PlatformManager<Twindow, Tinput, Tcontext>::get_window()
-	{ return window; }
 } // namespace joj
 
 #endif // JOJ_PLATFORM_MANAGER_H
