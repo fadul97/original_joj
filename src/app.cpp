@@ -3,7 +3,7 @@
 #include "engine.h"
 
 // Static member
-joj::JojPlatformManager* joj::App::platform_manager = nullptr;
+joj::JPlatformManager* joj::App::platform_manager = nullptr;
 
 joj::App::App()
 {

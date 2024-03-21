@@ -30,7 +30,7 @@ namespace joj
         virtual void on_pause() {}
     
     protected:
-        static JojPlatformManager* platform_manager;
+        static JPlatformManager* platform_manager;
     };
 }
 

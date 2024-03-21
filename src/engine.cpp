@@ -4,14 +4,14 @@
 #include <sstream>
 #include "app.h"
 
-joj::JojPlatformManager* joj::Engine::platform_manager = nullptr;
-joj::JojRenderer* joj::Engine::renderer = nullptr;
+joj::JPlatformManager* joj::Engine::platform_manager = nullptr;
+joj::JRenderer* joj::Engine::renderer = nullptr;
 b8 joj::Engine::m_paused = false;
 
 joj::Engine::Engine()
 {
-    platform_manager = new JojPlatformManager();
-    renderer = new JojRenderer();
+    platform_manager = new JPlatformManager();
+    renderer = new JRenderer();
     m_frametime = 0.0f;
 }
 

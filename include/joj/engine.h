@@ -5,6 +5,7 @@
 #include "defines.h"
 
 #include "error.h"
+#include "renderer/renderer.h"
 
 #if JPLATFORM_WINDOWS
 #include "platform/win32/platform_manager_win32.h"
@@ -17,11 +18,13 @@
 namespace joj
 {
 #if JPLATFORM_WINDOWS
-    using JojPlatformManager = Win32PlatformManager;
-    using JojRenderer = DX11Renderer;
+    using JPlatformManager = Win32PlatformManager;
+    using JRenderer = DX11Renderer;
+    using JWindow = Win32Window;
 #else
     using JojPlatformManager = X11PlatformManager;
-    using JojRenderer = GLRenderer;
+    using JRenderer = GLRenderer;
+    using JWindow = X11Window;
 #endif
 }
 
@@ -40,11 +43,11 @@ namespace joj
         ErrorCode run(App* app);
         void shutdown();
 
-        JojPlatformManager* get_platform_manager() const;
+        JPlatformManager* get_platform_manager() const;
 
         // TODO: static members?
-        static JojPlatformManager* platform_manager;
-        static JojRenderer* renderer;
+        static JPlatformManager* platform_manager;
+        static JRenderer* renderer;
 
         static void pause();	// Pause engine
         static void resume();	// Resume engine
