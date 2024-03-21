@@ -1,6 +1,9 @@
 #ifndef JOJ_ERROR_H
 #define JOJ_ERROR_H
 
+#include "defines.h"
+#include <string>
+
 namespace joj
 {
     enum class ErrorCode
@@ -51,7 +54,19 @@ namespace joj
         ERR_RENDERER_RASTERIZER_CREATION
     };
 
+    void print_error(ErrorCode e, const std::string& func, const std::string& file, i32 line);
+
     const char* error_to_string(ErrorCode e);
 }
+
+#define JFAILED(x) (((joj::ErrorCode)(x)) != joj::ErrorCode::OK)
+
+#ifndef JOUTPUTFAILED
+#define JOUTPUTFAILED(x)                                                                           \
+{                                                                                                  \
+    joj::ErrorCode result = (x);                                                                   \
+    if(result != joj::ErrorCode::OK) { joj::print_error(result, __func__, __FILE__, __LINE__); }   \
+}
+#endif
 
 #endif // JOJ_ERROR_H
