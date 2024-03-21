@@ -1,17 +1,20 @@
 #include "engine.h"
 
+#include <stdio.h>
 #include <iostream>
 #include <sstream>
 #include "app.h"
 
 joj::JPlatformManager* joj::Engine::platform_manager = nullptr;
 joj::JRenderer* joj::Engine::renderer = nullptr;
+joj::JGLRenderer* joj::Engine::gl_renderer = nullptr;
 b8 joj::Engine::m_paused = false;
 
 joj::Engine::Engine()
 {
     platform_manager = new JPlatformManager();
-    renderer = new JRenderer();
+    renderer = nullptr;
+    gl_renderer = nullptr;
     m_frametime = 0.0f;
 }
 
@@ -21,7 +24,7 @@ joj::Engine::~Engine()
     delete platform_manager;
 }
 
-joj::ErrorCode joj::Engine::init()
+joj::ErrorCode joj::Engine::init(RendererBackend renderer_backend)
 {
     platform_manager->init(800, 600);
     if (!platform_manager->init(800, 600))
@@ -38,26 +41,48 @@ joj::ErrorCode joj::Engine::init()
         return ErrorCode::ERR_PLATFORM_MANAGER_CREATION;
     }
 
-    if (!renderer->init(platform_manager->get_window()))
+    switch (renderer_backend)
     {
-        std::cout << "Failed to initialize renderer.\n";
-        return ErrorCode::ERR_PLATFORM_MANAGER_CREATION;
-    }
+    case RendererBackend::DX11:
+        renderer = new JRenderer();
+        if (!renderer->init(platform_manager->get_window()))
+        {
+            std::cout << "Failed to initialize renderer.\n";
+            return ErrorCode::ERR_PLATFORM_MANAGER_CREATION;
+        }
 
-#if JPLATFORM_WINDOWS
-    if (renderer->setup_default_pipeline(platform_manager->get_window()) != joj::ErrorCode::OK)
-    {
-        std::cout << "Failed to setup renderer pipeline.\n";
-        return ErrorCode::ERR_RENDERER_PIPELINE_ERROR;
+        if (renderer->setup_default_pipeline(platform_manager->get_window()) != joj::ErrorCode::OK)
+        {
+            std::cout << "Failed to setup renderer pipeline.\n";
+            return ErrorCode::ERR_RENDERER_PIPELINE_ERROR;
+        }
+
+        break;
+
+    case RendererBackend::GL:
+        gl_renderer = new JGLRenderer();
+        if (!gl_renderer->init(platform_manager->get_window()))
+        {
+            std::cout << "Failed to initialize renderer.\n";
+            return ErrorCode::ERR_PLATFORM_MANAGER_CREATION;
+        }
+
+        if (gl_renderer->setup_default_pipeline(platform_manager->get_window()) != joj::ErrorCode::OK)
+        {
+            std::cout << "Failed to setup renderer pipeline.\n";
+            return ErrorCode::ERR_RENDERER_PIPELINE_ERROR;
+        }
+
+        break;
+
     }
-#endif
 
     return ErrorCode::OK;
 }
 
-joj::ErrorCode joj::Engine::run(App* app)
+joj::ErrorCode joj::Engine::run(App* app, RendererBackend renderer_backend)
 {
-    if (init() != ErrorCode::OK)
+    if (init(renderer_backend) != ErrorCode::OK)
     {
         std::cout << "Failed to initialize engine.\n";
         return ErrorCode::ERR_ENGINE_INIT;
@@ -88,7 +113,7 @@ joj::ErrorCode joj::Engine::run(App* app)
             // -----------------------------------------------
 
             // P key pauses engine
-            if (platform_manager->is_key_pressed(joj::KEY_P))
+            if (platform_manager->is_key_pressed('P'))
             {
                 if (m_paused)
                     resume();

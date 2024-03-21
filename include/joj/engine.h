@@ -10,6 +10,7 @@
 #if JPLATFORM_WINDOWS
 #include "platform/win32/platform_manager_win32.h"
 #include "renderer/dx11/renderer_dx11.h"
+#include "renderer/opengl/renderer_gl.h"
 #else
 #include "platform/x11/platform_manager_x11.h"
 #include "renderer/opengl/renderer_gl.h"
@@ -20,6 +21,7 @@ namespace joj
 #if JPLATFORM_WINDOWS
     using JPlatformManager = Win32PlatformManager;
     using JRenderer = DX11Renderer;
+    using JGLRenderer = GLRenderer;
     using JWindow = Win32Window;
 #else
     using JojPlatformManager = X11PlatformManager;
@@ -39,8 +41,8 @@ namespace joj
         Engine();
         ~Engine();
 
-        ErrorCode init();
-        ErrorCode run(App* app);
+        ErrorCode init(RendererBackend renderer_backend);
+        ErrorCode run(App* app, RendererBackend renderer_backend);
         void shutdown();
 
         JPlatformManager* get_platform_manager() const;
@@ -48,6 +50,7 @@ namespace joj
         // TODO: static members?
         static JPlatformManager* platform_manager;
         static JRenderer* renderer;
+        static JGLRenderer* gl_renderer;
 
         static void pause();	// Pause engine
         static void resume();	// Resume engine

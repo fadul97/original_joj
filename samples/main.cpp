@@ -8,7 +8,7 @@
 int main()
 {
     joj::Engine* engine = new joj::Engine();
-    if (engine->run(new DX11App()) != joj::ErrorCode::OK)
+    if (engine->run(new DX11App(), joj::RendererBackend::DX11) != joj::ErrorCode::OK)
         return -1;
 
     delete engine;

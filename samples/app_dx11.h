@@ -1,5 +1,6 @@
 #include "joj/engine.h"
 #include "joj/app.h"
+#include <stdio.h>
 
 #include <DirectXMath.h>
 #include <DirectXColors.h>
@@ -51,16 +52,16 @@ public:
 
     void process_input_for_camera(f32 dt)
     {
-        if (joj::Engine::platform_manager->is_key_down(joj::KEY_W))
+        if (joj::Engine::platform_manager->is_key_down('W'))
             camera.process_keyboard(joj::CameraMovement::FORWARD, dt);
 
-        if (joj::Engine::platform_manager->is_key_down(joj::KEY_S))
+        if (joj::Engine::platform_manager->is_key_down('S'))
             camera.process_keyboard(joj::CameraMovement::BACKWARD, dt);
 
-        if (joj::Engine::platform_manager->is_key_down(joj::KEY_A))
+        if (joj::Engine::platform_manager->is_key_down('A'))
             camera.process_keyboard(joj::CameraMovement::LEFT, dt);
 
-        if (joj::Engine::platform_manager->is_key_down(joj::KEY_D))
+        if (joj::Engine::platform_manager->is_key_down('D'))
             camera.process_keyboard(joj::CameraMovement::RIGHT, dt);
     }
 
@@ -201,8 +202,12 @@ public:
 
     void update(f32 dt)
     {
+
         if (joj::Engine::platform_manager->is_key_pressed(joj::KEY_ESCAPE))
             joj::Engine::close();
+
+        if (joj::Engine::platform_manager->is_key_pressed('O'))
+            printf("OI");
 
         if (joj::Engine::platform_manager->is_key_pressed(joj::KEY_TAB))
         {
