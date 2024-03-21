@@ -41,6 +41,8 @@ namespace joj
 
         void set_polygon_mode(GLenum face, GLenum mode) const;
 
+        ErrorCode setup_default_pipeline(std::unique_ptr<Win32Window>& window) override;
+
     private:
         f32 bg_color[4];
     };

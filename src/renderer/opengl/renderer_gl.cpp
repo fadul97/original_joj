@@ -55,3 +55,8 @@ void joj::GLRenderer::shutdown()
 {
     std::cout << "TODO()!\n";
 }
+
+joj::ErrorCode joj::GLRenderer::setup_default_pipeline(std::unique_ptr<Win32Window>& window)
+{
+    return ErrorCode::OK;
+}

@@ -10,6 +10,8 @@
 
 namespace joj
 {
+    enum class RendererBackend { DX11, GL };
+
     template<class Twindow>
     class JAPI JIRenderer
     {
