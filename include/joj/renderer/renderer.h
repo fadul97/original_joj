@@ -6,6 +6,7 @@
 
 #include <memory>
 #include "platform/window.h"
+#include "error.h"
 
 namespace joj
 {
@@ -22,6 +23,8 @@ namespace joj
         virtual void clear(f32 r, f32 g, f32 b, f32 a) = 0;
         virtual void swap_buffers() = 0;
         virtual void shutdown() = 0;
+
+        virtual ErrorCode setup_default_pipeline(std::unique_ptr<Twindow>& window) = 0;
     };
 }
 
