@@ -22,8 +22,14 @@ joj::Engine::Engine()
 
 joj::Engine::~Engine()
 {
-    delete renderer;
-    delete platform_manager;
+    if (renderer)
+        delete renderer;
+    
+    if (gl_renderer)
+        delete gl_renderer;
+    
+    if (platform_manager)
+        delete platform_manager;
 }
 
 joj::ErrorCode joj::Engine::init(RendererBackend renderer_backend)
