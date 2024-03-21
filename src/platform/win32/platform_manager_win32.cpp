@@ -4,112 +4,97 @@
 
 joj::Win32PlatformManager::Win32PlatformManager()
 {
-    window = std::make_unique<Win32Window>();
+    m_window = std::make_unique<Win32Window>();
+    m_timer = std::make_unique<Win32Timer>();
 
     // ATTENTION: input must be initialized after window creation
-    input = nullptr;
+    m_input = nullptr;
     
-    context = nullptr;
-    msg = { 0 };
     m_dx11_context = nullptr;
-
-    m_timer = std::make_unique<Win32Timer>();
+    m_gl_context = nullptr;
+    
+    msg = { 0 };
 }
 
 joj::Win32PlatformManager::~Win32PlatformManager()
 {
 }
 
-b8 joj::Win32PlatformManager::init(i16 width, i16 height, std::string title)
+joj::ErrorCode joj::Win32PlatformManager::init(i16 width, i16 height, std::string title, WindowMode mode)
 {
-    window = std::make_unique<Win32Window>(width, height, title);
+    m_window = std::make_unique<Win32Window>(width, height, title);
     
-    window->set_mode(joj::WindowMode::WINDOWED);
-    window->set_color(60, 60, 60);
-    
-    return true;
+    m_window->set_mode(mode);
+    m_window->set_color(60, 60, 60);
+
+    return ErrorCode::OK;
 }
 
-b8 joj:: Win32PlatformManager::create_window()
+joj::ErrorCode joj:: Win32PlatformManager::create_window()
 {
-    if (!window->create())
+    if (!m_window->create())
     {
         // TODO: use own logger and return value, cleanup?
         printf("Failed to initialize Win32Window.\n");
-        return false;
+        return ErrorCode::ERR_WINDOW_CREATION;
     }
     
     // ATTENTION: input must be initialized after window creation
-    input = std::make_unique<Win32Input>();
+    m_input = std::make_unique<Win32Input>();
 
-    // TODO: Use own return value
-    return true;
+    return ErrorCode::OK;
 }
 
-b8 joj::Win32PlatformManager::create_simple_window(i16 width, i16 height, std::string title)
+joj::ErrorCode joj::Win32PlatformManager::create_simple_window(i16 width, i16 height, std::string title, WindowMode mode)
 {
-    // TODO: use own logger and return value
+    // TODO: use own logger
     printf("TODO()!\n");
-    return true;
+    return ErrorCode::FAILED;
 }
 
-b8 joj::Win32PlatformManager::create_context(joj::BackendRender backend_renderer)
+joj::ErrorCode joj::Win32PlatformManager::create_context(BackendRenderer backend_renderer)
 {
     switch (backend_renderer)
     {
-    case joj::BackendRender::OPENGL:
-        context = std::make_unique<Win32GLContext>();
+    case BackendRenderer::GL:
+        m_gl_context = std::make_unique<Win32GLContext>();
     
-        if (!context->create(window))
+        if (!m_gl_context->create(m_window))
         {
-            // TODO: use own logger and return value, cleanup?
+            // TODO: use own logger, cleanup?
             printf("Failed to initialize GLContext.\n");
-            return false;
+            return ErrorCode::ERR_CONTEXT_CREATION;
         }
 
         // FIXME: Check make_current method
-        context->make_current(window);
+        m_gl_context->make_current(m_window);
 
-        // TODO: Use own return value
-        return true;
+        return ErrorCode::OK;
 
-    case joj::BackendRender::DX11:
+    case BackendRenderer::DX11:
         m_dx11_context = std::make_unique<DX11Context>();
         
-        if (!m_dx11_context->create(window))
+        if (!m_dx11_context->create(m_window))
         {
-            // TODO: use own logger and return value
+            // TODO: use own logger
             printf("Failed to initialize DX11Context.\n");
-            return false;
+            return ErrorCode::ERR_CONTEXT_CREATION;
         }
 
         // FIXME: Check make_current method
-        m_dx11_context->make_current(window);
+        m_dx11_context->make_current(m_window);
         
-        // TODO: Use own return value
-        return true;
-
-    case joj::BackendRender::DX12:
-        printf("TODO()!\n");
-        return false;
-
-    // Use DirectX 11 as default renderer
-    default:
-        m_dx11_context = std::make_unique<DX11Context>();
-        
-        if (!m_dx11_context->create(window))
-        {
-            // TODO: use own logger and return value
-            printf("Failed to initialize DX11Context.\n");
-            return false;
-        }
-
-        // FIXME: Check make_current method
-        m_dx11_context->make_current(window);
-        
-        // TODO: Use own return value
-        return true;
+        return ErrorCode::OK;
     }
+
+    return ErrorCode::FAILED;
+}
+
+joj::ErrorCode joj::Win32PlatformManager::create_window_and_context(BackendRenderer backend_renderer)
+{
+    // TODO: use own logger
+    printf("TODO()!\n");
+    return ErrorCode::ERR_PLATFORM_MANAGER_CREATION;
 }
 
 b8 joj::Win32PlatformManager::process_events()
@@ -126,17 +111,24 @@ b8 joj::Win32PlatformManager::process_events()
 
 void joj::Win32PlatformManager::swap_buffers()
 {
-    SwapBuffers(window->get_device_context());
+    SwapBuffers(m_window->get_device_context());
 }
 
 void joj::Win32PlatformManager::shutdown()
 {
-    window->shutdown();
+    if (m_gl_context)
+        m_gl_context->destroy();
+
+    if (m_dx11_context)
+        m_dx11_context->destroy();
+
+    m_window->shutdown();
 }
 
 void joj::Win32PlatformManager::set_window_icon(i32 count, IconImage& image)
 {
-    
+    // TODO: use own logger
+    printf("TODO()!\n");
 }
 
 #endif // JPLATFORM_WINDOWS
