@@ -13,7 +13,7 @@ joj::Input::~Input()
 }
 
 
-b8 joj::Input::is_key_pressed(Keys key)
+b8 joj::Input::is_key_pressed(u32 key)
 {
     if (m_ctrl.keys[key])
     {

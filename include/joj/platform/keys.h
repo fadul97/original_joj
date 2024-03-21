@@ -6,7 +6,6 @@
 
 namespace joj 
 {
-    
     enum Buttons
     {
         BUTTON_LEFT,
@@ -28,7 +27,8 @@ namespace joj
         b8 buttons[MAX_BUTTONS];
     };
 
-    enum Keys {
+    enum Keys
+    {
         /** @brief The backspace key. */
         KEY_BACKSPACE = 0x08,
         /** @brief The enter key. */

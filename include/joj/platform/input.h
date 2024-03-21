@@ -14,9 +14,9 @@ namespace joj
         Input();
         virtual ~Input();
 
-        b8 is_key_down(Keys key) const;
-        b8 is_key_pressed(Keys key);
-        b8 is_key_up(Keys key) const;
+        b8 is_key_down(u32 key) const;
+        b8 is_key_pressed(u32 key);
+        b8 is_key_up(u32 key) const;
 
         b8 is_button_down(Buttons button) const;
         b8 is_button_up(Buttons button) const;
@@ -29,7 +29,7 @@ namespace joj
         void press_key(Keys key);
         void click_button(Buttons button);
 
-        void release_key(Keys key);
+        void release_key(u32 key);
         void release_button(Buttons button);
 
     protected:
@@ -38,10 +38,10 @@ namespace joj
         static Mouse m_mouse;
     };
 
-        inline b8 Input::is_key_down(Keys key) const
+        inline b8 Input::is_key_down(u32 key) const
         { return m_keyboard.keys[key]; }
 
-        inline b8 Input::is_key_up(Keys key) const
+        inline b8 Input::is_key_up(u32 key) const
         { return !m_keyboard.keys[key]; }
 
         inline i16 Input::get_xmouse() const
@@ -62,7 +62,7 @@ namespace joj
         inline void Input::click_button(Buttons button)
         { m_mouse.buttons[button] = true; }
 
-        inline void Input::release_key(Keys key)
+        inline void Input::release_key(u32 key)
         { m_keyboard.keys[key] = false; }
 
         inline void Input::release_button(Buttons button)

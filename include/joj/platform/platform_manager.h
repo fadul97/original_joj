@@ -24,9 +24,9 @@ namespace joj
 
         b8 is_running() const;
 
-        b8 is_key_down(Keys key) const;
-        b8 is_key_pressed(Keys key) const;
-        b8 is_key_up(Keys key) const;
+        b8 is_key_down(u32 key) const;
+        b8 is_key_pressed(u32 key) const;
+        b8 is_key_up(u32 key) const;
 
         b8 is_button_down(Buttons button) const;
         b8 is_button_up(Buttons button) const;
@@ -66,15 +66,15 @@ namespace joj
     { return window->is_running(); }
 
     template<class Twindow, class Tinput, class Tcontext>
-    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_down(Keys key) const
+    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_down(u32 key) const
     { return input->is_key_down(key); }
 
     template<class Twindow, class Tinput, class Tcontext>
-    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_pressed(Keys key) const
+    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_pressed(u32 key) const
     { return input->is_key_pressed(key); }
 
     template<class Twindow, class Tinput, class Tcontext>
-    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_up(Keys key) const
+    inline b8 PlatformManager<Twindow, Tinput, Tcontext>::is_key_up(u32 key) const
     { return input->is_key_up(key); }
 
     template<class Twindow, class Tinput, class Tcontext>
