@@ -1,10 +1,14 @@
 #include "joj/engine.h"
 #include "app_gl.h"
 
+#if JPLATFORM_WINDOWS
+#include "app_dx11.h"
+#endif
+
 int main()
 {
     joj::Engine* engine = new joj::Engine();
-    if (engine->run(new MyApp()) != joj::ErrorCode::OK)
+    if (engine->run(new DX11App()) != joj::ErrorCode::OK)
         return -1;
 
     delete engine;

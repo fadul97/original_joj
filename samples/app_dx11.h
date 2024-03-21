@@ -18,7 +18,7 @@
 #include "joj/renderer/dx11/obj_const_buffer_dx11.h"
 #include "joj/systems/camera.h"
 
-class MyApp : public joj::App
+class DX11App : public joj::App
 {
 public:
     //joj::Cube geo = joj::Cube(3.0f, 3.0f, 3.0f);
@@ -275,13 +275,3 @@ public:
     {
     }
 };
-
-int main()
-{
-    joj::Engine* engine = new joj::Engine();
-    if (engine->run(new MyApp()) != joj::ErrorCode::OK)
-        return -1;
-
-    delete engine;
-    return 0;
-}

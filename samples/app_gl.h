@@ -10,9 +10,10 @@
 #include "joj/resources/geometry/quad.h"
 #include "joj/resources/geometry/sphere.h"
 #include "joj/systems/camera.h"
-#include "matrix4.h"
+#include "math/matrix4.h"
+#include "math/jmath.h"
 
-class MyApp : public joj::App
+class GLApp : public joj::App
 {
 public:
     //joj::Cube geo = joj::Cube(3.0f, 3.0f, 3.0f);
@@ -81,8 +82,14 @@ public:
         View = camera.get_view_mat();
             
         // Projection Matrix
+#if JPLATFORM_WINDOWS
+        DirectX::XMMATRIX p = DirectX::XMMatrixPerspectiveFovLH(
+            DirectX::XMConvertToRadians(camera.m_zoom),
+            joj::Engine::platform_manager->get_window()->get_aspect_ratio(),
+            1.0f, 100.0f);
+#else
         Proj = joj::perspective_lh(joj::to_radians(45.0f), joj::Engine::platform_manager->get_window()->get_aspect_ratio(), 1.0f, 100.0f);
-        
+#endif   
 
         // Word-View-Projection Matrix
         joj::Matrix4 wvp = World * View * Proj;
