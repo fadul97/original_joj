@@ -26,7 +26,7 @@ namespace joj
 
 namespace joj
 {
-    class JAPI GLRenderer : public Renderer<JojWindow>
+    class JAPI GLRenderer : public JIRenderer<JojWindow>
     {
     public:
         GLRenderer();
@@ -34,8 +34,8 @@ namespace joj
         
         b8 init(std::unique_ptr<JojWindow>& window) override;
         void render() override;
+        void clear() override;
         void clear(f32 r, f32 g, f32 b, f32 a) override;
-        void clear();
         void swap_buffers() override;
         void shutdown() override;
 
