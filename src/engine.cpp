@@ -34,20 +34,9 @@ joj::Engine::~Engine()
 
 joj::ErrorCode joj::Engine::init(RendererBackend renderer_backend)
 {
-    platform_manager->init(800, 600);
-    if (!platform_manager->init(800, 600))
-    {
-        // TODO: Use own logger
-        std::cout << "Failed to initialize Platform Manager.\n";
-        return ErrorCode::ERR_PLATFORM_MANAGER_INIT;
-    }
+    JOUTPUTFAILED(platform_manager->init(800, 600, "JojEngine", WindowMode::WINDOWED));
 
-    if (!platform_manager->create_window())
-    {
-        // TODO: Use own logger
-        std::cout << "Failed to create window.\n";
-        return ErrorCode::ERR_PLATFORM_MANAGER_CREATION;
-    }
+    JOUTPUTFAILED(platform_manager->create_window());
 
     switch (renderer_backend)
     {
