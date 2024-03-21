@@ -1,7 +1,9 @@
 #ifndef JOJ_ERROR_H
 #define JOJ_ERROR_H
 
+#define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
+
 #include <string>
 
 namespace joj
@@ -57,6 +59,23 @@ namespace joj
     void print_error(ErrorCode e, const std::string& func, const std::string& file, i32 line);
 
     const char* error_to_string(ErrorCode e);
+
+    class JAPI Error
+    {
+    public:
+        Error();
+        Error(ErrorCode e, const std::string& func, const std::string& file, i32 line);
+        ~Error();
+
+        std::string to_string() const;
+        void what() const;
+
+    private:
+        ErrorCode m_ecode;
+        std::string m_func_name;
+        std::string m_filename;
+        i32 m_line;
+    };
 }
 
 #define JFAILED(x) (((joj::ErrorCode)(x)) != joj::ErrorCode::OK)
