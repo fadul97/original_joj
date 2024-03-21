@@ -27,8 +27,13 @@ namespace joj
          */
         virtual void draw() {}
         virtual void display() {}
+
+#if JPLATFORM_WINDOWS
+        virtual void on_pause() { Sleep(10); }
+#else
         virtual void on_pause() {}
-    
+#endif
+
     protected:
         static JPlatformManager* platform_manager;
     };
