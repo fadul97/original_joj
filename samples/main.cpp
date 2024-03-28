@@ -10,7 +10,7 @@ int main()
 {
     joj::Engine* engine = joj::Engine::get_singleton();
 
-    if JFAILED(engine->run(new DX11App(), joj::BackendRenderer::DX11))
+    if JFAILED(engine->run(new GLApp(), joj::BackendRenderer::GL))
         return -1;
     
     return 0;

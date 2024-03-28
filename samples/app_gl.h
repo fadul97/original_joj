@@ -19,8 +19,8 @@ public:
 
     void draw()
     {
-        joj::Engine::gl_renderer->clear(1, 1, 0, 0);
-        joj::Engine::window->swap_buffers();
+        joj::Engine::gl_renderer->clear(0, 1, 1, 1);
+        joj::Engine::swap_buffers();
     }
 
     void shutdown()
