@@ -52,16 +52,16 @@ public:
 
     void process_input_for_camera(f32 dt)
     {
-        if (joj::Engine::platform_manager->is_key_down('W'))
+        if (joj::Engine::input->is_key_down('W'))
             camera.process_keyboard(joj::CameraMovement::FORWARD, dt);
 
-        if (joj::Engine::platform_manager->is_key_down('S'))
+        if (joj::Engine::input->is_key_down('S'))
             camera.process_keyboard(joj::CameraMovement::BACKWARD, dt);
 
-        if (joj::Engine::platform_manager->is_key_down('A'))
+        if (joj::Engine::input->is_key_down('A'))
             camera.process_keyboard(joj::CameraMovement::LEFT, dt);
 
-        if (joj::Engine::platform_manager->is_key_down('D'))
+        if (joj::Engine::input->is_key_down('D'))
             camera.process_keyboard(joj::CameraMovement::RIGHT, dt);
     }
 
@@ -97,7 +97,7 @@ public:
 
         XMStoreFloat4x4(&Proj, DirectX::XMMatrixPerspectiveFovLH(
             DirectX::XMConvertToRadians(45.0f),
-            joj::Engine::platform_manager->get_window()->get_aspect_ratio(),
+            joj::Engine::window->get_aspect_ratio(),
             1.0f, 1000.0f));
 
         // World Matrix
@@ -113,7 +113,7 @@ public:
         // Projection Matrix
         DirectX::XMMATRIX p = DirectX::XMMatrixPerspectiveFovLH(
             DirectX::XMConvertToRadians(camera.m_zoom),
-            joj::Engine::platform_manager->get_window()->get_aspect_ratio(),
+            joj::Engine::window->get_aspect_ratio(),
             1.0f, 100.0f);
 
         // Word-View-Projection Matrix
@@ -125,7 +125,7 @@ public:
 
         objc_buffer.build(sizeof(DirectX::XMMATRIX), wvp);
 
-        if FAILED(joj::Engine::renderer->get_device()->CreateBuffer(
+        if FAILED(joj::Engine::dx11_renderer->get_device()->CreateBuffer(
             objc_buffer.get_const_buffer_desc(),
             objc_buffer.get_subdata(),
             objc_buffer.get_const_buffer().GetAddressOf()))
@@ -134,7 +134,7 @@ public:
         }
 
         // Set constant buffer
-        joj::Engine::renderer->get_device_context()->VSSetConstantBuffers(0, 1, objc_buffer.get_const_buffer().GetAddressOf());
+        joj::Engine::dx11_renderer->get_device_context()->VSSetConstantBuffers(0, 1, objc_buffer.get_const_buffer().GetAddressOf());
 
         // ---------------------------------
         // VERTEX BUFFERS
@@ -144,7 +144,7 @@ public:
         vertex_buffer.build(sizeof(joj::Vertex) * geo.get_vertex_count(), geo.get_vertex_data());
 
         // Create buffer with ID3D11Device::CreateBuffer
-        if FAILED(joj::Engine::renderer->get_device()->CreateBuffer(
+        if FAILED(joj::Engine::dx11_renderer->get_device()->CreateBuffer(
             vertex_buffer.get_buffer_desc(),
             vertex_buffer.get_subdata(),
             vertex_buffer.get_buffer().GetAddressOf()))
@@ -160,7 +160,7 @@ public:
         index_buffer.build(sizeof(u32)* geo.get_index_count(), geo.get_index_data());
 
         // 3) Create buffer with ID3D11Device::CreateBuffer
-        if (FAILED(joj::Engine::renderer->get_device()->CreateBuffer(
+        if (FAILED(joj::Engine::dx11_renderer->get_device()->CreateBuffer(
             index_buffer.get_buffer_desc(),
             index_buffer.get_subdata(),
             index_buffer.get_buffer().GetAddressOf())))
@@ -174,7 +174,7 @@ public:
 
         LPCWSTR vertex_path = L"../../../../samples/shaders/vert.hlsl";
         LPCWSTR pixel_path = L"../../../../samples/shaders/pixel.hlsl";
-        if (!shader.compile_shaders(vertex_path, pixel_path, joj::Engine::renderer->get_device()))
+        if (!shader.compile_shaders(vertex_path, pixel_path, joj::Engine::dx11_renderer->get_device()))
             std::cout << "Failed to compile shaders.\n";
     
         // ---------------------------------
@@ -182,34 +182,33 @@ public:
         // ---------------------------------
         
         // Bind input layout to the Input Assembler Stage
-        joj::Engine::renderer->get_device_context()->IASetInputLayout(shader.get_input_layout());
+        joj::Engine::dx11_renderer->get_device_context()->IASetInputLayout(shader.get_input_layout());
 
         // Tell how Direct3D will form geometric primitives from vertex data
-        joj::Engine::renderer->set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+        joj::Engine::dx11_renderer->set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        mouse_callback(joj::Engine::platform_manager->get_xmouse(), joj::Engine::platform_manager->get_ymouse());
+        mouse_callback(joj::Engine::input->get_xmouse(), joj::Engine::input->get_ymouse());
         
-        centerX = joj::Engine::platform_manager->get_window()->get_xcenter();
-        centerY = joj::Engine::platform_manager->get_window()->get_ycenter();
+        centerX = joj::Engine::window->get_xcenter();
+        centerY = joj::Engine::window->get_ycenter();
 
-        joj::Engine::platform_manager->get_window()->hide_cursor(true);
+        joj::Engine::window->hide_cursor(true);
 
-        cmouseX = joj::Engine::platform_manager->get_xmouse();
-        cmouseY = joj::Engine::platform_manager->get_ymouse();
+        cmouseX = joj::Engine::input->get_xmouse();
+        cmouseY = joj::Engine::input->get_ymouse();
 
         camera.m_movement_speed = 20.0f;
     }
 
     void update(f32 dt)
     {
-
-        if (joj::Engine::platform_manager->is_key_pressed(joj::KEY_ESCAPE))
+        if (joj::Engine::input->is_key_pressed(joj::KEY_ESCAPE))
             joj::Engine::close();
 
-        if (joj::Engine::platform_manager->is_key_pressed('O'))
+        if (joj::Engine::input->is_key_pressed('O'))
             printf("OI");
 
-        if (joj::Engine::platform_manager->is_key_pressed(joj::KEY_TAB))
+        if (joj::Engine::input->is_key_pressed(joj::KEY_TAB))
         {
             firstPerson = !firstPerson;
             hideCursor = !hideCursor;
@@ -247,33 +246,33 @@ public:
         DirectX::XMMATRIX WorldViewProj = world * view * proj;
 
         // Update constant buffer with combined matrix (Word-View-Projection Matrix)
-        objc_buffer.set_matrix(WorldViewProj, joj::Engine::renderer->get_device_context());
+        objc_buffer.set_matrix(WorldViewProj, joj::Engine::dx11_renderer->get_device_context());
     }
 
     void draw()
     {
-        joj::Engine::renderer->clear();
+        joj::Engine::dx11_renderer->clear();
 
         UINT stride = sizeof(joj::Vertex);
         UINT offset = 0;
 
         // Bind Vertex Buffer to an input slot of the device
-        joj::Engine::renderer->get_device_context()->IASetVertexBuffers(0, 1, vertex_buffer.get_buffer().GetAddressOf(), &stride, &offset);
+        joj::Engine::dx11_renderer->get_device_context()->IASetVertexBuffers(0, 1, vertex_buffer.get_buffer().GetAddressOf(), &stride, &offset);
         
         // Bind index buffer to the pipeline
-        joj::Engine::renderer->get_device_context()->IASetIndexBuffer(index_buffer.get_buffer().Get(), DXGI_FORMAT_R32_UINT, 0);
+        joj::Engine::dx11_renderer->get_device_context()->IASetIndexBuffer(index_buffer.get_buffer().Get(), DXGI_FORMAT_R32_UINT, 0);
 
         // Bind Vertex and Pixel Shaders
-        joj::Engine::renderer->get_device_context()->VSSetShader(shader.get_vertex_shader(), nullptr, 0);
-        joj::Engine::renderer->get_device_context()->PSSetShader(shader.get_pixel_shader(), nullptr, 0);
+        joj::Engine::dx11_renderer->get_device_context()->VSSetShader(shader.get_vertex_shader(), nullptr, 0);
+        joj::Engine::dx11_renderer->get_device_context()->PSSetShader(shader.get_pixel_shader(), nullptr, 0);
 
         // Bind constant buffer
-        joj::Engine::renderer->get_device_context()->VSSetConstantBuffers(0, 1, objc_buffer.get_const_buffer().GetAddressOf());
+        joj::Engine::dx11_renderer->get_device_context()->VSSetConstantBuffers(0, 1, objc_buffer.get_const_buffer().GetAddressOf());
 
         // Draw
-        joj::Engine::renderer->get_device_context()->DrawIndexedInstanced(geo.get_index_count(), 1, 0, 0, 0);
+        joj::Engine::dx11_renderer->get_device_context()->DrawIndexedInstanced(geo.get_index_count(), 1, 0, 0, 0);
 
-        joj::Engine::renderer->swap_buffers();
+        joj::Engine::dx11_renderer->swap_buffers();
     }
 
     void shutdown()

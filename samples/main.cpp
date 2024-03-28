@@ -8,11 +8,10 @@
 
 int main()
 {
-    joj::Engine* engine = new joj::Engine();
+    joj::Engine* engine = joj::Engine::get_singleton();
 
-    if JFAILED(engine->run(new DX11App(), joj::RendererBackend::DX11))
+    if JFAILED(engine->run(new DX11App(), joj::BackendRenderer::DX11))
         return -1;
     
-    delete engine;
     return 0;
 }
