@@ -46,7 +46,7 @@ joj::ErrorCode joj::Engine::init(BackendRenderer backend_renderer)
     {
     case BackendRenderer::GL:
     {
-        auto context = platform_manager->create_context(window, backend_renderer);
+        platform_manager->make_gl_context_current(window);
         gl_renderer = std::make_unique<JGLRenderer>();
         gl_renderer->init(window);
         gl_renderer->setup_default_pipeline(window);
