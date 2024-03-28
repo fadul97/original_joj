@@ -1,8 +1,8 @@
-#include "graphics/opengl/x11/context_gl.h"
+#include "platform/context/opengl/x11/context_gl.h"
 
 #if JPLATFORM_LINUX
 
-#include "graphics/opengl/joj_gl.h"
+#include "platform/context/opengl/joj_gl.h"
 #include <string.h>
 
 typedef GLXContext (*glXCreateContextAttribsARBProc)(Display*, GLXFBConfig, GLXContext, Bool, const int*);

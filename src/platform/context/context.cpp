@@ -1,4 +1,4 @@
-#include "graphics/context.h"
+#include "platform/context/context.h"
 
 #if JPLATFORM_LINUX
 #include "platform/x11/window_x11.h"

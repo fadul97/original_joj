@@ -6,7 +6,7 @@
 
 #if JPLATFORM_WINDOWS
 
-#include "graphics/context.h"
+#include "platform/context/context.h"
 #include "platform/win32/window_win32.h"
 #include <dxgi1_6.h>
 #include <d3d11.h>

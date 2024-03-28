@@ -7,17 +7,17 @@
 #endif
 
 template<class Twindow>
-joj::JIRenderer<Twindow>::JIRenderer()
+joj::IRenderer<Twindow>::IRenderer()
 {
 }
 
 template<class Twindow>
-joj::JIRenderer<Twindow>::~JIRenderer()
+joj::IRenderer<Twindow>::~IRenderer()
 {
 }
 
 #if JPLATFORM_LINUX
-template class joj::JIRenderer<joj::X11Window>;
+template class joj::IRenderer<joj::X11Window>;
 #elif JPLATFORM_WINDOWS
-template class joj::JIRenderer<joj::Win32Window>;
+template class joj::IRenderer<joj::Win32Window>;
 #endif

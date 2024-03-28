@@ -1,7 +1,7 @@
 #include "renderer/opengl/vao.h"
 
 #define JOJ_GL_DEFINE_EXTERN
-#include "graphics/opengl/joj_gl.h"
+#include "platform/context/opengl/joj_gl.h"
 
 joj::VAO::VAO()
 {

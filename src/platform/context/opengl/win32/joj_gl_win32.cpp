@@ -1,4 +1,4 @@
-#include "graphics/opengl/joj_gl.h"
+#include "platform/context/opengl/joj_gl.h"
 
 #if JPLATFORM_WINDOWS
 

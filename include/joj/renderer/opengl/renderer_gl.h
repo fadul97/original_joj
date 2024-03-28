@@ -7,7 +7,7 @@
 #include "renderer/renderer.h"
 
 #define JOJ_GL_DEFINE_EXTERN
-#include "graphics/opengl/joj_gl.h"
+#include "platform/context/opengl/joj_gl.h"
 
 #if JPLATFORM_LINUX
 #include "platform/x11/window_x11.h"

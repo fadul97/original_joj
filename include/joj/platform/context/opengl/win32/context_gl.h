@@ -6,7 +6,7 @@
 
 #if JPLATFORM_WINDOWS
 
-#include "graphics/context.h"
+#include "platform/context/context.h"
 #include "platform/win32/window_win32.h"
 
 namespace joj

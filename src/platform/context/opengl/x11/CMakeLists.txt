@@ -10,4 +10,4 @@ target_link_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-target_link_libraries(jojX11GLGraphics PUBLIC jojGraphics -lGL)
+target_link_libraries(jojX11GLGraphics PUBLIC jojGraphicsContext -lGL)

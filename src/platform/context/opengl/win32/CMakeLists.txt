@@ -17,4 +17,4 @@ find_package(OpenGL REQUIRED)
 target_include_directories(jojWin32GLGraphics PRIVATE ${OPENGL_INCLUDE_DIR})
 
 # Link OpenGL and JojPlatform to JojGraphicsGL
-target_link_libraries(jojWin32GLGraphics PUBLIC ${OPENGL_LIBRARY} jojGraphics)
+target_link_libraries(jojWin32GLGraphics PUBLIC ${OPENGL_LIBRARY} jojGraphicsContext)

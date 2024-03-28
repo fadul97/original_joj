@@ -9,7 +9,7 @@
 #include "renderer/renderer.h"
 #include "platform/win32/window_win32.h"
 #include <memory>
-#include "graphics/dx11/context_dx11.h"
+#include "platform/context/dx11/context_dx11.h"
 #include "swapchain_dx11.h"
 #include "error.h"
 #include "depth_stencil_manager_dx11.h"

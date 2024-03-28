@@ -8,7 +8,7 @@
 #include "window.h"
 #include "input.h"
 #include "timer.h"
-#include "graphics/context.h"
+#include "context/context.h"
 #include <memory>
 #include "icon_image.h"
 #include "error.h"

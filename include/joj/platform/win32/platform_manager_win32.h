@@ -9,8 +9,8 @@
 #include "platform/platform_manager.h"
 #include "platform/win32/window_win32.h"
 #include "platform/win32/input_win32.h"
-#include "graphics/opengl/win32/context_gl.h"
-#include "graphics/dx11/context_dx11.h"
+#include "platform/context/opengl/win32/context_gl.h"
+#include "platform/context/dx11/context_dx11.h"
 #include "platform/win32/timer_win32.h"
 
 namespace joj

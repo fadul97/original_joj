@@ -2,7 +2,7 @@
 #define JOJ_GL_SHADER_H
 
 #define JOJ_GL_DEFINE_EXTERN
-#include "graphics/opengl/joj_gl.h"
+#include "platform/context/opengl/joj_gl.h"
 
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
