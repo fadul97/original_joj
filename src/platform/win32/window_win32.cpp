@@ -231,9 +231,12 @@ LRESULT CALLBACK joj::Win32Window::WinProc(HWND hWnd, UINT msg, WPARAM wParam, L
             on_focus();
         return 0;
 
+    // FIXME: For some reason, the window automatically closes when running an OpenGL App
+    /*
     case WM_DESTROY:
         PostQuitMessage(0);
         return 0;
+    */
     }
     
     return DefWindowProc(hWnd, msg, wParam, lParam);

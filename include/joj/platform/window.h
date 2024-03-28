@@ -45,6 +45,9 @@ namespace joj
         virtual void clear() = 0;
         virtual void swap_buffers() = 0;
 
+        virtual void set_on_focus(void(*func)()) = 0;
+        virtual void set_lost_focus(void(*func)()) = 0;
+
     protected:
         i16 width;
         i16 height;

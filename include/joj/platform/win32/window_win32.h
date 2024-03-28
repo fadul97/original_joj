@@ -36,8 +36,8 @@ namespace joj
         void clear() override;
         void swap_buffers() override;
         
-        void set_on_focus(void(*func)());
-        void set_lost_focus(void(*func)());;
+        void set_on_focus(void(*func)()) override;
+        void set_lost_focus(void(*func)()) override;
 
         static LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
         
