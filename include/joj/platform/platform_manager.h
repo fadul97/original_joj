@@ -29,10 +29,12 @@ namespace joj
 
         virtual std::unique_ptr<Tinput> create_input() = 0;
 
-        virtual std::unique_ptr<GraphicsContext<Twindow>> create_context(std::unique_ptr<Twindow>& window, BackendRenderer backend_renderer) = 0;
+        virtual ErrorCode create_context(std::unique_ptr<Twindow>& window, BackendRenderer backend_renderer) = 0;
         virtual ErrorCode create_window_and_context(std::unique_ptr<Twindow>& window, BackendRenderer backend_renderer) = 0;
 
         virtual std::unique_ptr<Timer> create_timer() = 0;
+
+        virtual ErrorCode make_gl_context_current(std::unique_ptr<Twindow>& window) = 0;
 
         virtual void set_on_focus(void(*func)()) = 0;
         virtual void set_lost_focus(void(*func)()) = 0;

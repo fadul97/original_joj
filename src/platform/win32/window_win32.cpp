@@ -200,7 +200,7 @@ void joj::Win32Window::clear()
 
 void joj::Win32Window::swap_buffers()
 {
-    
+    SwapBuffers(m_hdc);
 }
 
 void joj::Win32Window::set_on_focus(void(*func)())

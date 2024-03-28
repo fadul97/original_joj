@@ -4,6 +4,7 @@
 
 joj::Win32PlatformManager::Win32PlatformManager()
 {
+    m_context = nullptr;
 }
 
 joj::Win32PlatformManager::~Win32PlatformManager()
@@ -68,40 +69,50 @@ std::unique_ptr<joj::Timer> joj::Win32PlatformManager::create_timer()
     return timer;
 }
 
-std::unique_ptr<joj::GraphicsContext<joj::Win32Window>> joj::Win32PlatformManager::create_context(std::unique_ptr<Win32Window>& window, BackendRenderer backend_renderer)
+joj::ErrorCode joj::Win32PlatformManager::make_gl_context_current(std::unique_ptr<Win32Window>& window)
+{
+    if (m_context == nullptr)
+    {
+        m_context = std::make_unique<Win32GLContext>();
+
+        if (!m_context->create(window))
+        {
+            // TODO: use own logger, cleanup?
+            printf("Failed to create GLContext.\n");
+            return ErrorCode::ERR_CONTEXT_CREATION;
+        }
+    }
+
+    m_context->make_current(window);
+    
+    return ErrorCode::OK;
+}
+
+joj::ErrorCode joj::Win32PlatformManager::create_context(std::unique_ptr<Win32Window>& window, BackendRenderer backend_renderer)
 {
     switch (backend_renderer)
     {
     case BackendRenderer::GL:
     {
-        auto context = std::make_unique<Win32GLContext>();
+        m_context = std::make_unique<Win32GLContext>();
 
-        if (!context->create(window))
+        if (!m_context->create(window))
         {
             // TODO: use own logger, cleanup?
             printf("Failed to create GLContext.\n");
-            return nullptr;
+            return ErrorCode::ERR_CONTEXT_CREATION;
         }
 
-        context->make_current(window);
+        m_context->make_current(window);
 
-        return context;
+        return ErrorCode::OK;
+    }
+    
+    default:
+        return ErrorCode::FAILED;
     }
 
-    case BackendRenderer::DX11:
-        auto context = std::make_unique<DX11Context>();
-        
-        if (!context->create(window))
-        {
-            // TODO: use own logger, cleanup?
-            printf("Failed to create DX11Context.\n");
-            return nullptr;
-        }
-
-        return context;
-    }
-
-    return nullptr;
+    return ErrorCode::FAILED;
 }
 
 joj::ErrorCode joj::Win32PlatformManager::create_window_and_context(std::unique_ptr<Win32Window>& window, BackendRenderer backend_renderer)

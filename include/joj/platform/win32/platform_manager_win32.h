@@ -24,18 +24,23 @@ namespace joj
         std::unique_ptr<Win32Window> create_window(i16 width, i16 height, const char* title, WindowMode mode) override;
         std::unique_ptr<Win32Window> create_simple_window(i16 width, i16 height, const char* title) override;
 
-        std::unique_ptr<GraphicsContext<Win32Window>> create_context(std::unique_ptr<Win32Window>& window, BackendRenderer backend_renderer) override;
+        ErrorCode create_context(std::unique_ptr<Win32Window>& window, BackendRenderer backend_renderer) override;
         ErrorCode create_window_and_context(std::unique_ptr<Win32Window>& window, BackendRenderer backend_renderer) override;
         
         std::unique_ptr<Win32Input> create_input() override;
 
         std::unique_ptr<Timer> create_timer() override;
 
+        ErrorCode make_gl_context_current(std::unique_ptr<Win32Window>& window) override;
+
         void set_on_focus(void(*func)()) override;
         void set_lost_focus(void(*func)()) override;
 
         void set_window_icon(std::unique_ptr<Win32Window>& window, i32 count, IconImage& image) override;
         void hide_cursor(b8 hide) override;
+
+    private:
+        std::unique_ptr<GraphicsContext<Win32Window>> m_context;
     };
 
     inline void Win32PlatformManager::hide_cursor(b8 hide)
