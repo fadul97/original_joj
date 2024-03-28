@@ -18,7 +18,7 @@
 
 namespace joj
 {
-    class JAPI DX11Renderer : public JIRenderer<Win32Window>
+    class JAPI DX11Renderer : public IRenderer<Win32Window>
     {
     public:
         DX11Renderer();

@@ -26,7 +26,7 @@ namespace joj
 
 namespace joj
 {
-    class JAPI GLRenderer : public JIRenderer<JojWindow>
+    class JAPI GLRenderer : public IRenderer<JojWindow>
     {
     public:
         GLRenderer();

@@ -10,14 +10,12 @@
 
 namespace joj
 {
-    enum class RendererBackend { DX11, GL };
-
     template<class Twindow>
-    class JAPI JIRenderer
+    class JAPI IRenderer
     {
     public:
-        JIRenderer();
-        virtual ~JIRenderer() = 0;
+        IRenderer();
+        virtual ~IRenderer() = 0;
 
         virtual b8 init(std::unique_ptr<Twindow>& window) = 0;
         virtual void render() = 0;
