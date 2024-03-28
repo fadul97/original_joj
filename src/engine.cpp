@@ -5,112 +5,107 @@
 #include <sstream>
 #include "app.h"
 
+joj::Engine* joj::Engine::engine = nullptr;
 joj::JPlatformManager* joj::Engine::platform_manager = nullptr;
-joj::JRenderer* joj::Engine::renderer = nullptr;
-joj::JGLRenderer* joj::Engine::gl_renderer = nullptr;
+std::unique_ptr<joj::JRenderer> joj::Engine::dx11_renderer = nullptr;
+std::unique_ptr<joj::JGLRenderer> joj::Engine::gl_renderer = nullptr;
+std::unique_ptr<joj::JWindow> joj::Engine::window = nullptr;
+
+// ATTENTION: input must be initialized after window creation
+std::unique_ptr<joj::JInput> joj::Engine::input = nullptr;
+
+std::unique_ptr<joj::JTimer> joj::Engine::timer = nullptr;
 std::vector<joj::Error> joj::Engine::errors = std::vector<joj::Error>();
 
 b8 joj::Engine::m_paused = false;
 
+joj::App* joj::Engine::m_app = nullptr;
+
 joj::Engine::Engine()
 {
     platform_manager = new JPlatformManager();
-    renderer = nullptr;
-    gl_renderer = nullptr;
     m_frametime = 0.0f;
 }
 
 joj::Engine::~Engine()
 {
-    if (renderer)
-        delete renderer;
-    
-    if (gl_renderer)
-        delete gl_renderer;
-    
     if (platform_manager)
         delete platform_manager;
 }
 
-joj::ErrorCode joj::Engine::init(RendererBackend renderer_backend)
+joj::ErrorCode joj::Engine::init(BackendRenderer backend_renderer)
 {
-    JOUTPUTFAILED(platform_manager->init(800, 600, "JojEngine", WindowMode::WINDOWED));
+    window = platform_manager->create_window(800, 600, "My JWindow", WindowMode::WINDOWED);
+    if (window == nullptr)
+        return ErrorCode::ERR_WINDOW_CREATION;
 
-    JOUTPUTFAILED(platform_manager->create_window());
+    // ATTENTION: input must be initialized after window creation
+    input = platform_manager->create_input();
 
-    switch (renderer_backend)
+    switch (backend_renderer)
     {
-    case RendererBackend::DX11:
-        renderer = new JRenderer();
-        if (!renderer->init(platform_manager->get_window()))
-        {
-            std::cout << "Failed to initialize renderer.\n";
-            return ErrorCode::ERR_PLATFORM_MANAGER_CREATION;
-        }
-
-        if (renderer->setup_default_pipeline(platform_manager->get_window()) != joj::ErrorCode::OK)
-        {
-            std::cout << "Failed to setup renderer pipeline.\n";
-            return ErrorCode::ERR_RENDERER_PIPELINE_ERROR;
-        }
-
+    case BackendRenderer::GL:
+    {
+        auto context = platform_manager->create_context(window, backend_renderer);
+        gl_renderer = std::make_unique<JGLRenderer>();
+        gl_renderer->init(window);
+        gl_renderer->setup_default_pipeline(window);
         break;
+    }
 
-    case RendererBackend::GL:
-        gl_renderer = new JGLRenderer();
-        if (!gl_renderer->init(platform_manager->get_window()))
-        {
-            std::cout << "Failed to initialize renderer.\n";
-            return ErrorCode::ERR_PLATFORM_MANAGER_CREATION;
-        }
-
-        if (gl_renderer->setup_default_pipeline(platform_manager->get_window()) != joj::ErrorCode::OK)
-        {
-            std::cout << "Failed to setup renderer pipeline.\n";
-            return ErrorCode::ERR_RENDERER_PIPELINE_ERROR;
-        }
-
+    case BackendRenderer::DX11:
+        dx11_renderer = std::make_unique<JRenderer>();
+        dx11_renderer->init(window);
+        dx11_renderer->setup_default_pipeline(window);
         break;
-
     }
 
     return ErrorCode::OK;
 }
 
-joj::ErrorCode joj::Engine::run(App* app, RendererBackend renderer_backend)
+joj::ErrorCode joj::Engine::run(App* app, BackendRenderer backend_renderer)
 {
-    if (init(renderer_backend) != ErrorCode::OK)
+    if (init(backend_renderer) != ErrorCode::OK)
     {
         std::cout << "Failed to initialize engine.\n";
         return ErrorCode::ERR_ENGINE_INIT;
     }
 
+    SetWindowLongPtr(GetActiveWindow(), GWLP_WNDPROC, (LONG_PTR)EngineProc);
+
     // Adjust sleep resolution to 1 millisecond
-    platform_manager->begin_period();
+    timer = platform_manager->create_timer();
+    timer->time_begin_period();
 
 #if JPLATFORM_WINDOWS
     // Game pauses/resumes when losing/gaining focus
-    platform_manager->set_lost_focus(pause);
-    platform_manager->set_on_focus(resume);
+    window->set_lost_focus(pause);
+    window->set_on_focus(resume);
 #endif
 
     // Start time counter
-    platform_manager->start_timer();
+    timer->start();
 
-    app->init();
+    m_app = app;
+    m_app->init();
 
-    f32 dt = 1.0f;
+    MSG msg = { 0 };
 
-    while (platform_manager->is_running())
+    while (window->is_running() && msg.message != WM_QUIT)
     {
-        if (!platform_manager->process_events())
+        if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+        {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+        }
+        else
         {
             // -----------------------------------------------
             // Pause/Resume Game
             // -----------------------------------------------
 
             // P key pauses engine
-            if (platform_manager->is_key_pressed('P'))
+            if (input->is_key_pressed('P'))
             {
                 if (m_paused)
                     resume();
@@ -124,33 +119,43 @@ joj::ErrorCode joj::Engine::run(App* app, RendererBackend renderer_backend)
                 m_frametime = get_frametime();
 
                 // Update game
-                app->update(m_frametime);
+                m_app->update(m_frametime);
 
                 // Game draw
-                app->draw();
+                m_app->draw();
             }
             else
             {
                 // Game paused
-                app->on_pause();
+                m_app->on_pause();
             }
         }
     }
 
-    app->shutdown();
+    // Close game
+    printf("Message: %d\n", i32(msg.wParam));
+
+    m_app->shutdown();
 
     if (!errors.empty())
         ouput_log();
 
     shutdown();
 
+    delete engine;
+
     return ErrorCode::OK;
 }
 
 void joj::Engine::shutdown()
 {
-    renderer->shutdown();
-    platform_manager->shutdown();
+    window->close();
+
+    if (dx11_renderer)
+        dx11_renderer->shutdown();
+
+    if (gl_renderer)
+        gl_renderer->shutdown();
 }
 
 f32 joj::Engine::get_frametime()
@@ -162,7 +167,7 @@ f32 joj::Engine::get_frametime()
 #endif
 
     // Current frame time
-    m_frametime = platform_manager->reset_timer();
+    m_frametime = timer->reset();
 
 #ifdef _DEBUG
     // Accumulated frametime
@@ -178,12 +183,12 @@ f32 joj::Engine::get_frametime()
         text << std::fixed;			// Always show the fractional part
         text.precision(3);			// three numbers after comma
 
-        text << platform_manager->get_window()->get_title().c_str() << "    "
+        text << window->get_title().c_str() << "    "
             << "Renderer Backend: " << "DirectX 11" << "    "
             << "FPS: " << frame_count << "    "
             << "Frametime: " << m_frametime * 1000 << " (ms)";
 
-        SetWindowText(platform_manager->get_window()->get_id(), text.str().c_str());
+        SetWindowText(window->get_id(), text.str().c_str());
 
         frame_count = 0;
         total_time -= 1.0f;
@@ -197,4 +202,13 @@ void joj::Engine::ouput_log() const
 {
     for (Error e : errors)
         e.what();
+}
+
+LRESULT CALLBACK joj::Engine::EngineProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    // Window must be repainted
+    if (msg == WM_PAINT)
+        m_app->display();
+
+    return CallWindowProc(joj::Win32Input::InputProc, hWnd, msg, wParam, lParam);
 }

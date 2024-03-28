@@ -7,16 +7,23 @@
 #include <vector>
 #include "error.h"
 #include "renderer/renderer.h"
+#include <memory>
 
 #if JPLATFORM_WINDOWS
 #include "platform/win32/platform_manager_win32.h"
+#include "platform/win32/window_win32.h"
+#include "platform/win32/input_win32.h"
+#include "platform/win32/timer_win32.h"
 #include "renderer/dx11/renderer_dx11.h"
 #include "renderer/opengl/renderer_gl.h"
 #else
 #include "platform/x11/platform_manager_x11.h"
+#include "platform/x11/window_x11.h"
+#include "platform/x11/input_x11.h"
 #include "renderer/opengl/renderer_gl.h"
 #endif
 
+// FIXME: Abstract classes
 namespace joj
 {
 #if JPLATFORM_WINDOWS
@@ -24,10 +31,13 @@ namespace joj
     using JRenderer = DX11Renderer;
     using JGLRenderer = GLRenderer;
     using JWindow = Win32Window;
+    using JInput = Win32Input;
+    using JTimer = Timer;
 #else
     using JojPlatformManager = X11PlatformManager;
     using JRenderer = GLRenderer;
     using JWindow = X11Window;
+    using JInput = X11Input;
 #endif
 }
 
@@ -39,43 +49,64 @@ namespace joj
     class JAPI Engine
     {
     public:
-        Engine();
-        ~Engine();
-
-        ErrorCode init(RendererBackend renderer_backend);
-        ErrorCode run(App* app, RendererBackend renderer_backend);
+        ErrorCode init(BackendRenderer backend_renderer);
+        ErrorCode run(App* app, BackendRenderer backend_renderer);
         void shutdown();
-
-        JPlatformManager* get_platform_manager() const;
 
         // TODO: static members?
         static JPlatformManager* platform_manager;
-        static JRenderer* renderer;
-        static JGLRenderer* gl_renderer;
+        static std::unique_ptr<JRenderer> dx11_renderer;
+        static std::unique_ptr<JGLRenderer> gl_renderer;
         static std::vector<Error> errors;
+
+        static std::unique_ptr<JWindow> window;
+        static std::unique_ptr<JInput> input;
+        static std::unique_ptr<JTimer> timer;
 
         void ouput_log() const;
 
         static void pause();	// Pause engine
         static void resume();	// Resume engine
+        
+        static void swap_buffers();
 
         static void close();
         static b8 m_paused;
 
+        static Engine* get_singleton();
+
+        static LRESULT CALLBACK EngineProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     private:
+        Engine();
+        ~Engine();
+
+        static Engine* engine;
         f32 get_frametime();
         f32 m_frametime;
+
+        static App* m_app;
     };
 
+    inline Engine* Engine::get_singleton()
+    { 
+        if (engine == nullptr)
+            engine = new Engine();
+
+        return engine;
+    }
+
     inline void Engine::pause()
-	{ m_paused = true; platform_manager->stop_timer(); }
+	{ m_paused = true; timer->stop(); }
 
 	inline void Engine::resume()
-	{ m_paused = false; platform_manager->start_timer(); }
+	{ m_paused = false; timer->start(); }
 
     inline void Engine::close()
-    { platform_manager->close_window(); }
+    { window->close(); }
+
+    inline void Engine::swap_buffers()
+    { SwapBuffers(window->get_device_context()); }
 
 } // namespace joj
 
