@@ -26,7 +26,7 @@ namespace joj
         void set_mode(WindowMode mode) override;
         void set_color(u32 r, u32 g, u32 b) override;
 
-        void close();
+        void close() override;
         
         b8 init() override;
         b8 create() override;

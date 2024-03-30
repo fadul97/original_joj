@@ -31,7 +31,7 @@ namespace joj
         void set_width(i16 width);
         void set_height(i16 height);
         void set_title(std::string title);
-        void close();
+        virtual void close();
 
         virtual void hide_cursor(b8 hide) = 0;
         virtual void set_mode(WindowMode mode) = 0;
