@@ -52,16 +52,16 @@ public:
 
     void process_input_for_camera(f32 dt)
     {
-        if (joj::Engine::input->is_key_down('W'))
+        if (joj::Engine::platform_manager->is_key_down('W'))
             camera.process_keyboard(joj::CameraMovement::FORWARD, dt);
 
-        if (joj::Engine::input->is_key_down('S'))
+        if (joj::Engine::platform_manager->is_key_down('S'))
             camera.process_keyboard(joj::CameraMovement::BACKWARD, dt);
 
-        if (joj::Engine::input->is_key_down('A'))
+        if (joj::Engine::platform_manager->is_key_down('A'))
             camera.process_keyboard(joj::CameraMovement::LEFT, dt);
 
-        if (joj::Engine::input->is_key_down('D'))
+        if (joj::Engine::platform_manager->is_key_down('D'))
             camera.process_keyboard(joj::CameraMovement::RIGHT, dt);
     }
 
@@ -97,7 +97,7 @@ public:
 
         XMStoreFloat4x4(&Proj, DirectX::XMMatrixPerspectiveFovLH(
             DirectX::XMConvertToRadians(45.0f),
-            joj::Engine::window->get_aspect_ratio(),
+            joj::Engine::platform_manager->get_window()->get_aspect_ratio(),
             1.0f, 1000.0f));
 
         // World Matrix
@@ -113,7 +113,7 @@ public:
         // Projection Matrix
         DirectX::XMMATRIX p = DirectX::XMMatrixPerspectiveFovLH(
             DirectX::XMConvertToRadians(camera.m_zoom),
-            joj::Engine::window->get_aspect_ratio(),
+            joj::Engine::platform_manager->get_window()->get_aspect_ratio(),
             1.0f, 100.0f);
 
         // Word-View-Projection Matrix
@@ -187,28 +187,28 @@ public:
         // Tell how Direct3D will form geometric primitives from vertex data
         joj::Engine::dx11_renderer->set_primitive_topology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-        mouse_callback(joj::Engine::input->get_xmouse(), joj::Engine::input->get_ymouse());
+        mouse_callback(joj::Engine::platform_manager->get_xmouse(), joj::Engine::platform_manager->get_ymouse());
         
-        centerX = joj::Engine::window->get_xcenter();
-        centerY = joj::Engine::window->get_ycenter();
+        centerX = joj::Engine::platform_manager->get_xcenter();
+        centerY = joj::Engine::platform_manager->get_ycenter();
 
-        joj::Engine::window->hide_cursor(true);
+        joj::Engine::platform_manager->hide_cursor(true);
 
-        cmouseX = joj::Engine::input->get_xmouse();
-        cmouseY = joj::Engine::input->get_ymouse();
+        cmouseX = joj::Engine::platform_manager->get_xmouse();
+        cmouseY = joj::Engine::platform_manager->get_ymouse();
 
         camera.m_movement_speed = 20.0f;
     }
 
     void update(f32 dt)
     {
-        if (joj::Engine::input->is_key_pressed(joj::KEY_ESCAPE))
+        if (joj::Engine::platform_manager->is_key_pressed(joj::KEY_ESCAPE))
             joj::Engine::close();
 
-        if (joj::Engine::input->is_key_pressed('O'))
+        if (joj::Engine::platform_manager->is_key_pressed('O'))
             printf("OI");
 
-        if (joj::Engine::input->is_key_pressed(joj::KEY_TAB))
+        if (joj::Engine::platform_manager->is_key_pressed(joj::KEY_TAB))
         {
             firstPerson = !firstPerson;
             hideCursor = !hideCursor;
@@ -218,14 +218,13 @@ public:
         if (firstPerson)
         {
             // Now read the mouse position
-            POINT cursorPos;
-            GetCursorPos(&cursorPos);  // Get the current cursor position
+            joj::Point cursor_position = joj::Engine::platform_manager->get_cursor_position();  // Get the current cursor position
             // Rotate freely inside window
-            SetCursorPos(centerX, centerY);
+            joj::Engine::platform_manager->set_cursor_position(centerX, centerY);
 
             // Calculate the mouse movement
-            int xoffset = cursorPos.x - centerX;
-            int yoffset = centerY - cursorPos.y;
+            int xoffset = cursor_position.x - centerX;
+            int yoffset = centerY - cursor_position.y;
 
             //mouse_callback(JojEngine::Engine::pm->get_xmouse(), JojEngine::Engine::pm->get_ymouse());
             camera.process_mouse_movement(xoffset, yoffset);
