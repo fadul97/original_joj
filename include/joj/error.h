@@ -26,6 +26,12 @@ namespace joj
         ERR_WINDOW_CREATION,
         ERR_WINDOW_ID_CREATION,
 
+        // General Input error codes
+        ERR_INPUT_CREATION,
+
+        // General Timer error codes
+        ERR_TIMER_CREATION,
+
         // X11Window error codes
         ERR_WINDOW_DISPLAY,
 
