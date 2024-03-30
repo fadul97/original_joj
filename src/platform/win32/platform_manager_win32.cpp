@@ -5,26 +5,27 @@
 joj::Win32PlatformManager::Win32PlatformManager()
 {
     m_context = nullptr;
+    m_timer = nullptr;
 }
 
 joj::Win32PlatformManager::~Win32PlatformManager()
 {
 }
 
-std::unique_ptr<joj::Win32Window> joj::Win32PlatformManager::create_window(i16 width, i16 height, const char* title, WindowMode mode)
+joj::ErrorCode joj::Win32PlatformManager::create_window(i16 width, i16 height, const char* title, WindowMode mode)
 {
-    auto window = std::make_unique<Win32Window>(width, height, title);
-    window->set_mode(mode);
-    window->set_color(60, 60, 60);
+    m_window = std::make_unique<Win32Window>(width, height, title);
+    m_window->set_mode(mode);
+    m_window->set_color(60, 60, 60);
 
-    if (!window->create())
+    if (!m_window->create())
     {
         // TODO: Use own logger
         printf("Failed to create window.\n");
-        return nullptr;
+        return ErrorCode::ERR_WINDOW_CREATION;
     }
 
-    return window;
+    return ErrorCode::OK;
 }
 
 std::unique_ptr<joj::Win32Window> joj::Win32PlatformManager::create_simple_window(i16 width, i16 height, const char* title)
@@ -41,32 +42,32 @@ std::unique_ptr<joj::Win32Window> joj::Win32PlatformManager::create_simple_windo
     return window;
 }
 
-std::unique_ptr<joj::Win32Input> joj::Win32PlatformManager::create_input()
+joj::ErrorCode joj::Win32PlatformManager::create_input()
 {
-    auto input = std::make_unique<Win32Input>();
+    m_input = std::make_unique<Win32Input>();
 
-    if (input == nullptr)
+    if (m_input == nullptr)
     {
         // TODO: Use own logger
         printf("Failed to create input.\n");
-        return nullptr;
+        return ErrorCode::ERR_INPUT_CREATION;
     }
 
-    return input;
+    return ErrorCode::OK;
 }
 
-std::unique_ptr<joj::Timer> joj::Win32PlatformManager::create_timer()
+joj::ErrorCode joj::Win32PlatformManager::create_timer()
 {
-    auto timer = std::make_unique<Win32Timer>();
+    m_timer = std::make_unique<Win32Timer>();
 
-    if (timer == nullptr)
+    if (m_timer == nullptr)
     {
         // TODO: Use own logger
         printf("Failed to create timer.\n");
-        return nullptr;
+        return ErrorCode::ERR_TIMER_CREATION;
     }
 
-    return timer;
+    return ErrorCode::OK;
 }
 
 joj::ErrorCode joj::Win32PlatformManager::make_gl_context_current(std::unique_ptr<Win32Window>& window)
@@ -126,6 +127,37 @@ void joj::Win32PlatformManager::set_window_icon(std::unique_ptr<Win32Window>& wi
 {
     // TODO: use own logger
     printf("TODO()!\n");
+}
+
+b8 joj::Win32PlatformManager::process_events()
+{
+    MSG msg = { 0 };
+
+    if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+    {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+ 
+        if (msg.message == WM_QUIT || msg.message == WM_DESTROY)
+            return false;
+    }
+
+    return true;
+}
+
+void joj::Win32PlatformManager::change_window_procedure(std::unique_ptr<Win32Window>& window, void* func)
+{
+    SetWindowLongPtr(window->get_id(), GWLP_WNDPROC, (LONG_PTR)func);
+}
+
+void joj::Win32PlatformManager::shutdown()
+{
+    m_window->close();
+}
+
+void joj::Win32PlatformManager::set_window_title(std::unique_ptr<Win32Window>& window, const char* title)
+{
+    SetWindowText(window->get_id(), title);
 }
 
 #endif // JPLATFORM_WINDOWS
