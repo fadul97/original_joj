@@ -8,17 +8,17 @@
 #endif // JPLATFORM_WINDOWS
 
 template<class Twindow, class Tinput>
-joj::IPlatformManager<Twindow, Tinput>::IPlatformManager()
+joj::PlatformManager<Twindow, Tinput>::PlatformManager()
 {
 }
 
 template<class Twindow, class Tinput>
-joj::IPlatformManager<Twindow, Tinput>::~IPlatformManager()
+joj::PlatformManager<Twindow, Tinput>::~PlatformManager()
 {
 }
 
 #if JPLATFORM_LINUX
-template class joj::IPlatformManager<joj::X11Window>;
+template class joj::PlatformManager<joj::X11Window>;
 #elif JPLATFORM_WINDOWS
-template class joj::IPlatformManager<joj::Win32Window, joj::Win32Input>;
+template class joj::PlatformManager<joj::Win32Window, joj::Win32Input>;
 #endif // JPLATFORM_WINDOWS
