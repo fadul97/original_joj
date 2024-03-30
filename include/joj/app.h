@@ -33,9 +33,6 @@ namespace joj
 #else
         virtual void on_pause() {}
 #endif
-
-    protected:
-        static JPlatformManager* platform_manager;
     };
 }
 
