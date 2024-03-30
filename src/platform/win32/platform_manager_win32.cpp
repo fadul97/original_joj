@@ -94,7 +94,6 @@ joj::ErrorCode joj::Win32PlatformManager::create_context(std::unique_ptr<Win32Wi
     switch (backend_renderer)
     {
     case BackendRenderer::GL:
-    {
         m_context = std::make_unique<Win32GLContext>();
 
         if (!m_context->create(window))
@@ -107,8 +106,11 @@ joj::ErrorCode joj::Win32PlatformManager::create_context(std::unique_ptr<Win32Wi
         m_context->make_current(window);
 
         return ErrorCode::OK;
-    }
     
+    case BackendRenderer::DX11:
+        printf("DX11Renderer already initializes DX11Context.\n");
+        return ErrorCode::FAILED;
+
     default:
         return ErrorCode::FAILED;
     }

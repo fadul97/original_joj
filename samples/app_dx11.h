@@ -5,8 +5,6 @@
 #include <DirectXMath.h>
 #include <DirectXColors.h>
 #include <iostream>
-#include <dxgi.h>
-#include <d3dcompiler.h>
 #include "joj/resources/geometry/cube.h"
 #include "joj/resources/geometry/cylinder.h"
 #include "joj/resources/geometry/geo_sphere.h"
