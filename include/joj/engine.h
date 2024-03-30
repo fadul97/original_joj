@@ -30,14 +30,9 @@ namespace joj
     using JPlatformManager = Win32PlatformManager;
     using JRenderer = DX11Renderer;
     using JGLRenderer = GLRenderer;
-    using JWindow = Win32Window;
-    using JInput = Win32Input;
-    using JTimer = Timer;
 #else
     using JojPlatformManager = X11PlatformManager;
     using JRenderer = GLRenderer;
-    using JWindow = X11Window;
-    using JInput = X11Input;
 #endif
 }
 
@@ -54,28 +49,24 @@ namespace joj
         void shutdown();
 
         // TODO: static members?
-        static JPlatformManager* platform_manager;
+        static  std::unique_ptr<JPlatformManager> platform_manager;
         static std::unique_ptr<JRenderer> dx11_renderer;
         static std::unique_ptr<JGLRenderer> gl_renderer;
         static std::vector<Error> errors;
-
-        static std::unique_ptr<JWindow> window;
-        static std::unique_ptr<JInput> input;
-        static std::unique_ptr<JTimer> timer;
 
         void ouput_log() const;
 
         static void pause();	// Pause engine
         static void resume();	// Resume engine
         
-        static void swap_buffers();
-
         static void close();
         static b8 m_paused;
 
         static Engine* get_singleton();
 
+#if JPLATFORM_WINDOWS
         static LRESULT CALLBACK EngineProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+#endif // JPLATFORM_WINDOWS
 
     private:
         Engine();
@@ -84,7 +75,7 @@ namespace joj
         static Engine* engine;
         f32 get_frametime();
         f32 m_frametime;
-
+        static b8 m_running;
         static App* m_app;
     };
 
@@ -97,17 +88,13 @@ namespace joj
     }
 
     inline void Engine::pause()
-	{ m_paused = true; timer->stop(); }
+	{ m_paused = true; platform_manager->stop_timer(); }
 
 	inline void Engine::resume()
-	{ m_paused = false; timer->start(); }
+	{ m_paused = false; platform_manager->start_timer(); }
 
     inline void Engine::close()
-    { window->close(); }
-
-    inline void Engine::swap_buffers()
-    { SwapBuffers(window->get_device_context()); }
-
+    { m_running = false; platform_manager->close_window(); }
 } // namespace joj
 
 #ifndef JADDERROR
