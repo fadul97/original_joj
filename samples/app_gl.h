@@ -7,6 +7,7 @@
 #include "joj/math/jmath.h"
 #include "joj/systems/camera.h"
 
+// Using 3.3 OpenGL functions
 class GLApp : public joj::App
 {
 public:
