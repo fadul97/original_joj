@@ -15,6 +15,8 @@ public:
     joj::Cylinder geo = joj::Cylinder(1.0f, 0.5f, 3.0f, 20, 10);
     joj::GLShader shader;
 
+    u32 bind_index = 0;
+
     joj::Camera camera = joj::Camera{ joj::Vector3{ 0.0f, 0.0f, -6.0f } };
 
     DirectX::XMFLOAT4X4 World = {};
@@ -75,19 +77,21 @@ public:
         // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
         glBindVertexArray(VAO);
 
+        u32 position_location = 0;
+        glEnableVertexAttribArray(position_location);
+        glVertexAttribFormat(position_location, 3, GL_FLOAT, GL_FALSE, 0);
+        glVertexAttribBinding(position_location, bind_index);
+
+        u32 color_location = 1;
+        glEnableVertexAttribArray(color_location);
+        glVertexAttribFormat(color_location, 4, GL_FLOAT, GL_FALSE, 3 * sizeof(f32));
+        glVertexAttribBinding(color_location, bind_index);
+       
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
         glBufferData(GL_ARRAY_BUFFER, geo.get_vertex_count() * sizeof(joj::Vertex), geo.get_vertex_data(), GL_STATIC_DRAW);
 
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, geo.get_index_count() * sizeof(unsigned int), geo.get_index_data(), GL_STATIC_DRAW);
-
-        // Specify the layout of the vertex(pos) data
-        glEnableVertexAttribArray(0);
-        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(joj::Vertex), (void*)0);
-
-        // Specify the layout of the vertex(color) data
-        glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(joj::Vertex), (GLvoid*)(3 * sizeof(f32)));
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, geo.get_index_count() * sizeof(u32), geo.get_index_data(), GL_STATIC_DRAW);
 
         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -204,6 +208,8 @@ public:
 
         shader.use();
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        glBindVertexBuffer(bind_index, VBO, 0, sizeof(joj::Vertex));
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glDrawElements(GL_TRIANGLES, geo.get_index_count(), GL_UNSIGNED_INT, 0);
 
         SwapBuffers(joj::Engine::platform_manager->get_window()->get_device_context());
