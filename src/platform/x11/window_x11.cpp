@@ -196,4 +196,14 @@ b8 joj::X11Window::create_simple_window()
     return true;
 }
 
+void joj::X11Window::set_on_focus(void(*func)())
+{
+    printf("TODO()!\n");
+}
+
+void joj::X11Window::set_lost_focus(void(*func)())
+{
+    printf("TODO()!\n");
+}
+
 #endif // JPLATFORM_LINUX

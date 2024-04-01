@@ -37,6 +37,9 @@ namespace joj
         void shutdown() override;
         void clear() override;
         void swap_buffers() override;
+
+        void set_on_focus(void(*func)()) override;
+        void set_lost_focus(void(*func)()) override;
         
     private:
         Display* display;
