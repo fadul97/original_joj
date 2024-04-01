@@ -31,8 +31,9 @@ namespace joj
     using JRenderer = DX11Renderer;
     using JGLRenderer = GLRenderer;
 #else
-    using JojPlatformManager = X11PlatformManager;
+    using JPlatformManager = X11PlatformManager;
     using JRenderer = GLRenderer;
+    using JGLRenderer = GLRenderer;
 #endif
 }
 
@@ -50,9 +51,12 @@ namespace joj
 
         // TODO: static members?
         static  std::unique_ptr<JPlatformManager> platform_manager;
-        static std::unique_ptr<JRenderer> dx11_renderer;
         static std::unique_ptr<JGLRenderer> gl_renderer;
         static std::vector<Error> errors;
+
+#if JPLATFORM_WINDOWS
+        static std::unique_ptr<JRenderer> dx11_renderer;
+#endif
 
         void ouput_log() const;
 

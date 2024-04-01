@@ -7,7 +7,11 @@
 
 joj::Engine* joj::Engine::engine = nullptr;
 std::unique_ptr<joj::JPlatformManager> joj::Engine::platform_manager = nullptr;
+
+#if JPLATFORM_WINDOWS
 std::unique_ptr<joj::JRenderer> joj::Engine::dx11_renderer = nullptr;
+#endif
+
 std::unique_ptr<joj::JGLRenderer> joj::Engine::gl_renderer = nullptr;
 
 std::vector<joj::Error> joj::Engine::errors = std::vector<joj::Error>();
@@ -31,8 +35,10 @@ joj::ErrorCode joj::Engine::init(BackendRenderer backend_renderer)
 {
     JOUTPUTFAILED(platform_manager->create_window(800, 600, "My JWindow", WindowMode::WINDOWED));
 
+#if JPLATFORM_WINDOWS
     // ATTENTION: input must be initialized after window creation
     JOUTPUTFAILED(platform_manager->create_input());
+#endif
 
     switch (backend_renderer)
     {
@@ -45,11 +51,13 @@ joj::ErrorCode joj::Engine::init(BackendRenderer backend_renderer)
         break;
     }
 
+#if JPLATFORM_WINDOWS
     case BackendRenderer::DX11:
         dx11_renderer = std::make_unique<JRenderer>();
         dx11_renderer->init(platform_manager->get_window());
         dx11_renderer->setup_default_pipeline(platform_manager->get_window());
         break;
+#endif
     }
 
     return ErrorCode::OK;
@@ -63,11 +71,15 @@ joj::ErrorCode joj::Engine::run(App* app, BackendRenderer backend_renderer)
         return ErrorCode::ERR_ENGINE_INIT;
     }
 
+#if JPLATFORM_WINDOWS
     platform_manager->change_window_procedure(platform_manager->get_window(), EngineProc);
+#endif
 
+#if JPLATFORM_WINDOWS
     // Adjust sleep resolution to 1 millisecond
     JOUTPUTFAILED(platform_manager->create_timer());
     platform_manager->begin_period();
+#endif
 
 #if JPLATFORM_WINDOWS
     // Game pauses/resumes when losing/gaining focus
@@ -135,8 +147,10 @@ void joj::Engine::shutdown()
 {
     platform_manager->shutdown();
 
+#if JPLATFORM_WINDOWS
     if (dx11_renderer)
         dx11_renderer->shutdown();
+#endif
 
     if (gl_renderer)
         gl_renderer->shutdown();

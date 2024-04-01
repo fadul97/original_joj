@@ -11,4 +11,4 @@ target_link_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/../graphics/
 )
 
-target_link_libraries(jojX11Platform PUBLIC jojPlatform -lX11 jojGraphics)
+target_link_libraries(jojX11Platform PUBLIC jojPlatform -lX11)
