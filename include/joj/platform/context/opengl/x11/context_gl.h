@@ -6,7 +6,7 @@
 
 #if JPLATFORM_LINUX
 
-#include "graphics/context.h"
+#include "platform/context/context.h"
 #include <GL/glx.h>
 #include "platform/x11/window_x11.h"
 
