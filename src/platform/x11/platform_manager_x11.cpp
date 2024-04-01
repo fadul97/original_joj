@@ -4,105 +4,118 @@
 
 #include "platform/x11/window_x11.h"
 #include "platform/x11/input_x11.h"
-#include "graphics/context.h"
-#include "graphics/opengl/x11/context_gl.h"
+#include "platform/context/context.h"
+#include "platform/context/opengl/x11/context_gl.h"
 #include <memory>
 #include <X11/Xatom.h>
 
 joj::X11PlatformManager::X11PlatformManager()
 {
-    window = nullptr;
-    input = nullptr;
-    context = nullptr;
+    m_window = nullptr;
+    m_input = nullptr;
+    m_context = nullptr;
 }
 
 joj::X11PlatformManager::~X11PlatformManager()
 {
 }
 
-
-b8 joj::X11PlatformManager::init(i16 width, i16 height, std::string title)
+joj::ErrorCode joj::X11PlatformManager::create_window(i16 width, i16 height, const char* title, WindowMode mode)
 {
-    window = std::make_unique<X11Window>(width, height, title);
-    input = std::make_unique<X11Input>();
-    context = std::make_unique<X11GLContext>();
+    m_window = std::make_unique<X11Window>(width, height, title);
+    m_input = std::make_unique<X11Input>();
+    m_context = std::make_unique<X11GLContext>();
 
-    if (!window->init())
+    if (!m_window->init())
     {
         // TODO: use own logger and return value, cleanup?
         printf("Failed to initialize X11Window.\n");
-        return false;
+        return ErrorCode::ERR_WINDOW_INIT;
     }
 
-    if (!context->create(window))
+    if (!m_context->create(m_window))
     {
         // TODO: use own logger and return value, cleanup?
         printf("Failed to initialize GLContext.\n");
-        return false;
+        return ErrorCode::ERR_CONTEXT_CREATION;
     }
 
-    return true;
-}
-
-b8 joj::X11PlatformManager::create_window()
-{
-    if (!window->create())
+    if (!m_window->create())
     {
         // TODO: use own logger and return value, cleanup?
         printf("Failed to create X11Window.\n");
-        return false;
+        return ErrorCode::ERR_WINDOW_CREATION;
     }
 
-    context->make_current(window);
+    m_context->make_current(m_window);
 
     // Redirect close
-    delete_msg = XInternAtom(window->get_display(), "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(window->get_display(), window->get_id(), &delete_msg, 1);
+    delete_msg = XInternAtom(m_window->get_display(), "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(m_window->get_display(), m_window->get_id(), &delete_msg, 1);
 
-    XAutoRepeatOff(window->get_display());
+    XAutoRepeatOff(m_window->get_display());
 
-    window->show();
+    m_window->show();
 
-    return true;
+    return ErrorCode::OK;
 }
 
-b8 joj::X11PlatformManager::create_simple_window(i16 width, i16 height, std::string title)
+std::unique_ptr<joj::X11Window> joj::X11PlatformManager::create_simple_window(i16 width, i16 height, const char* title)
 {
-    window = std::make_unique<X11Window>(width, height, title);
-    input = std::make_unique<X11Input>();
+    auto new_window = std::make_unique<X11Window>(width, height, title);
 
-    if (!window->create_simple_window())
+    if (!new_window->create_simple_window())
     {
         // TODO: use own logger and return value, cleanup?
         printf("Failed to create X11Window.\n");
-        return false;
+        return nullptr;
     }
 
     // Redirect close
-    delete_msg = XInternAtom(window->get_display(), "WM_DELETE_WINDOW", False);
-    XSetWMProtocols(window->get_display(), window->get_id(), &delete_msg, 1);
+    delete_msg = XInternAtom(new_window->get_display(), "WM_DELETE_WINDOW", False);
+    XSetWMProtocols(new_window->get_display(), new_window->get_id(), &delete_msg, 1);
 
-    XAutoRepeatOff(window->get_display());
+    XAutoRepeatOff(new_window->get_display());
 
-    window->show();
+    new_window->show();
 
-    return true;
+    return new_window;
 }
 
-b8 joj::X11PlatformManager::create_context(BackendRender backend_renderer)
+joj::ErrorCode joj::X11PlatformManager::create_input()
+{
+    return ErrorCode::FAILED;
+}
+
+joj::ErrorCode joj::X11PlatformManager::create_context(std::unique_ptr<X11Window>& window, BackendRenderer backend_renderer)
 {
     switch (backend_renderer)
     {
     default:
-        if (!context->create(window))
+        if (!m_context->create(window))
         {
             // TODO: use own logger and return value, cleanup?
             printf("Failed to initialize GLContext.\n");
-            return false;
+            return ErrorCode::ERR_CONTEXT_CREATION;
         }
 
-        return true;
+        return ErrorCode::OK;
     }
+}
+
+joj::ErrorCode joj::X11PlatformManager::create_window_and_context(std::unique_ptr<X11Window>& window, BackendRenderer backend_renderer)
+{
+    return ErrorCode::FAILED;
+}
+
+joj::ErrorCode joj::X11PlatformManager::make_gl_context_current(std::unique_ptr<X11Window>& window)
+{
+    return ErrorCode::FAILED;
+}
+
+joj::ErrorCode joj::X11PlatformManager::create_timer()
+{
+    return ErrorCode::FAILED;
 }
 
 b8 joj::X11PlatformManager::process_events()
@@ -111,9 +124,9 @@ b8 joj::X11PlatformManager::process_events()
     char str[25];
     KeySym keysym;
 
-    if (XPending(window->get_display()) > 0)
+    if (XPending(m_window->get_display()) > 0)
     {
-        XNextEvent(window->get_display(), &ev);
+        XNextEvent(m_window->get_display(), &ev);
 
         switch (ev.type)
         {
@@ -130,7 +143,7 @@ b8 joj::X11PlatformManager::process_events()
 
                 if (button != MAX_BUTTONS)
                 {
-                    input->click_button(button);
+                    m_input->click_button(button);
                     return true;
                 }
                 
@@ -149,7 +162,7 @@ b8 joj::X11PlatformManager::process_events()
 
                 if (button != MAX_BUTTONS)
                 {
-                    input->release_button(button);
+                    m_input->release_button(button);
                     return true;
                 }
 
@@ -161,8 +174,8 @@ b8 joj::X11PlatformManager::process_events()
                 u32 len = XLookupString(&ev.xkey, str, 25, &keysym, nullptr);
                 if (len > 0)
                 {
-                    Keys key = input->translate_keycode(keysym);
-                    input->press_key(key);
+                    Keys key = m_input->translate_keycode(keysym);
+                    m_input->press_key(key);
                     return true;
 
                     // if (input->is_key_pressed(KEY_SPACE))
@@ -177,19 +190,19 @@ b8 joj::X11PlatformManager::process_events()
                 u32 len = XLookupString(&ev.xkey, str, 25, &keysym, nullptr);
                 if (len > 0)
                 {
-                    Keys key = input->translate_keycode(keysym);
-                    input->release_key(key);
+                    Keys key = m_input->translate_keycode(keysym);
+                    m_input->release_key(key);
                     return true;
                 }
             }
 
             case MotionNotify:
-                input->move_mouse(ev.xmotion.x, ev.xmotion.y);
+                m_input->move_mouse(ev.xmotion.x, ev.xmotion.y);
                 break;
 
             case ClientMessage:
                 if (ev.xclient.data.l[0] == delete_msg)
-                    window->close();
+                    return false;
 
                 break;
 
@@ -203,16 +216,16 @@ b8 joj::X11PlatformManager::process_events()
 
 void joj::X11PlatformManager::swap_buffers()
 {
-    glXSwapBuffers(window->get_display(), window->get_id());
+    glXSwapBuffers(m_window->get_display(), m_window->get_id());
 }
 
 void joj::X11PlatformManager::shutdown()
 {
-    XAutoRepeatOn(window->get_display());
-    window->shutdown();
+    XAutoRepeatOn(m_window->get_display());
+    m_window->shutdown();
 }
 
-void joj::X11PlatformManager::set_window_icon(i32 count, IconImage& image)
+void joj::X11PlatformManager::set_window_icon(std::unique_ptr<X11Window>& window, i32 count, IconImage& image)
 {
     if (count)
     {
@@ -254,6 +267,16 @@ void joj::X11PlatformManager::set_window_icon(i32 count, IconImage& image)
     }
 
     XFlush(window->get_display());
+}
+
+void joj::X11PlatformManager::change_window_procedure(std::unique_ptr<X11Window>& window, void* func)
+{
+    printf("TODO()!\n");
+}
+
+void joj::X11PlatformManager::set_window_title(std::unique_ptr<X11Window>& window, const char* title)
+{
+    printf("TODO()!\n");
 }
 
 #endif // JPLATFORM_LINUX
