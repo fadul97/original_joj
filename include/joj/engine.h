@@ -1,6 +1,8 @@
 #ifndef JOJ_ENGINE_H
 #define JOJ_ENGINE_H
 
+// FIXME: PlatformManager architecture is awful
+
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
