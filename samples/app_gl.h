@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "joj/resources/geometry/cylinder.h"
+#include "joj/resources/geometry/cube.h"
 #include "joj/renderer/opengl/shader_gl.h"
 #include "joj/math/jmath.h"
 #include "joj/systems/camera.h"
@@ -13,8 +14,11 @@ class GLApp : public joj::App
 {
 public:
     unsigned int VBO, VAO, EBO;
+    u32 cubeVBO, cubeEBO;
     joj::Cylinder geo = joj::Cylinder(1.0f, 0.5f, 3.0f, 20, 10);
+    joj::Cube cube = joj::Cube(3.0f, 3.0f, 3.0f);
     joj::GLShader shader;
+    joj::GLShader cube_shader;
 
     u32 bind_index = 0;
 
@@ -75,6 +79,8 @@ public:
         glGenVertexArrays(1, &VAO);
         glGenBuffers(1, &VBO);
         glGenBuffers(1, &EBO);
+        glGenBuffers(1, &cubeVBO);
+        glGenBuffers(1, &cubeEBO);
         // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
         glBindVertexArray(VAO);
 
@@ -94,6 +100,12 @@ public:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, geo.get_index_count() * sizeof(u32), geo.get_index_data(), GL_STATIC_DRAW);
 
+        glBindBuffer(GL_ARRAY_BUFFER, cubeVBO);
+        glBufferData(GL_ARRAY_BUFFER, cube.get_vertex_count() * sizeof(joj::Vertex), cube.get_vertex_data(), GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, cube.get_index_count() * sizeof(u32), cube.get_index_data(), GL_STATIC_DRAW);
+
         // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
@@ -106,6 +118,7 @@ public:
 
         //shader.compile_shaders("../../../../samples/shaders/vertex.glsl", "../../../../samples/shaders/frag.glsl");
         shader = joj::GLShader{ "../../../../samples/shaders/vertex.glsl", "../../../../samples/shaders/frag.glsl" };
+        cube_shader = joj::GLShader{ "../../../../samples/shaders/vertex.glsl", "../../../../samples/shaders/frag.glsl" };
         
         World = View =
         {
@@ -154,6 +167,8 @@ public:
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+        cube.translate(3, 3, 3);
     }
 
     void update(f32 dt)
@@ -199,6 +214,11 @@ public:
 
         shader.use();
         shader.set_mat4("transform", WorldViewProj);
+
+        cube_shader.use();
+        world = world * DirectX::XMMatrixTranslation(cube.get_position().x, cube.get_position().y, cube.get_position().z);
+        WorldViewProj = world * view * proj;
+        cube_shader.set_mat4("transform", WorldViewProj);
     }
 
     void draw()
@@ -207,13 +227,19 @@ public:
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        shader.use();
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
+        
+        shader.use();
         glBindVertexBuffer(bind_index, VBO, 0, sizeof(joj::Vertex));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glDrawElements(GL_TRIANGLES, geo.get_index_count(), GL_UNSIGNED_INT, 0);
 
-        joj::Engine::platform_manager::swap_buffers();
+        cube_shader.use();
+        glBindVertexBuffer(bind_index, cubeVBO, 0, sizeof(joj::Vertex));
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, cubeEBO);
+        glDrawElements(GL_TRIANGLES, cube.get_index_count(), GL_UNSIGNED_INT, 0);
+
+
         SwapBuffers(joj::Engine::platform_manager->get_window()->get_device_context());
     }
 
