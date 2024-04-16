@@ -4,7 +4,7 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#include "vertex.h"
+#include "resources/vertex.h"
 #include <vector>
 
 namespace joj

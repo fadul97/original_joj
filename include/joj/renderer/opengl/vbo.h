@@ -4,7 +4,7 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#include "resources/geometry/vertex.h"
+#include "resources/vertex.h"
 #define JOJ_GL_DEFINE_EXTERN
 #include "platform/context/opengl/joj_gl.h"
 

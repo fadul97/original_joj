@@ -7,7 +7,7 @@
 #include <vector>
 #include "vbo.h"
 #include "ebo.h"
-#include "resources/geometry/vertex.h"
+#include "resources/vertex.h"
 #include "resources/geometry/geometry.h"
 
 #define JOJ_GL_DEFINE_EXTERN
