@@ -2,9 +2,9 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojPlatform STATIC window.cpp input.cpp timer.cpp platform_manager.cpp)
+add_library(jojPlatform STATIC window.cpp)
 
-add_subdirectory(context)
+#add_subdirectory(context)
 
 # Specify include directories for jojPlatform
 target_include_directories(
@@ -19,9 +19,9 @@ if(LINUX)
         jojPlatform 
         PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/x11
-        ${CMAKE_CURRENT_SOURCE_DIR}/context
+#        ${CMAKE_CURRENT_SOURCE_DIR}/context
     )
-    target_link_libraries(jojPlatform PUBLIC jojX11Platform jojGraphicsContext)
+    target_link_libraries(jojPlatform PUBLIC jojX11Platform)
 
 elseif(WIN32)
     add_subdirectory(win32)
@@ -29,8 +29,8 @@ elseif(WIN32)
         jojPlatform
         PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/win32
-        ${CMAKE_CURRENT_SOURCE_DIR}/context
+#        ${CMAKE_CURRENT_SOURCE_DIR}/context
     )
-    target_link_libraries(jojPlatform PUBLIC jojWin32Platform jojGraphicsContext)
+    target_link_libraries(jojPlatform PUBLIC jojWin32Platform)
 endif()
 
