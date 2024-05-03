@@ -4,15 +4,6 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#if JPLATFORM_WINDOWS
-#include <DirectXMath.h>
-namespace joj
-{
-    using Vector2 = DirectX::XMFLOAT2;
-}
-
-#else
-
 #include <cmath>
 #include <string>
 #include <sstream>
@@ -118,7 +109,7 @@ namespace joj
         std::string to_string() const
         {
             std::ostringstream oss;
-            
+
             for (i32 i = 0; i < 2; ++i)
                 oss << std::setw(10) << std::setprecision(4) << std::fixed << elem[i] << " ";
 
@@ -127,7 +118,5 @@ namespace joj
     };
 
 }
-
-#endif // JPLATFORM_LINUX
 
 #endif // JOJ_VECTOR2_H

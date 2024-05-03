@@ -55,16 +55,7 @@ namespace joj
 
     inline Matrix4 Camera::get_view_mat() const
     {
-#if JPLATFORM_WINDOWS
-        DirectX::XMFLOAT3 r = DirectX::XMFLOAT3{ m_position.x + m_target.x, m_position.y + m_target.y, m_position.z + m_target.z };
-        return DirectX::XMMatrixLookAtLH(
-            DirectX::XMLoadFloat3(&m_position),
-            DirectX::XMLoadFloat3(&r),
-            DirectX::XMLoadFloat3(&m_up)
-        );
-#else
         return look_at_lh(m_position, m_target, m_up);
-#endif
     }
 }
 

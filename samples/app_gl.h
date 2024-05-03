@@ -1,5 +1,7 @@
-#if JPLATFORM_WINDOWS
 #include "joj/engine.h"
+
+#if JCOMPILER_MSC
+
 #include "joj/app.h"
 #include <stdio.h>
 
@@ -249,7 +251,6 @@ public:
 };
 
 #else
-#include "joj/engine.h"
 #include "joj/app.h"
 #include <stdio.h>
 
@@ -442,10 +443,8 @@ public:
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
         glDrawElements(GL_TRIANGLES, geo.get_index_count(), GL_UNSIGNED_INT, 0);
 
-        glXSwapBuffers(
-            joj::Engine::platform_manager->get_window()->get_display(),
-            joj::Engine::platform_manager->get_window()->get_id()
-        );
+
+        SwapBuffers(joj::Engine::platform_manager->get_window()->get_device_context());
     }
 
     void shutdown()
@@ -453,4 +452,4 @@ public:
     }
 };
 
-#endif
+#endif // JCOMPILER_MSC

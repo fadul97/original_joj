@@ -4,15 +4,6 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#if JPLATFORM_WINDOWS
-#include <DirectXMath.h>
-namespace joj
-{
-    using Vector3 = DirectX::XMFLOAT3;
-}
-
-#else
-
 #include <cmath>
 #include <string>
 #include <sstream>
@@ -145,7 +136,5 @@ namespace joj
     };
 
 }
-
-#endif // JPLATFORM_LINUX
 
 #endif // JOJ_VECTOR3_H

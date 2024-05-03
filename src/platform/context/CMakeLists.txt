@@ -30,9 +30,9 @@ elseif(WIN32)
         PUBLIC 
         ${CMAKE_CURRENT_SOURCE_DIR}/../
         ${CMAKE_CURRENT_SOURCE_DIR}/opengl/win32
-        ${CMAKE_CURRENT_SOURCE_DIR}/dx11
+#        ${CMAKE_CURRENT_SOURCE_DIR}/dx11
     )
 
-    target_link_libraries(jojGraphicsContext PUBLIC jojPlatform jojWin32GLGraphics jojDX11Graphics)
+    target_link_libraries(jojGraphicsContext PUBLIC jojPlatform jojWin32GLGraphics)
 endif()
 

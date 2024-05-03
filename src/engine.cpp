@@ -72,7 +72,8 @@ joj::ErrorCode joj::Engine::run(App* app, BackendRenderer backend_renderer)
     }
 
 #if JPLATFORM_WINDOWS
-    platform_manager->change_window_procedure(platform_manager->get_window(), EngineProc);
+    // platform_manager->change_window_procedure(platform_manager->get_window(), EngineProc);
+    SetWindowLongPtr(platform_manager->get_window()->get_id(), GWLP_WNDPROC, (LONG_PTR)EngineProc);
 #endif
 
 #if JPLATFORM_WINDOWS

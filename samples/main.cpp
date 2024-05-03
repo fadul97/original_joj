@@ -1,17 +1,10 @@
-#include "joj/engine.h"
-#include "app_gl.h"
-#include <stdio.h>
+#include <cstdio>
 
-#if JPLATFORM_WINDOWS
-#include "app_dx11.h"
-#endif
+#include "joj/platform/win32/window_win32.h"
 
 int main()
 {
-    joj::Engine* engine = joj::Engine::get_singleton();
-
-    if JFAILED(engine->run(new GLApp(), joj::BackendRenderer::GL))
-        return -1;
-    
+    joj::Win32Window window{};
+    printf("Hello, Refactoring!\n");
     return 0;
 }

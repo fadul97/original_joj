@@ -1,4 +1,7 @@
 #include "joj/engine.h"
+
+#if JCOMPILER_MSC
+
 #include "joj/app.h"
 #include <stdio.h>
 
@@ -276,3 +279,5 @@ public:
     {
     }
 };
+
+#endif // JCOMPILER_MSC

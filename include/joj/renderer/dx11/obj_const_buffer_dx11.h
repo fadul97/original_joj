@@ -5,6 +5,7 @@
 #include "defines.h"
 
 #include <d3d11.h>
+#include <DirectXMath.h>
 #include <WRL/client.h>
 #include "math/matrix4.h"
 

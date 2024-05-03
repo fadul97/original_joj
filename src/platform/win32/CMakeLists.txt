@@ -10,5 +10,4 @@ target_link_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
-
 target_link_libraries(jojWin32Platform PUBLIC jojPlatform User32.lib Gdi32.lib winmm.lib)

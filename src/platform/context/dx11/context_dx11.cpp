@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include <winuser.h>
+
 joj::DX11Context::DX11Context()
 {
     m_device = nullptr;
