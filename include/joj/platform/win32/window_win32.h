@@ -8,32 +8,37 @@
 
 #include "platform/window.h"
 #include <windows.h>
-#include <windowsx.h>
 
 namespace joj
 {
-    class JAPI Win32Window : public Window<HWND>
+    struct WindowConfig {
+        HWND handle;
+        HDC hdc;
+        WindowMode window_mode;
+        u16 width;
+        u16 height;
+    };
+
+    class JAPI Win32Window : public Window<WindowConfig>
     {
     public:
-        Win32Window(i16 width = 600, i16 height = 400, std::string title = std::string{"Joj Win32Window"});
+        Win32Window();
         ~Win32Window() override;
 
-        HWND get_id() const override;
-        HDC get_device_context() const;
-        COLORREF get_color() const;
-        
-        void hide_cursor(b8 hide) override;
+        void get_window_size(u16 &width, u16 &height) override;
+        void get_client_size(u16 &width, u16 &height) override;
+
+        [[nodiscard]] u16 get_width() const override;
+        [[nodiscard]] u16 get_height() const override;
+        [[nodiscard]] u16 get_xcenter() override;
+        [[nodiscard]] u16 get_ycenter() override;
+        [[nodiscard]] f32 get_aspect_ratio() const override;
+
         void set_mode(WindowMode mode) override;
         void set_color(u32 r, u32 g, u32 b) override;
 
-        void close() override;
-        
-        b8 init() override;
-        b8 create() override;
-        b8 create_simple_window() override;
-        void show() override;
-        void shutdown() override;
-        void clear() override;
+        ErrorCode create(i16 width, i16 height, const char* title, WindowMode mode) override;
+        void destroy() override;
         void swap_buffers() override;
         
         void set_on_focus(void(*func)()) override;
@@ -42,14 +47,13 @@ namespace joj
         static LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
         
     private:
-        HWND m_id;
-        HDC m_hdc;
-        RECT m_rect;
+        WindowConfig m_window_config;
+        RECT m_window_rect;
+        RECT m_client_rect;
         HICON m_icon;
         HCURSOR m_cursor;
         COLORREF m_color;
         DWORD m_style;
-        WindowMode m_mode;
 
         u16 m_xpos;
         u16 m_ypos;
@@ -60,17 +64,14 @@ namespace joj
         static void (*lost_focus)();
     };
 
-    inline HWND Win32Window::get_id() const
-    { return m_id; }
-    
-    inline HDC Win32Window::get_device_context() const
-    { return m_hdc; }
-    
-    inline COLORREF Win32Window::get_color() const
-    { return m_color; }
-    
-    inline void Win32Window::close()
-    { running = false; DestroyWindow(m_id); }
+    inline u16 Win32Window::get_width() const
+    { return m_window_config.width; }
+
+    inline u16 Win32Window::get_height() const
+    { return m_window_config.width; }
+
+    inline f32 Win32Window::get_aspect_ratio() const
+    { return static_cast<f32>(m_window_config.width) / static_cast<f32>(m_window_config.height); }
 }
 
 #endif // JPLATFORM_WINDOWS

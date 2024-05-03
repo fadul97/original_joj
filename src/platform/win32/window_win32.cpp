@@ -1,39 +1,44 @@
 #include "platform/win32/window_win32.h"
 
-#include <stdio.h>
+#if JPLATFORM_WINDOWS
+
+#include <windowsx.h>
+#include <cstdio>
 
 void (*joj::Win32Window::on_focus)() = nullptr;
 void (*joj::Win32Window::lost_focus)() = nullptr;
 
-joj::Win32Window::Win32Window(i16 width, i16 height, std::string title)
-    : joj::Window<HWND>(width, height, title)
+joj::Win32Window::Win32Window()
+    : m_xpos(0), m_ypos(0), m_xcenter(0), m_ycenter(0),
+        m_window_config(WindowConfig {
+            .handle = nullptr,
+            .hdc = nullptr,
+            .window_mode = WindowMode::Windowed,
+            .width = static_cast<u16>(GetSystemMetrics(SM_CXSCREEN)),
+            .height = static_cast<u16>(GetSystemMetrics(SM_CYSCREEN))}),
+        m_window_rect({ 0, 0, 0, 0 }),
+        m_client_rect({ 0, 0, 0, 0 })
 {
-    m_id = 0;
-    m_hdc = { 0 };
-    m_rect = { 0, 0, 0, 0 };
-    m_icon = LoadIcon(NULL, IDI_APPLICATION);
-    m_cursor = LoadCursor(NULL, IDC_ARROW);
-    m_color = RGB(0, 0, 0);
-    m_style = WS_POPUP | WS_VISIBLE;
-    m_mode = WindowMode::FULLSCREEN;
-    m_xpos = 0;
-    m_ypos = 0;
-    m_xcenter = width / 2;
-    m_ycenter = height / 2;
+    m_color = RGB(60, 60, 60);
+    m_style = WS_OVERLAPPED | WS_SYSMENU | WS_VISIBLE;
+    m_icon = LoadIcon(nullptr, IDI_APPLICATION);
+    m_cursor = LoadCursor(nullptr, IDC_ARROW);
 }
 
 joj::Win32Window::~Win32Window()
 {
+    if (m_window_config.hdc != nullptr) {
+        ReleaseDC(m_window_config.handle, m_window_config.hdc);
+    }
+
+    if (m_window_config.handle != nullptr) {
+        DestroyWindow(m_window_config.handle);
+    }
 }
 
-void joj::Win32Window::hide_cursor(b8 hide)
+void joj::Win32Window::set_mode(const WindowMode mode)
 {
-    ShowCursor(!hide);
-}
-
-void joj::Win32Window::set_mode(WindowMode mode)
-{
-    if (mode == WindowMode::WINDOWED)
+    if (mode == WindowMode::Windowed)
     {
         m_style = WS_OVERLAPPED | WS_SYSMENU | WS_VISIBLE;
     }
@@ -42,48 +47,41 @@ void joj::Win32Window::set_mode(WindowMode mode)
         m_style = WS_EX_TOPMOST | WS_POPUP | WS_VISIBLE;
     }
     
-    m_mode = mode;
+    m_window_config.window_mode = mode;
 }
 
-void joj::Win32Window::set_color(u32 r, u32 g, u32 b)
+void joj::Win32Window::set_color(const u32 r, const u32 g, const u32 b)
 {
     m_color = RGB(r, g, b);
 }
 
-b8 joj::Win32Window::init()
-{
-    // TODO: use own logger and return value
-    printf("TODO()!\n");
-    return true;
-}
-
-b8 joj::Win32Window::create()
+joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const char* title, const WindowMode mode)
 {
     const char* joj_wnd_class_name = "JOJ_WINDOW_CLASS";
 
-    HINSTANCE app_id = GetModuleHandle(NULL);
+    HINSTANCE app_id = GetModuleHandle(nullptr);
 
     if (!app_id)
     {
         // TODO: Use own logger and return value
         printf("Failed to get module handle.\n");
-        return false;
+        return ErrorCode::ERR_WINDOW_CREATION;
     }
 
-    WNDCLASSEX wnd_class = { };
+    WNDCLASSEX wnd_class{};
 
     if (!GetClassInfoExA(app_id, joj_wnd_class_name, &wnd_class))
     {
         wnd_class.cbSize = sizeof(WNDCLASSEX);
         wnd_class.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-        wnd_class.lpfnWndProc = joj::Win32Window::WinProc;
+        wnd_class.lpfnWndProc = WinProc;
         wnd_class.cbClsExtra = 0;
         wnd_class.cbWndExtra = 0;
         wnd_class.hInstance = app_id;
         wnd_class.hIcon = m_icon;
         wnd_class.hCursor = m_cursor;
-        wnd_class.hbrBackground = (HBRUSH)CreateSolidBrush(m_color);
-        wnd_class.lpszMenuName = NULL;
+        wnd_class.hbrBackground = CreateSolidBrush(m_color);
+        wnd_class.lpszMenuName = nullptr;
         wnd_class.lpszClassName = joj_wnd_class_name;
         wnd_class.hIconSm = m_icon;
 
@@ -92,38 +90,57 @@ b8 joj::Win32Window::create()
         {
             // TODO: Use own logger and return value
             printf("Failed to register window class.\n");
-            return false;
+            return ErrorCode::ERR_WINDOW_CREATION;
         }
     }
 
-    m_id = CreateWindowEx(
-        NULL,
+    if (mode == WindowMode::Windowed)
+    {
+        m_window_config.width = width;
+        m_window_config.height = height;
+    }
+    else if (mode == WindowMode::Fullscreen)
+    {
+        // Ignore width and height paremeters
+        m_style = WS_EX_TOPMOST | WS_POPUP | WS_VISIBLE;
+        m_window_config.width = GetSystemMetrics(SM_CXSCREEN);
+        m_window_config.height = GetSystemMetrics(SM_CYSCREEN);
+    }
+    else
+    {
+        m_style = WS_EX_TOPMOST | WS_POPUP | WS_VISIBLE;
+        m_window_config.width = width;
+        m_window_config.height = height;
+    }
+    m_window_config.window_mode = mode;
+
+    m_window_config.handle = CreateWindowEx(
+        0,
         joj_wnd_class_name,
-        title.c_str(),
+        title,
         m_style,
         m_xpos, m_ypos,
-        width, height,
-        NULL,
-        NULL,
+        m_window_config.width, m_window_config.height,
+        nullptr,
+        nullptr,
         app_id,
-        NULL
+        nullptr
     );
 
-    if (!m_id)
+    if (!m_window_config.handle)
     {
         // TODO: Use own logger and return value
         printf("Failed to create a window.\n");
-        return false;
+        return ErrorCode::ERR_WINDOW_ID_CREATION;
     }
 
-    if (m_mode == WindowMode::WINDOWED)
+    RECT new_rect = { 0, 0, m_window_config.width, m_window_config.height };
+    if (m_window_config.window_mode == WindowMode::Windowed || m_window_config.window_mode == WindowMode::Borderless)
     {
-        RECT new_rect = { 0, 0, width, height };
-
         if (!AdjustWindowRectEx(&new_rect,
-            GetWindowStyle(m_id),
-            GetMenu(m_id) != NULL,
-            GetWindowExStyle(m_id)))
+            GetWindowStyle(m_window_config.handle),
+            GetMenu(m_window_config.handle) != nullptr,
+            GetWindowExStyle(m_window_config.handle)))
         {
             // TODO: Use own logger
             printf("Could not adjust window rect ex.\n");
@@ -133,7 +150,7 @@ b8 joj::Win32Window::create()
         m_ypos = (GetSystemMetrics(SM_CYSCREEN) / 2) - ((new_rect.bottom - new_rect.top) / 2);
 
         if (!MoveWindow(
-            m_id,
+            m_window_config.handle,
             m_xpos,
             m_ypos,
             new_rect.right - new_rect.left,
@@ -145,62 +162,45 @@ b8 joj::Win32Window::create()
         }
     }
 
-    m_hdc = GetDC(m_id);
-
-    if (!m_hdc)
+    m_window_config.hdc = GetDC(m_window_config.handle);
+    if (!m_window_config.hdc)
     {
         // TODO: Use own logger and return value
         printf("Failed to get device context.\n");
-        return false;
+        return ErrorCode::ERR_WINDOW_CREATION;
     }
-    
-    if (!GetClientRect(m_id, &m_rect))
+
+    if (!GetWindowRect(m_window_config.handle, &m_window_rect))
     {
-        // TODO: Use own logger and return value
+        printf("Failed to get window size.\n");
+    }
+
+    if (!GetClientRect(m_window_config.handle, &m_client_rect))
+    {
         printf("Failed to get client area size.\n");
-        return false;
     }
 
-    if (!m_id)
-    {
-        // TODO: Use own logger and return value
-        printf("Failed to create window ID.\n");
-        return false;
+    m_running = true;
+
+    return ErrorCode::OK;
+}
+
+void joj::Win32Window::destroy()
+{
+    if (m_window_config.hdc != nullptr) {
+        ReleaseDC(m_window_config.handle, m_window_config.hdc);
+        m_window_config.hdc = nullptr;
     }
-    
-    show();
 
-    return true;
-}
-
-b8 joj::Win32Window::create_simple_window()
-{
-    // TODO: Use own logger and return value
-    printf("TODO()!\n");
-    return true;
-}
-
-void joj::Win32Window::show()
-{
-    running = true;
-}
-
-void joj::Win32Window::shutdown()
-{
-    if (m_hdc)
-        ReleaseDC(m_id, m_hdc);
-    
-    DestroyWindow(m_id);
-}
-
-void joj::Win32Window::clear()
-{
-    
+    if (m_window_config.handle != nullptr) {
+        DestroyWindow(m_window_config.handle);
+        m_window_config.handle = nullptr;
+    }
 }
 
 void joj::Win32Window::swap_buffers()
 {
-    SwapBuffers(m_hdc);
+    SwapBuffers(m_window_config.hdc);
 }
 
 void joj::Win32Window::set_on_focus(void(*func)())
@@ -213,11 +213,61 @@ void joj::Win32Window::set_lost_focus(void(*func)())
     lost_focus = func;
 }
 
+void joj::Win32Window::get_window_size(u16 &width, u16 &height)
+{
+    if (!GetWindowRect(m_window_config.handle, &m_window_rect))
+    {
+        printf("Failed to get window rect.");
+        return;
+    }
+
+    width = m_window_rect.right - m_window_rect.left;
+    height = m_window_rect.bottom - m_window_rect.top;
+}
+
+void joj::Win32Window::get_client_size(u16 &width, u16 &height)
+{
+    if (!GetClientRect(m_window_config.handle, &m_client_rect))
+    {
+        printf("Failed to get client rect.");
+        return;
+    }
+
+    width = m_client_rect.right - m_client_rect.left;
+    height = m_client_rect.bottom - m_client_rect.top;
+}
+
+u16 joj::Win32Window::get_xcenter()
+{
+    if (!GetClientRect(m_window_config.handle, &m_client_rect))
+    {
+        printf("Failed to get client rect.");
+        return 0;
+    }
+
+    return m_client_rect.left + (m_client_rect.right / 2);
+}
+
+u16 joj::Win32Window::get_ycenter()
+{
+    if (!GetClientRect(m_window_config.handle, &m_client_rect))
+    {
+        printf("Failed to get client rect.");
+        return 0;
+    }
+
+    return m_client_rect.top + (m_client_rect.bottom / 2);
+}
+
 LRESULT CALLBACK joj::Win32Window::WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg)
     {
+    // FIXME: Window always close when creating OpenGL context
+    // case WM_DESTROY:
+    case WM_QUIT:
     case WM_CLOSE:
+        printf("Closing window.\n");
         PostQuitMessage(0);
         return 0;
 
@@ -231,13 +281,11 @@ LRESULT CALLBACK joj::Win32Window::WinProc(HWND hWnd, UINT msg, WPARAM wParam, L
             on_focus();
         return 0;
 
-    // FIXME: For some reason, the window automatically closes when running an OpenGL App
-    /*
-    case WM_DESTROY:
-        PostQuitMessage(0);
-        return 0;
-    */
+    default:
+        break;
     }
     
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
+
+#endif // JPLATFORM_WINDOWS
