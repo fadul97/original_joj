@@ -105,7 +105,7 @@ namespace joj
 
     template<class Twindow, class Tinput>
     inline void PlatformManager<Twindow, Tinput>::close_window()
-    { m_window->close(); }
+    { m_window->stop_running(); }
 
     template<class Twindow, class Tinput>
     inline b8 PlatformManager<Twindow, Tinput>::is_key_down(u32 key) const

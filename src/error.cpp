@@ -10,7 +10,7 @@ const char* joj::error_to_string(joj::ErrorCode e)
         case ErrorCode::OK: return "OK";
         case ErrorCode::FAILED: return "FAILED";
         case ErrorCode::ERR_ENGINE_INIT: return "ERR_ENGINE_INIT";
-        case ErrorCode::ERR_PLATFORM_MANAGER_INIT: return "ERR_PLATFORM_MANAGER_INIT";
+        // case ErrorCode::ERR_PLATFORM_MANAGER_INIT: return "ERR_PLATFORM_MANAGER_INIT";
         case ErrorCode::ERR_PLATFORM_MANAGER_CREATION: return "ERR_PLATFORM_MANAGER_CREATION";
         case ErrorCode::ERR_WINDOW_INIT: return "ERR_WINDOW_INIT";
         case ErrorCode::ERR_WINDOW_CREATION: return "ERR_WINDOW_CREATION";
