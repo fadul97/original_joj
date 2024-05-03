@@ -6,16 +6,14 @@
 #include "platform/win32/window_win32.h"
 #endif
 
-template<typename Tid>
-joj::Window<Tid>::Window(i16 width, i16 height, std::string title)
-    : width(width), height(height), title(title), running(false), m_mode(WindowMode::WINDOWED)
+template<typename TWindowConfig>
+joj::Window<TWindowConfig>::Window(const i16 width, const i16 height, const char* title, const WindowMode mode)
+    : m_width(width), m_height(height), m_title(title), m_running(false), m_mode(mode)
 {
 }
 
-template<typename Tid>
-joj::Window<Tid>::~Window()
-{
-}
+template<typename TWindowConfig>
+joj::Window<TWindowConfig>::~Window() = default;
 
 #if JPLATFORM_LINUX
 template class joj::Window<u32>;
