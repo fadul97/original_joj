@@ -1,5 +1,7 @@
 #include "platform/win32/input_win32.h"
 
+#include <windowsx.h>
+
 joj::Win32Input::Win32Input()
 {
     // ATTENTION: input must be initialized after window creation
