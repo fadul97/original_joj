@@ -1,5 +1,7 @@
 #include "platform/win32/input_win32.h"
 
+#if JPLATFORM_WINDOWS
+
 #include <windowsx.h>
 
 joj::Win32Input::Win32Input()
@@ -80,3 +82,5 @@ LRESULT CALLBACK joj::Win32Input::InputProc(HWND hWnd, UINT msg, WPARAM wParam, 
 
     return CallWindowProc(Win32Window::WinProc, hWnd, msg, wParam, lParam);
 }
+
+#endif // JPLATFORM_WINDOWS

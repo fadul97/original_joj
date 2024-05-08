@@ -16,7 +16,7 @@ namespace joj
     {
     public:
         Win32Input();
-        ~Win32Input();
+        ~Win32Input() override;
 
         static LRESULT CALLBACK InputProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     };
