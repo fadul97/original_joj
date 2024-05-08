@@ -1,10 +1,8 @@
 #include "platform/timer.h"
 
 joj::Timer::Timer()
+    : m_stopped(false)
 {
-    m_stopped = false;
 }
 
-joj::Timer::~Timer()
-{
-}
+joj::Timer::~Timer() = default;
