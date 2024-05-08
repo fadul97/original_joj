@@ -34,7 +34,8 @@ namespace joj
         
         virtual void set_mode(WindowMode mode) = 0;
         virtual void set_color(u32 r, u32 g, u32 b) = 0;
-        
+        virtual void set_title(const char* title) = 0;
+
         virtual ErrorCode create(i16 width, i16 height, const char* title, WindowMode mode) = 0;
         virtual void destroy() = 0;
         virtual void swap_buffers() = 0;

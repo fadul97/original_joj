@@ -36,6 +36,7 @@ namespace joj
 
         void set_mode(WindowMode mode) override;
         void set_color(u32 r, u32 g, u32 b) override;
+        void set_title(const char* title) override;
 
         ErrorCode create(i16 width, i16 height, const char* title, WindowMode mode) override;
         void destroy() override;
@@ -72,6 +73,13 @@ namespace joj
 
     inline f32 Win32Window::get_aspect_ratio() const
     { return static_cast<f32>(m_window_config.width) / static_cast<f32>(m_window_config.height); }
+
+    inline void Win32Window::set_title(const char* title)
+    {
+        SetWindowText(m_window_config.handle, title);
+        m_title = title;
+    }
+
 }
 
 #endif // JPLATFORM_WINDOWS
