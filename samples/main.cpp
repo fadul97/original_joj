@@ -1,5 +1,6 @@
 #include <cstdio>
 #include "joj/platform/win32/window_win32.h"
+#include "joj/platform/win32/input_win32.h"
 
 b8 process_events();
 
@@ -9,6 +10,8 @@ int main()
     if (window.create(400, 400, "Refactored window", joj::WindowMode::Windowed) < joj::ErrorCode::OK) {
         return -1;
     }
+
+    joj::Win32Input input{};
 
     u16 width = 0;
     u16 height = 0;
@@ -22,6 +25,16 @@ int main()
         if (!process_events()) {
             window.stop_running();
         }
+
+        if (joj::Win32Input::is_key_pressed('A')) {
+            printf("A pressed.\n");
+        }
+
+        if (joj::Win32Input::is_key_pressed(joj::KEY_ESCAPE)) {
+            printf("Escape key pressed.\n");
+        }
+
+        window.swap_buffers();
 
     }
 
