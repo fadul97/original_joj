@@ -1,7 +1,7 @@
 #include "platform/win32/timer_win32.h"
 
 joj::Win32Timer::Win32Timer()
-    : joj::Timer()
+    : m_counter_start({}), m_end({}), m_freq({})
 {
     // Get frequency from high-resolution counter
     QueryPerformanceFrequency(&m_freq);
@@ -11,9 +11,7 @@ joj::Win32Timer::Win32Timer()
     ZeroMemory(&m_end, sizeof(m_end));
 }
 
-joj::Win32Timer::~Win32Timer()
-{
-}
+joj::Win32Timer::~Win32Timer() = default;
 
 void joj::Win32Timer::start()
 {
@@ -27,7 +25,7 @@ void joj::Win32Timer::start()
                 //
 
                 // Time elapsed before stopping
-                i64 elapsed = m_end.QuadPart - m_counter_start.QuadPart;
+                const i64 elapsed = m_end.QuadPart - m_counter_start.QuadPart;
 
                 // Takes into account time already elapsed before the stop
                 QueryPerformanceCounter(&m_counter_start);
@@ -82,7 +80,7 @@ f32 joj::Win32Timer::reset()
     }
 
     // Convert time to seconds
-    return f32(elapsed / f64(m_freq.QuadPart));
+    return static_cast<f32>(static_cast<f64>(elapsed) / static_cast<f64>(m_freq.QuadPart));
 }
 
 f32 joj::Win32Timer::elapsed()
@@ -106,5 +104,5 @@ f32 joj::Win32Timer::elapsed()
     }
 
     // Convert time to seconds
-    return float(elapsed / f64(m_freq.QuadPart));
+    return static_cast<f32>(static_cast<f64>(elapsed) / static_cast<f64>(m_freq.QuadPart));
 }

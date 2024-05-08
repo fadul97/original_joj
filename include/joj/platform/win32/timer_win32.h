@@ -15,15 +15,15 @@ namespace joj
     {
     public:
         Win32Timer();
-        ~Win32Timer();
+        ~Win32Timer() override;
 
-        void start();
-        void stop();
+        void start() override;
+        void stop() override;
         f32 reset() override;
         f32 elapsed() override;
         b8 was_elapsed(f32 secs) override;
-        void time_begin_period();
-        void time_end_period();
+        void begin_period() override;
+        void end_period() override;
 
     private:
         LARGE_INTEGER m_counter_start;
@@ -31,13 +31,13 @@ namespace joj
         LARGE_INTEGER m_freq;
     };
 
-    inline b8 Win32Timer::was_elapsed(f32 secs)
+    inline b8 Win32Timer::was_elapsed(const f32 secs)
     { return (elapsed() >= secs ? true : false); }
     
-    inline void Win32Timer::time_begin_period()
+    inline void Win32Timer::begin_period()
     { timeBeginPeriod(1); }
 
-    inline void Win32Timer::time_end_period()
+    inline void Win32Timer::end_period()
     { timeEndPeriod(1); }
 }
 
