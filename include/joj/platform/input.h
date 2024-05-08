@@ -14,23 +14,16 @@ namespace joj
         Input();
         virtual ~Input();
 
-        b8 is_key_down(u32 key) const;
-        b8 is_key_pressed(u32 key);
-        b8 is_key_up(u32 key) const;
+        static b8 is_key_down(u32 key) ;
+        static b8 is_key_pressed(u32 key);
+        static b8 is_key_up(u32 key) ;
 
-        b8 is_button_down(Buttons button) const;
-        b8 is_button_up(Buttons button) const;
+        static b8 is_button_down(Buttons button) ;
+        static b8 is_button_up(Buttons button) ;
 
-        i16 get_xmouse() const;
-        i16 get_ymouse() const;
-        i16 get_mouse_wheel() const;
-
-        void move_mouse(i16 x, i16 y);
-        void press_key(Keys key);
-        void click_button(Buttons button);
-
-        void release_key(u32 key);
-        void release_button(Buttons button);
+        static i16 get_xmouse() ;
+        static i16 get_ymouse() ;
+        static i16 get_mouse_wheel() ;
 
     protected:
         static Keyboard m_keyboard;
@@ -38,40 +31,25 @@ namespace joj
         static Mouse m_mouse;
     };
 
-        inline b8 Input::is_key_down(u32 key) const
+        inline b8 Input::is_key_down(const u32 key)
         { return m_keyboard.keys[key]; }
 
-        inline b8 Input::is_key_up(u32 key) const
+        inline b8 Input::is_key_up(const u32 key)
         { return !m_keyboard.keys[key]; }
 
-        inline i16 Input::get_xmouse() const
+        inline i16 Input::get_xmouse()
         { return m_mouse.x; }
 
-        inline i16 Input::get_ymouse() const
+        inline i16 Input::get_ymouse()
         { return m_mouse.y; }
 
-        inline i16 Input::get_mouse_wheel() const
+        inline i16 Input::get_mouse_wheel()
         { return m_mouse.wheel; }
 
-        inline void Input::move_mouse(i16 x, i16 y)
-        { m_mouse.x = x; m_mouse.y = y; }
-
-        inline void Input::press_key(Keys key)
-        { m_keyboard.keys[key] = true; }
-
-        inline void Input::click_button(Buttons button)
-        { m_mouse.buttons[button] = true; }
-
-        inline void Input::release_key(u32 key)
-        { m_keyboard.keys[key] = false; }
-
-        inline void Input::release_button(Buttons button)
-        { m_mouse.buttons[button] = false; }
-
-        inline b8 Input::is_button_down(Buttons button) const
+        inline b8 Input::is_button_down(const Buttons button)
         { return m_mouse.buttons[button]; }
 
-        inline b8 Input::is_button_up(Buttons button) const
+        inline b8 Input::is_button_up(const Buttons button)
         { return !m_mouse.buttons[button]; }
 }
 

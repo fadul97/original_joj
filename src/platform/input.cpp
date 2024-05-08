@@ -4,16 +4,12 @@ joj::Keyboard joj::Input::m_keyboard = { 0 };
 joj::Keyboard joj::Input::m_ctrl = { 0 };
 joj::Mouse joj::Input::m_mouse = { 0 };
 
-joj::Input::Input()
-{
-}
+joj::Input::Input() = default;
 
-joj::Input::~Input()
-{
-}
+joj::Input::~Input() = default;
 
 
-b8 joj::Input::is_key_pressed(u32 key)
+b8 joj::Input::is_key_pressed(const u32 key)
 {
     if (m_ctrl.keys[key])
     {
