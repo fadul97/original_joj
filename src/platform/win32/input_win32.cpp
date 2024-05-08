@@ -5,12 +5,10 @@
 joj::Win32Input::Win32Input()
 {
     // ATTENTION: input must be initialized after window creation
-    SetWindowLongPtr(GetActiveWindow(), GWLP_WNDPROC, (LONG_PTR)joj::Win32Input::InputProc);
+    SetWindowLongPtr(GetActiveWindow(), GWLP_WNDPROC, (LONG_PTR)InputProc);
 }
 
-joj::Win32Input::~Win32Input()
-{
-}
+joj::Win32Input::~Win32Input() = default;
 
 LRESULT CALLBACK joj::Win32Input::InputProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -75,7 +73,10 @@ LRESULT CALLBACK joj::Win32Input::InputProc(HWND hWnd, UINT msg, WPARAM wParam, 
         m_keyboard.keys[VK_RBUTTON] = false;
         m_mouse.buttons[BUTTON_RIGHT] = false;
         return 0;
+
+    default:
+        break;
     }
 
-    return CallWindowProc(joj::Win32Window::WinProc, hWnd, msg, wParam, lParam);  
+    return CallWindowProc(Win32Window::WinProc, hWnd, msg, wParam, lParam);
 }
