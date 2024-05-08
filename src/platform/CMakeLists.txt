@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.27)
 project(joj)
 
-add_library(jojPlatform STATIC window.cpp input.cpp)
+add_library(jojPlatform STATIC window.cpp input.cpp timer.cpp)
 
 #add_subdirectory(context)
 
