@@ -4,6 +4,7 @@
 #include "joj/platform/win32/window_win32.h"
 #include "joj/platform/win32/input_win32.h"
 #include "joj/platform/win32/timer_win32.h"
+#include "joj/platform/context/opengl/win32/context_gl.h"
 
 f32 frametime;
 
@@ -19,15 +20,26 @@ int main()
         return -1;
     }
 
-    joj::Win32Input input{};
+    auto input = joj::Win32Input();
 
-    u16 wiframetimeh = 0;
+    u16 width = 0;
     u16 height = 0;
-    window.get_window_size(wiframetimeh, height);
-    printf("Window size: %dx%d\n", wiframetimeh, height);
+    window.get_window_size(width, height);
+    printf("Window size: %dx%d\n", width, height);
 
-    window.get_client_size(wiframetimeh, height);
-    printf("Client size: %dx%d\n", wiframetimeh, height);
+    window.get_client_size(width, height);
+    printf("Client size: %dx%d\n", width, height);
+
+    joj::Win32GLContext context{};
+    if (context.create(window.get_window_config()) < joj::ErrorCode::OK) {
+        window.destroy();
+        return -2;
+    }
+
+    if (context.make_current(window.get_window_config()) < joj::ErrorCode::OK) {
+        window.destroy();
+        return -3;
+    }
 
 
     timer.begin_period();
