@@ -11,25 +11,29 @@
 
 namespace joj
 {
-    class JAPI Win32GLContext : public GraphicsContext<Win32Window>
+    struct GLContextConfig
+    {
+        HGLRC shared_context;
+    };
+
+    class JAPI Win32GLContext : public GraphicsContext<WindowConfig>
     {
     public:
         Win32GLContext();
-        ~Win32GLContext();
+        ~Win32GLContext() override;
 
-        b8 create(std::unique_ptr<Win32Window>& window) override;
-        void make_current(std::unique_ptr<Win32Window>& window) override;
+        ErrorCode create(WindowConfig& window) override;
+        ErrorCode make_current(WindowConfig& window) override;
         void destroy() override;
           
-    private:  
-        HGLRC m_rc;
-        u32 m_color_bits;
-        u32 m_depth_bits;
-        i32 m_pixel_format_attrib_list[19];
-        u32 m_context_attribs[16];
-
+    private:
+        GLContextConfig m_context_config{};
         u32 m_gl_version_major;
         u32 m_gl_version_minor;
+        i32 m_color_bits;
+        i32 m_depth_bits;
+        i32 m_pixel_format_attrib_list[19]{};
+        i32 m_context_attribs[16]{};
 
         void log_hardware_info() override;
         b8 is_extension_supported(const char *ext_list, const char *extension);

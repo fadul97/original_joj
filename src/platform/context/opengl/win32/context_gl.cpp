@@ -4,7 +4,11 @@
 
 #define JOJ_GL_DEFINE_EXTERN
 #include "platform/context/opengl/joj_gl.h"
-#include <string.h>
+
+#include <logger.h>
+
+#include <windows.h>
+#include <strsafe.h>
 
 typedef BOOL(WINAPI* PFNWGLCHOOSEPIXELFORMATARBPROC) (HDC hdc, const int* piAttribIList, const FLOAT* pfAttribFList, UINT nMaxFormats, int* piFormats, UINT* nNumFormats);
 typedef HGLRC(WINAPI* PFNWGLCREATECONTEXTATTRIBSARBPROC) (HDC hDC, HGLRC hShareContext, const int* attribList);
@@ -14,9 +18,11 @@ PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB = nullptr;
 PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = nullptr;
 PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT = nullptr;
 
-joj::Win32GLContext::Win32GLContext()
-{
-	m_rc = nullptr;
+joj::Win32GLContext::Win32GLContext() {
+    m_context_config = GLContextConfig {
+        .shared_context = nullptr,
+    };
+
     m_color_bits = 32;
     m_depth_bits = 24;
 
@@ -64,14 +70,14 @@ joj::Win32GLContext::Win32GLContext()
 
     const i32 ctx_attribs[] =
     {
-      WGL_CONTEXT_MAJOR_VERSION_ARB, static_cast<i32>(m_gl_version_major),
-      WGL_CONTEXT_MINOR_VERSION_ARB, static_cast<i32>(m_gl_version_minor),
-      WGL_CONTEXT_FLAGS_ARB,
+        WGL_CONTEXT_MAJOR_VERSION_ARB, static_cast<i32>(m_gl_version_major),
+        WGL_CONTEXT_MINOR_VERSION_ARB, static_cast<i32>(m_gl_version_minor),
+        WGL_CONTEXT_FLAGS_ARB,
 #ifdef _DEBUG
-      WGL_CONTEXT_DEBUG_BIT_ARB |
+        WGL_CONTEXT_DEBUG_BIT_ARB |
 #endif // _DEBUG
         WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-      0
+        0
     };
 
     memcpy(m_context_attribs, ctx_attribs, sizeof(ctx_attribs));
@@ -79,28 +85,28 @@ joj::Win32GLContext::Win32GLContext()
 
 joj::Win32GLContext::~Win32GLContext()
 {
+    if (m_context_config.shared_context != nullptr) {
+        wglDeleteContext(m_context_config.shared_context);
+    }
 }
 
-b8 joj::Win32GLContext::create(std::unique_ptr<Win32Window>& window)
-{
-    auto dummy_window = new joj::Win32Window();
-    dummy_window->create();
+joj::ErrorCode joj::Win32GLContext::create(WindowConfig &window) {
+    Win32Window dummy_window{};
+    dummy_window.create(0, 0, "", WindowMode::Borderless);
 
-    // TODO: Add comments about pfd
-    // Describe pixel format
-    PIXELFORMATDESCRIPTOR pfd =
+    const PIXELFORMATDESCRIPTOR pfd =
     {
         sizeof(PIXELFORMATDESCRIPTOR),  //  size of this pfd
         1,
         PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
         PFD_TYPE_RGBA,
-        (BYTE)m_depth_bits,
+        static_cast<BYTE>(m_depth_bits),
         0, 0, 0, 0, 0, 0,
         0,
         0,
         0,
         0, 0, 0, 0,
-        (BYTE)m_color_bits,
+        static_cast<BYTE>(m_color_bits),
         0,
         0,
         PFD_MAIN_PLANE,
@@ -108,75 +114,73 @@ b8 joj::Win32GLContext::create(std::unique_ptr<Win32Window>& window)
         0, 0, 0
     };
 
-    u32 pixel_format = ChoosePixelFormat(dummy_window->get_device_context(), &pfd);
+    dummy_window.get_window_config().hdc = GetDC(nullptr);
+
+    const i32 pixel_format = ChoosePixelFormat(dummy_window.get_window_config().hdc, &pfd);
     if (!pixel_format)
     {
-        // TODO: Use own logger and return value
-        printf("Failed to ChoosePixelFormat for dummy_window.\n");
-        DestroyWindow(dummy_window->get_id());
-        return false;
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to ChoosePixelFormat for dummy_window.");
+        dummy_window.destroy();
+        return ErrorCode::ERR_CONTEXT;
     }
 
-    if (!SetPixelFormat(dummy_window->get_device_context(), pixel_format, &pfd))
+    if (!SetPixelFormat(dummy_window.get_window_config().hdc, pixel_format, &pfd))
     {
-        // TODO: Use own logger and return value
-        printf("Failed to SetPixelFormat for dummy_window.\n");
-        DestroyWindow(dummy_window->get_id());
-        return false;
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to SetPixelFormat for dummy_window.");
+        dummy_window.destroy();
+        return ErrorCode::ERR_CONTEXT;
     }
 
-    HGLRC new_rc = wglCreateContext(dummy_window->get_device_context());
+    HGLRC new_rc = wglCreateContext(dummy_window.get_window_config().hdc);
     if (!new_rc)
     {
-        // TODO: Use own logger and return value
-        printf("Failed to wglCreateContext for dummy_window.\n");
-        DestroyWindow(dummy_window->get_id());
-        return false;
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglCreateContext for dummy_window.");
+        dummy_window.destroy();
+        return ErrorCode::ERR_CONTEXT;
     }
 
-    if (!wglMakeCurrent(dummy_window->get_device_context(), new_rc))
+    if (!wglMakeCurrent(dummy_window.get_window_config().hdc, new_rc))
     {
-        // TODO: Use own logger and return value
-        printf("Failed to wglMakeCurrent for dummy_window.\n");
-        DestroyWindow(dummy_window->get_id());
-        return false;
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglMakeCurrent for dummy_window.");
+        dummy_window.destroy();
+        return ErrorCode::ERR_CONTEXT;
     }
 
     wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
     if (!wglChoosePixelFormatARB)
     {
-        // TODO: Use own logger and return value
-        printf("Failed to wglGetProcAddress of wglChoosePixelFormatARB.\n\n");
-        return false;
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglGetProcAddress of wglChoosePixelFormatARB.");
+        dummy_window.destroy();
+        return ErrorCode::ERR_CONTEXT;
     }
 
     wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
     if (!wglCreateContextAttribsARB)
     {
-        // TODO: Use own logger and return value
-        printf("Failed to wglGetProcAddress of wglCreateContextAttribsARB.\n\n");
-        return false;
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglGetProcAddress of wglCreateContextAttribsARB.");
+        dummy_window.destroy();
+        return ErrorCode::ERR_CONTEXT;
     }
 
-    wglMakeCurrent(0, 0);
+    wglMakeCurrent(nullptr, nullptr);
     wglDeleteContext(new_rc);
-    DestroyWindow(dummy_window->get_id());
+    dummy_window.destroy();
 
-    int new_pixel_format;
-    int num_pixel_formats = 0;
-    PIXELFORMATDESCRIPTOR new_pfd =
+    i32 new_pixel_format;
+    i32 num_pixel_formats = 0;
+    const PIXELFORMATDESCRIPTOR new_pfd =
     {
         sizeof(PIXELFORMATDESCRIPTOR),  //  size of this pfd
         1,
         PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,
         PFD_TYPE_RGBA,
-        (BYTE)m_depth_bits,
+        static_cast<BYTE>(m_depth_bits),
         0, 0, 0, 0, 0, 0,
         0,
         0,
         0,
         0, 0, 0, 0,
-        (BYTE)m_color_bits,
+        static_cast<BYTE>(m_color_bits),
         0,
         0,
         PFD_MAIN_PLANE,
@@ -184,76 +188,106 @@ b8 joj::Win32GLContext::create(std::unique_ptr<Win32Window>& window)
         0, 0, 0
     };
 
-    const int* pxf_attrib_list = (const int*)m_pixel_format_attrib_list;
-    const int* context_attrib_list = (const int*)m_context_attribs;
+    const i32* pxf_attrib_list = m_pixel_format_attrib_list;
+    const i32* context_attrib_list = m_context_attribs;
 
-    wglChoosePixelFormatARB(window->get_device_context(), pxf_attrib_list, nullptr, 1, &new_pixel_format, (UINT*)&num_pixel_formats);
+    // window.hdc = GetDC(nullptr);
+
+    wglChoosePixelFormatARB(window.hdc, pxf_attrib_list, nullptr, 1, &new_pixel_format, (UINT*)&num_pixel_formats);
     if (num_pixel_formats <= 0)
     {
-        // TODO: Use own logger and return value
-        printf("Failed to wglChoosePixelFormatARB.\n");
-        return false;
+        // TODO: Use better return values
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglChoosePixelFormatARB.");
+        return ErrorCode::ERR_CONTEXT;
     }
 
-    if (!SetPixelFormat(window->get_device_context(), new_pixel_format, &pfd))
+    // window.hdc = GetDC(window.handle);
+    // window.hdc = GetDC(nullptr);
+
+    if (!SetPixelFormat(window.hdc, new_pixel_format, &new_pfd))
     {
-        // TODO: Use own logger and return value
-        printf("Failed to SetPixelFormat.\n");
-        return false;
+        // Retrieve the system error message for the last-error code
+
+        LPVOID lpMsgBuf;
+        LPVOID lpDisplayBuf;
+        DWORD dw = GetLastError();
+
+        FormatMessage(
+            FORMAT_MESSAGE_ALLOCATE_BUFFER |
+            FORMAT_MESSAGE_FROM_SYSTEM |
+            FORMAT_MESSAGE_IGNORE_INSERTS,
+            NULL,
+            dw,
+            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+            (LPTSTR) &lpMsgBuf,
+            0, NULL );
+
+        // Display the error message and exit the process
+
+        lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
+            (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)SetPixelFormat) + 40) * sizeof(TCHAR));
+        StringCchPrintf((LPTSTR)lpDisplayBuf,
+            LocalSize(lpDisplayBuf) / sizeof(TCHAR),
+            TEXT("%s failed with error %d: %s"),
+            SetPixelFormat, dw, lpMsgBuf);
+        MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
+
+        LocalFree(lpMsgBuf);
+        LocalFree(lpDisplayBuf);
+        ExitProcess(dw);
+
+        // TODO: Use better return values
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to SetPixelFormat.");
+        return ErrorCode::ERR_CONTEXT;
     }
 
-    new_rc = wglCreateContextAttribsARB(window->get_device_context(), 0, context_attrib_list);
-    if (!new_rc)
+    m_context_config.shared_context = wglCreateContextAttribsARB(window.hdc, nullptr, context_attrib_list);
+    if (!m_context_config.shared_context)
     {
-        // TODO: Use own logger and return value
-        printf("Failed to wglCreateContextAttribsARB.\n");
-        return false;
+        // TODO: Use better return values
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglCreateContextAttribsARB.");
+        return ErrorCode::ERR_CONTEXT;
     }
 
-    m_rc = new_rc;
-
-    if (!wglMakeCurrent(window->get_device_context(), m_rc))
-    {
-        // TODO: Use own logger and return value
-        printf("Failed to wglMakeCurrent of window.\n");
-        return false;
-    }
-
-    return true;
+    return ErrorCode::OK;
 }
 
 // FIXME: make_current method only loads opengl functions (mainly)
-void joj::Win32GLContext::make_current(std::unique_ptr<Win32Window>& window)
-{
+joj::ErrorCode joj::Win32GLContext::make_current(WindowConfig &window) {
+    if (!wglMakeCurrent(window.hdc, m_context_config.shared_context))
+    {
+        // TODO: Use better return values
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglMakeCurrent of window.");
+        return ErrorCode::ERR_CONTEXT;
+    }
+
     load_opengl_functions();
 
-    COLORREF c = window->get_color();
+    log_hardware_info();
 
-    f32 r = GetRValue(window->get_color()) / 255.0f;
-    f32 g = GetGValue(window->get_color()) / 255.0f;
-    f32 b = GetBValue(window->get_color()) / 255.0f;
-
-    glClearColor(r, g, b, 1.0f);
+    glClearColor(1, 0, 1, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    SwapBuffers(window->get_device_context());
+    SwapBuffers(window.hdc);
 
-#if _DEBUG
-    log_hardware_info();
-#endif // _DEBUG
-}
-
-void joj::Win32GLContext::log_hardware_info()
-{
-    // TODO: Use own logger
-    printf("OpenGL Version: %s.\n", glGetString(GL_VERSION));
-    printf("OpenGL Renderer: %s.\n", glGetString(GL_RENDERER));
-    printf("OpenGL GLSL Version: %s.\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    return ErrorCode::OK;
 }
 
 void joj::Win32GLContext::destroy()
 {
-    printf("TODO()!\n");    
+    if (m_context_config.shared_context != nullptr) {
+        wglDeleteContext(m_context_config.shared_context);
+    }
+}
+
+
+void joj::Win32GLContext::log_hardware_info()
+{
+    if (glGetString) {
+        JDEBUG("OpenGL Version: %s.", glGetString(GL_VERSION));
+        JDEBUG("OpenGL Renderer: %s.", glGetString(GL_RENDERER));
+        JDEBUG("OpenGL GLSL Version: %s.", glGetString(GL_SHADING_LANGUAGE_VERSION));
+    }
 }
 
 #endif // JPLATFORM_WINDOWS
