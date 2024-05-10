@@ -90,9 +90,12 @@ joj::Win32GLContext::~Win32GLContext()
     }
 }
 
-joj::ErrorCode joj::Win32GLContext::create(WindowConfig &window) {
+joj::ErrorCode joj::Win32GLContext::create(const WindowConfig &window) const {
     Win32Window dummy_window{};
-    dummy_window.create(0, 0, "", WindowMode::Borderless);
+    if (dummy_window.create(0, 0, "", WindowMode::Borderless) < ErrorCode::OK) {
+        JFATAL(ErrorCode::ERR_CONTEXT, "Failed to create dummy window for OpenGL context.");
+        return ErrorCode::ERR_CONTEXT;
+    }
 
     const PIXELFORMATDESCRIPTOR pfd =
     {
@@ -114,51 +117,53 @@ joj::ErrorCode joj::Win32GLContext::create(WindowConfig &window) {
         0, 0, 0
     };
 
-    dummy_window.get_window_config().hdc = GetDC(nullptr);
-
     const i32 pixel_format = ChoosePixelFormat(dummy_window.get_window_config().hdc, &pfd);
     if (!pixel_format)
     {
+        // TODO: Use own logger and return value
         JFATAL(ErrorCode::ERR_CONTEXT, "Failed to ChoosePixelFormat for dummy_window.");
-        dummy_window.destroy();
+        DestroyWindow(dummy_window.get_window_config().handle);
         return ErrorCode::ERR_CONTEXT;
     }
 
     if (!SetPixelFormat(dummy_window.get_window_config().hdc, pixel_format, &pfd))
     {
+        // TODO: Use own logger and return value
         JFATAL(ErrorCode::ERR_CONTEXT, "Failed to SetPixelFormat for dummy_window.");
-        dummy_window.destroy();
+        DestroyWindow(dummy_window.get_window_config().handle);
         return ErrorCode::ERR_CONTEXT;
     }
 
     HGLRC new_rc = wglCreateContext(dummy_window.get_window_config().hdc);
     if (!new_rc)
     {
+        // TODO: Use own logger and return value
         JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglCreateContext for dummy_window.");
-        dummy_window.destroy();
+        DestroyWindow(dummy_window.get_window_config().handle);
         return ErrorCode::ERR_CONTEXT;
     }
 
     if (!wglMakeCurrent(dummy_window.get_window_config().hdc, new_rc))
     {
+        // TODO: Use own logger and return value
         JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglMakeCurrent for dummy_window.");
-        dummy_window.destroy();
+        DestroyWindow(dummy_window.get_window_config().handle);
         return ErrorCode::ERR_CONTEXT;
     }
 
     wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)wglGetProcAddress("wglChoosePixelFormatARB");
     if (!wglChoosePixelFormatARB)
     {
+        // TODO: Use own logger and return value
         JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglGetProcAddress of wglChoosePixelFormatARB.");
-        dummy_window.destroy();
         return ErrorCode::ERR_CONTEXT;
     }
 
     wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
     if (!wglCreateContextAttribsARB)
     {
+        // TODO: Use own logger and return value
         JFATAL(ErrorCode::ERR_CONTEXT, "Failed to wglGetProcAddress of wglCreateContextAttribsARB.");
-        dummy_window.destroy();
         return ErrorCode::ERR_CONTEXT;
     }
 
@@ -166,6 +171,11 @@ joj::ErrorCode joj::Win32GLContext::create(WindowConfig &window) {
     wglDeleteContext(new_rc);
     dummy_window.destroy();
 
+    return ErrorCode::OK;
+}
+
+// FIXME: make_current method only loads opengl functions (mainly)
+joj::ErrorCode joj::Win32GLContext::make_current(const WindowConfig &window) {
     i32 new_pixel_format;
     i32 num_pixel_formats = 0;
     const PIXELFORMATDESCRIPTOR new_pfd =
@@ -191,8 +201,6 @@ joj::ErrorCode joj::Win32GLContext::create(WindowConfig &window) {
     const i32* pxf_attrib_list = m_pixel_format_attrib_list;
     const i32* context_attrib_list = m_context_attribs;
 
-    // window.hdc = GetDC(nullptr);
-
     wglChoosePixelFormatARB(window.hdc, pxf_attrib_list, nullptr, 1, &new_pixel_format, (UINT*)&num_pixel_formats);
     if (num_pixel_formats <= 0)
     {
@@ -201,41 +209,8 @@ joj::ErrorCode joj::Win32GLContext::create(WindowConfig &window) {
         return ErrorCode::ERR_CONTEXT;
     }
 
-    // window.hdc = GetDC(window.handle);
-    // window.hdc = GetDC(nullptr);
-
     if (!SetPixelFormat(window.hdc, new_pixel_format, &new_pfd))
     {
-        // Retrieve the system error message for the last-error code
-
-        LPVOID lpMsgBuf;
-        LPVOID lpDisplayBuf;
-        DWORD dw = GetLastError();
-
-        FormatMessage(
-            FORMAT_MESSAGE_ALLOCATE_BUFFER |
-            FORMAT_MESSAGE_FROM_SYSTEM |
-            FORMAT_MESSAGE_IGNORE_INSERTS,
-            NULL,
-            dw,
-            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-            (LPTSTR) &lpMsgBuf,
-            0, NULL );
-
-        // Display the error message and exit the process
-
-        lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT,
-            (lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)SetPixelFormat) + 40) * sizeof(TCHAR));
-        StringCchPrintf((LPTSTR)lpDisplayBuf,
-            LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-            TEXT("%s failed with error %d: %s"),
-            SetPixelFormat, dw, lpMsgBuf);
-        MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK);
-
-        LocalFree(lpMsgBuf);
-        LocalFree(lpDisplayBuf);
-        ExitProcess(dw);
-
         // TODO: Use better return values
         JFATAL(ErrorCode::ERR_CONTEXT, "Failed to SetPixelFormat.");
         return ErrorCode::ERR_CONTEXT;
@@ -249,11 +224,6 @@ joj::ErrorCode joj::Win32GLContext::create(WindowConfig &window) {
         return ErrorCode::ERR_CONTEXT;
     }
 
-    return ErrorCode::OK;
-}
-
-// FIXME: make_current method only loads opengl functions (mainly)
-joj::ErrorCode joj::Win32GLContext::make_current(WindowConfig &window) {
     if (!wglMakeCurrent(window.hdc, m_context_config.shared_context))
     {
         // TODO: Use better return values
@@ -273,7 +243,7 @@ joj::ErrorCode joj::Win32GLContext::make_current(WindowConfig &window) {
     return ErrorCode::OK;
 }
 
-void joj::Win32GLContext::destroy()
+void joj::Win32GLContext::destroy() const
 {
     if (m_context_config.shared_context != nullptr) {
         wglDeleteContext(m_context_config.shared_context);

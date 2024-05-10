@@ -16,15 +16,15 @@ namespace joj
         HGLRC shared_context;
     };
 
-    class JAPI Win32GLContext : public GraphicsContext<WindowConfig>
+    class JAPI Win32GLContext
     {
     public:
         Win32GLContext();
-        ~Win32GLContext() override;
+        ~Win32GLContext();
 
-        ErrorCode create(WindowConfig& window) override;
-        ErrorCode make_current(WindowConfig& window) override;
-        void destroy() override;
+        [[nodiscard]] ErrorCode create(const WindowConfig& window) const;
+        ErrorCode make_current(const WindowConfig& window);
+        void destroy() const;
           
     private:
         GLContextConfig m_context_config{};
@@ -35,7 +35,7 @@ namespace joj
         i32 m_pixel_format_attrib_list[19]{};
         i32 m_context_attribs[16]{};
 
-        void log_hardware_info() override;
+        static void log_hardware_info();
         b8 is_extension_supported(const char *ext_list, const char *extension);
     };
 }
