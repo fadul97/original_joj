@@ -4,25 +4,36 @@
 
 #include <windowsx.h>
 #include <cstdio>
+#include "logger.h"
 
 void (*joj::Win32Window::on_focus)() = nullptr;
 void (*joj::Win32Window::lost_focus)() = nullptr;
 
 joj::Win32Window::Win32Window()
-    : m_xpos(0), m_ypos(0), m_xcenter(0), m_ycenter(0),
-        m_window_config(WindowConfig {
-            .handle = nullptr,
-            .hdc = nullptr,
-            .window_mode = WindowMode::Windowed,
-            .width = static_cast<u16>(GetSystemMetrics(SM_CXSCREEN)),
-            .height = static_cast<u16>(GetSystemMetrics(SM_CYSCREEN))}),
-        m_window_rect({ 0, 0, 0, 0 }),
-        m_client_rect({ 0, 0, 0, 0 })
+    // : m_xpos(0), m_ypos(0), m_xcenter(0), m_ycenter(0),
+    //     m_window_config(WindowConfig {
+    //         .handle = nullptr,
+    //         .hdc = nullptr,
+    //         .window_mode = WindowMode::Windowed,
+    //         .width = static_cast<u16>(GetSystemMetrics(SM_CXSCREEN)),
+    //         .height = static_cast<u16>(GetSystemMetrics(SM_CYSCREEN))}),
+    //     m_window_rect({ 0, 0, 0, 0 }),
+    //     m_client_rect({ 0, 0, 0, 0 })
 {
+    m_window_config = WindowConfig {
+        .handle = nullptr,
+        .hdc = nullptr,
+        .window_mode = WindowMode::Windowed,
+        .width = static_cast<u16>(GetSystemMetrics(SM_CXSCREEN)),
+        .height = static_cast<u16>(GetSystemMetrics(SM_CYSCREEN))
+    };
+
     m_color = RGB(60, 60, 60);
     m_style = WS_OVERLAPPED | WS_SYSMENU | WS_VISIBLE;
     m_icon = LoadIcon(nullptr, IDI_APPLICATION);
     m_cursor = LoadCursor(nullptr, IDC_ARROW);
+    m_window_rect = { 0, 0, m_window_config.width, m_window_config.height };
+    m_client_rect = { 0, 0, 0, 0 };
 }
 
 joj::Win32Window::~Win32Window()
@@ -57,15 +68,13 @@ void joj::Win32Window::set_color(const u32 r, const u32 g, const u32 b)
 
 joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const char* title, const WindowMode mode)
 {
-    const char* joj_wnd_class_name = "JOJ_WINDOW_CLASS";
+    const auto* joj_wnd_class_name = "JOJ_WINDOW_CLASS";
 
     HINSTANCE app_id = GetModuleHandle(nullptr);
-
     if (!app_id)
     {
-        // TODO: Use own logger and return value
-        printf("Failed to get module handle.\n");
-        return ErrorCode::ERR_WINDOW_CREATION;
+        JFATAL(ErrorCode::ERR_WINDOW, "Failed to get module handle.");
+        return ErrorCode::ERR_WINDOW;
     }
 
     WNDCLASSEX wnd_class{};
@@ -78,19 +87,18 @@ joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const
         wnd_class.cbClsExtra = 0;
         wnd_class.cbWndExtra = 0;
         wnd_class.hInstance = app_id;
-        wnd_class.hIcon = m_icon;
-        wnd_class.hCursor = m_cursor;
-        wnd_class.hbrBackground = CreateSolidBrush(m_color);
+        wnd_class.hIcon = LoadIcon(nullptr, IDI_APPLICATION);
+        wnd_class.hCursor = LoadCursor(nullptr, IDC_ARROW);
+        wnd_class.hbrBackground = CreateSolidBrush(RGB(60, 60, 60));
         wnd_class.lpszMenuName = nullptr;
         wnd_class.lpszClassName = joj_wnd_class_name;
-        wnd_class.hIconSm = m_icon;
+        wnd_class.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
 
         // Register "JOJ_WINDOW_CLASS" class
         if (!RegisterClassEx(&wnd_class))
         {
-            // TODO: Use own logger and return value
-            printf("Failed to register window class.\n");
-            return ErrorCode::ERR_WINDOW_CREATION;
+            JERROR(ErrorCode::ERR_WINDOW, "Failed to register window class.");
+            return ErrorCode::ERR_WINDOW;
         }
     }
 
@@ -119,7 +127,7 @@ joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const
         joj_wnd_class_name,
         title,
         m_style,
-        m_xpos, m_ypos,
+        0, 0,
         m_window_config.width, m_window_config.height,
         nullptr,
         nullptr,
@@ -129,9 +137,8 @@ joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const
 
     if (!m_window_config.handle)
     {
-        // TODO: Use own logger and return value
-        printf("Failed to create a window.\n");
-        return ErrorCode::ERR_WINDOW_ID_CREATION;
+        JFATAL(ErrorCode::ERR_WINDOW, "Failed to create window.");
+        return ErrorCode::ERR_WINDOW;
     }
 
     RECT new_rect = { 0, 0, m_window_config.width, m_window_config.height };
@@ -142,42 +149,38 @@ joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const
             GetMenu(m_window_config.handle) != nullptr,
             GetWindowExStyle(m_window_config.handle)))
         {
-            // TODO: Use own logger
-            printf("Could not adjust window rect ex.\n");
+            JERROR(ErrorCode::ERR_WINDOW, "Could not adjust window rect ex.");
         }
 
-        m_xpos = (GetSystemMetrics(SM_CXSCREEN) / 2) - ((new_rect.right - new_rect.left) / 2);
-        m_ypos = (GetSystemMetrics(SM_CYSCREEN) / 2) - ((new_rect.bottom - new_rect.top) / 2);
+        const u16 xpos = (GetSystemMetrics(SM_CXSCREEN) / 2) - ((new_rect.right - new_rect.left) / 2);
+        const u16 ypos = (GetSystemMetrics(SM_CYSCREEN) / 2) - ((new_rect.bottom - new_rect.top) / 2);
 
         if (!MoveWindow(
             m_window_config.handle,
-            m_xpos,
-            m_ypos,
+            xpos,
+            ypos,
             new_rect.right - new_rect.left,
             new_rect.bottom - new_rect.top,
             TRUE))
         {
-            // TODO: Use own logger
-            printf("Could not move window.\n");
+            JERROR(ErrorCode::ERR_WINDOW, "Could not move window.");
         }
     }
 
     m_window_config.hdc = GetDC(m_window_config.handle);
     if (!m_window_config.hdc)
     {
-        // TODO: Use own logger and return value
-        printf("Failed to get device context.\n");
-        return ErrorCode::ERR_WINDOW_CREATION;
+        JERROR(ErrorCode::ERR_WINDOW, "Failed to get device context.");
     }
 
     if (!GetWindowRect(m_window_config.handle, &m_window_rect))
     {
-        printf("Failed to get window size.\n");
+        JERROR(ErrorCode::ERR_WINDOW, "Failed to get window rect");
     }
 
     if (!GetClientRect(m_window_config.handle, &m_client_rect))
     {
-        printf("Failed to get client area size.\n");
+        JERROR(ErrorCode::ERR_WINDOW, "Failed to get client rect");
     }
 
     m_running = true;
@@ -217,7 +220,7 @@ void joj::Win32Window::get_window_size(u16 &width, u16 &height)
 {
     if (!GetWindowRect(m_window_config.handle, &m_window_rect))
     {
-        printf("Failed to get window rect.");
+        JERROR(joj::ErrorCode::ERR_WINDOW, "Failed to get window rect.");
         return;
     }
 
@@ -229,7 +232,7 @@ void joj::Win32Window::get_client_size(u16 &width, u16 &height)
 {
     if (!GetClientRect(m_window_config.handle, &m_client_rect))
     {
-        printf("Failed to get client rect.");
+        JERROR(joj::ErrorCode::ERR_WINDOW, "Failed to get client rect.");
         return;
     }
 
@@ -241,7 +244,7 @@ u16 joj::Win32Window::get_xcenter()
 {
     if (!GetClientRect(m_window_config.handle, &m_client_rect))
     {
-        printf("Failed to get client rect.");
+        JERROR(joj::ErrorCode::ERR_WINDOW, "Failed to get client rect.");
         return 0;
     }
 
@@ -252,7 +255,7 @@ u16 joj::Win32Window::get_ycenter()
 {
     if (!GetClientRect(m_window_config.handle, &m_client_rect))
     {
-        printf("Failed to get client rect.");
+        JERROR(joj::ErrorCode::ERR_WINDOW, "Failed to get client rect.");
         return 0;
     }
 

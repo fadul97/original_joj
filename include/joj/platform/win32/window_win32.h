@@ -48,18 +48,16 @@ namespace joj
         static LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
         
     private:
-        WindowConfig m_window_config;
-        RECT m_window_rect;
-        RECT m_client_rect;
+        WindowConfig m_window_config{};
+        RECT m_window_rect{};
+        RECT m_client_rect{};
         HICON m_icon;
         HCURSOR m_cursor;
         COLORREF m_color;
         DWORD m_style;
 
-        u16 m_xpos;
-        u16 m_ypos;
-        u16 m_xcenter;
-        u16 m_ycenter;
+        u16 m_xcenter{};
+        u16 m_ycenter{};
 
         static void (*on_focus)();
         static void (*lost_focus)();
