@@ -71,16 +71,14 @@ joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const
     const auto* joj_wnd_class_name = "JOJ_WINDOW_CLASS";
 
     HINSTANCE app_id = GetModuleHandle(nullptr);
-    if (!app_id)
-    {
+    if (!app_id) {
         JFATAL(ErrorCode::ERR_WINDOW, "Failed to get module handle.");
         return ErrorCode::ERR_WINDOW;
     }
 
     WNDCLASSEX wnd_class{};
 
-    if (!GetClassInfoExA(app_id, joj_wnd_class_name, &wnd_class))
-    {
+    if (!GetClassInfoExA(app_id, joj_wnd_class_name, &wnd_class)) {
         wnd_class.cbSize = sizeof(WNDCLASSEX);
         wnd_class.style = CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
         wnd_class.lpfnWndProc = WinProc;
@@ -95,27 +93,21 @@ joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const
         wnd_class.hIconSm = LoadIcon(nullptr, IDI_APPLICATION);
 
         // Register "JOJ_WINDOW_CLASS" class
-        if (!RegisterClassEx(&wnd_class))
-        {
+        if (!RegisterClassEx(&wnd_class)) {
             JERROR(ErrorCode::ERR_WINDOW, "Failed to register window class.");
             return ErrorCode::ERR_WINDOW;
         }
     }
 
-    if (mode == WindowMode::Windowed)
-    {
+    if (mode == WindowMode::Windowed) {
         m_window_config.width = width;
         m_window_config.height = height;
-    }
-    else if (mode == WindowMode::Fullscreen)
-    {
+    } else if (mode == WindowMode::Fullscreen) {
         // Ignore width and height paremeters
         m_style = WS_EX_TOPMOST | WS_POPUP | WS_VISIBLE;
         m_window_config.width = GetSystemMetrics(SM_CXSCREEN);
         m_window_config.height = GetSystemMetrics(SM_CYSCREEN);
-    }
-    else
-    {
+    } else {
         m_style = WS_EX_TOPMOST | WS_POPUP | WS_VISIBLE;
         m_window_config.width = width;
         m_window_config.height = height;
@@ -135,15 +127,13 @@ joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const
         nullptr
     );
 
-    if (!m_window_config.handle)
-    {
+    if (!m_window_config.handle) {
         JFATAL(ErrorCode::ERR_WINDOW, "Failed to create window.");
         return ErrorCode::ERR_WINDOW;
     }
 
     RECT new_rect = { 0, 0, m_window_config.width, m_window_config.height };
-    if (m_window_config.window_mode == WindowMode::Windowed || m_window_config.window_mode == WindowMode::Borderless)
-    {
+    if (m_window_config.window_mode == WindowMode::Windowed || m_window_config.window_mode == WindowMode::Borderless) {
         if (!AdjustWindowRectEx(&new_rect,
             GetWindowStyle(m_window_config.handle),
             GetMenu(m_window_config.handle) != nullptr,
@@ -168,22 +158,17 @@ joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const
     }
 
     m_window_config.hdc = GetDC(m_window_config.handle);
-    if (!m_window_config.hdc)
-    {
+    if (!m_window_config.hdc) {
         JERROR(ErrorCode::ERR_WINDOW, "Failed to get device context.");
     }
 
-    if (!GetWindowRect(m_window_config.handle, &m_window_rect))
-    {
+    if (!GetWindowRect(m_window_config.handle, &m_window_rect)) {
         JERROR(ErrorCode::ERR_WINDOW, "Failed to get window rect");
     }
 
-    if (!GetClientRect(m_window_config.handle, &m_client_rect))
-    {
+    if (!GetClientRect(m_window_config.handle, &m_client_rect)) {
         JERROR(ErrorCode::ERR_WINDOW, "Failed to get client rect");
     }
-
-    m_running = true;
 
     return ErrorCode::OK;
 }
