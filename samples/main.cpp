@@ -24,15 +24,16 @@ int main()
         window.destroy();
         return -2;
     }
-    //
-    // if (context.make_current(window.get_window_config()) < joj::ErrorCode::OK) {
-    //     window.destroy();
-    //     return -3;
-    // }
 
-    while (window.is_running()) {
+    if (context.make_current(window.get_window_config()) < joj::ErrorCode::OK) {
+        window.destroy();
+        return -3;
+    }
+
+    b8 running = true;
+    while (running) {
         if (!process_events()) {
-            window.stop_running();
+            running = false;
         }
     }
 
