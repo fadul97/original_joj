@@ -186,7 +186,7 @@ void joj::Win32Window::destroy()
     }
 }
 
-void joj::Win32Window::swap_buffers()
+void joj::Win32Window::swap_buffers() const
 {
     SwapBuffers(m_window_config.hdc);
 }

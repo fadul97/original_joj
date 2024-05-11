@@ -19,31 +19,33 @@ namespace joj
         u16 height;
     };
 
-    class JAPI Win32Window : public Window<WindowConfig>
+    class JAPI Win32Window //: public Window<WindowConfig>
     {
     public:
         Win32Window();
-        ~Win32Window() override;
+        ~Win32Window();
 
-        void get_window_size(u16 &width, u16 &height) override;
-        void get_client_size(u16 &width, u16 &height) override;
+        WindowConfig& get_window_config();
 
-        [[nodiscard]] u16 get_width() const override;
-        [[nodiscard]] u16 get_height() const override;
-        [[nodiscard]] u16 get_xcenter() override;
-        [[nodiscard]] u16 get_ycenter() override;
-        [[nodiscard]] f32 get_aspect_ratio() const override;
+        void get_window_size(u16 &width, u16 &height);
+        void get_client_size(u16 &width, u16 &height);
 
-        void set_mode(WindowMode mode) override;
-        void set_color(u32 r, u32 g, u32 b) override;
-        void set_title(const char* title) override;
+        [[nodiscard]] u16 get_width() const;
+        [[nodiscard]] u16 get_height() const;
+        [[nodiscard]] u16 get_xcenter();
+        [[nodiscard]] u16 get_ycenter();
+        [[nodiscard]] f32 get_aspect_ratio() const;
 
-        ErrorCode create(i16 width, i16 height, const char* title, WindowMode mode) override;
-        void destroy() override;
-        void swap_buffers() override;
+        void set_mode(WindowMode mode);
+        void set_color(u32 r, u32 g, u32 b);
+        void set_title(const char* title) const;
+
+        ErrorCode create(i16 width, i16 height, const char* title, WindowMode mode);
+        void destroy();
+        void swap_buffers() const;
         
-        void set_on_focus(void(*func)()) override;
-        void set_lost_focus(void(*func)()) override;
+        void set_on_focus(void(*func)());
+        void set_lost_focus(void(*func)());
 
         static LRESULT CALLBACK WinProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
         
@@ -63,6 +65,9 @@ namespace joj
         static void (*lost_focus)();
     };
 
+    inline WindowConfig& Win32Window::get_window_config()
+    { return m_window_config; }
+
     inline u16 Win32Window::get_width() const
     { return m_window_config.width; }
 
@@ -72,10 +77,10 @@ namespace joj
     inline f32 Win32Window::get_aspect_ratio() const
     { return static_cast<f32>(m_window_config.width) / static_cast<f32>(m_window_config.height); }
 
-    inline void Win32Window::set_title(const char* title)
+    inline void Win32Window::set_title(const char* title) const
     {
         SetWindowText(m_window_config.handle, title);
-        m_title = title;
+        // m_title = title;
     }
 
 }
