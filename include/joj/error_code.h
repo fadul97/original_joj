@@ -13,6 +13,7 @@ namespace  joj {
         ERR_VSHADER = -4,
         ERR_FSHADER = -5,
         ERR_SHADER_PROGRAM = -6
+        ERR_RENDERER = -7,
     };
 
     i32 err_to_i32(ErrorCode err);

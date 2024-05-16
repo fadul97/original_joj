@@ -23,6 +23,9 @@ i32 joj::err_to_i32(const ErrorCode err) {
         case ErrorCode::ERR_SHADER_PROGRAM:
             return -6;
 
+        case ErrorCode::ERR_RENDERER:
+            return -7;
+
         default:
             return 1;
     }
@@ -50,6 +53,9 @@ const char* joj::err_to_str(const ErrorCode err) {
 
         case ErrorCode::ERR_SHADER_PROGRAM:
             return "ERR_SHADER_PROGRAM";
+
+        case ErrorCode::ERR_RENDERER:
+            return "ERR_RENDERER";
 
         default:
             return "UNKNOWN";
