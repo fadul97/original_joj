@@ -17,7 +17,7 @@ namespace joj
     {
     public:
         GLRenderer();
-        ~GLRenderer();
+        ~GLRenderer() override;
         
         b8 init(WindowConfig& window) override;
         void render() override;
@@ -26,7 +26,7 @@ namespace joj
         void swap_buffers() override;
         void shutdown() override;
 
-        void set_polygon_mode(GLenum face, GLenum mode) const;
+        static void set_polygon_mode(GLenum face, GLenum mode) ;
 
         ErrorCode setup_default_pipeline(WindowConfig& window) override;
 
@@ -34,7 +34,7 @@ namespace joj
         f32 bg_color[4];
     };
 
-    inline void GLRenderer::set_polygon_mode(GLenum face, GLenum mode) const
+    inline void GLRenderer::set_polygon_mode(const GLenum face, const GLenum mode)
     { glPolygonMode(face, mode); }
 }
 
