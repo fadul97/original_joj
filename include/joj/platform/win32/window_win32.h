@@ -30,19 +30,17 @@ namespace joj
         void get_window_size(u16 &width, u16 &height);
         void get_client_size(u16 &width, u16 &height);
 
-        [[nodiscard]] u16 get_width() const;
-        [[nodiscard]] u16 get_height() const;
         [[nodiscard]] u16 get_xcenter();
         [[nodiscard]] u16 get_ycenter();
         [[nodiscard]] f32 get_aspect_ratio() const;
 
         void set_mode(WindowMode mode);
         void set_color(u32 r, u32 g, u32 b);
-        void set_title(const char* title) const;
+        void set_title(const char* title);
 
         ErrorCode create(i16 width, i16 height, const char* title, WindowMode mode);
         void destroy();
-        void swap_buffers() const;
+        void swap_buffers();
         
         void set_on_focus(void(*func)());
         void set_lost_focus(void(*func)());
@@ -68,21 +66,14 @@ namespace joj
     inline WindowConfig& Win32Window::get_window_config()
     { return m_window_config; }
 
-    inline u16 Win32Window::get_width() const
-    { return m_window_config.width; }
-
-    inline u16 Win32Window::get_height() const
-    { return m_window_config.width; }
-
     inline f32 Win32Window::get_aspect_ratio() const
     { return static_cast<f32>(m_window_config.width) / static_cast<f32>(m_window_config.height); }
 
-    inline void Win32Window::set_title(const char* title) const
+    inline void Win32Window::set_title(const char* title)
     {
         SetWindowText(m_window_config.handle, title);
         // m_title = title;
     }
-
 }
 
 #endif // JPLATFORM_WINDOWS

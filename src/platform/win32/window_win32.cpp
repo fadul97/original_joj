@@ -66,6 +66,7 @@ void joj::Win32Window::set_color(const u32 r, const u32 g, const u32 b)
     m_color = RGB(r, g, b);
 }
 
+// ErrorCode create(i16 width, i16 height, const char* title, WindowMode mode)
 joj::ErrorCode joj::Win32Window::create(const i16 width, const i16 height, const char* title, const WindowMode mode)
 {
     const auto* joj_wnd_class_name = "JOJ_WINDOW_CLASS";
@@ -186,7 +187,7 @@ void joj::Win32Window::destroy()
     }
 }
 
-void joj::Win32Window::swap_buffers() const
+void joj::Win32Window::swap_buffers()
 {
     SwapBuffers(m_window_config.hdc);
 }
