@@ -26,7 +26,7 @@ namespace joj
         void swap_buffers() override;
         void shutdown() override;
 
-        static void set_polygon_mode(GLenum face, GLenum mode) ;
+        static void set_polygon_mode(GLenum face, GLenum mode);
 
         ErrorCode setup_default_pipeline(WindowConfig& window) override;
 
