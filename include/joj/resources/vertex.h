@@ -1,14 +1,14 @@
 #ifndef JOJ_VERTEX_H
 #define JOJ_VERTEX_H
 
-#include "math/vector3.h"
-#include "math/vector4.h"
+#include "math/jmath.h"
 
 namespace joj
 {
     struct Vertex
     {
         Vector3 pos;
+        Vector3 normal;
         Vector4 color;
     };
 }
