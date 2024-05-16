@@ -1,25 +1,14 @@
 #include <iostream>
 #include <logger.h>
 #include <renderer/opengl/shader_gl.h>
-
 #include "joj/platform/win32/window_win32.h"
 #include "joj/platform/context/opengl/win32/context_gl.h"
 #include "joj/renderer/opengl/renderer_gl.h"
+#include "joj/renderer/opengl/shader_library_gl.h"
+#include "joj/resources/vertex.h"
+#include "joj/resources/mesh.h"
 
 b8 process_events();
-
-const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-    "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
-    "}\0";
-const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
-    "void main()\n"
-    "{\n"
-    "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
-    "}\n\0";
 
 int main()
 {
@@ -53,35 +42,75 @@ int main()
         return -4;
     }
 
-    const joj::GLShader shader{vertexShaderSource, fragmentShaderSource};
+    const joj::GLShader shader{
+        joj::GLShaderLibrary::vs_simple_transform,
+        joj::GLShaderLibrary::fs_simple_color
+    };
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
-    constexpr  float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // top right
-         0.5f, -0.5f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f,  // bottom left
-        -0.5f,  0.5f, 0.0f   // top left
+    const joj::Vertex quad_vertices[] =
+    {
+        { joj::Vector3{-0.5f, -0.5f, -0.0f},  joj::Vector3{0.0f,  0.0f, -1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f, -0.5f, -0.5f},  joj::Vector3{0.0f,  0.0f, -1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f,  0.5f, -0.5f},  joj::Vector3{0.0f,  0.0f, -1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f,  0.5f, -0.5f},  joj::Vector3{0.0f,  0.0f, -1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f,  0.5f, -0.5f},  joj::Vector3{0.0f,  0.0f, -1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f, -0.5f, -0.5f},  joj::Vector3{0.0f,  0.0f, -1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+
+        { joj::Vector3{-0.5f, -0.5f,  0.5f},  joj::Vector3{0.0f,  0.0f,  1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f, -0.5f,  0.5f},  joj::Vector3{0.0f,  0.0f,  1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f,  0.5f,  0.5f},  joj::Vector3{0.0f,  0.0f,  1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f,  0.5f,  0.5f},  joj::Vector3{0.0f,  0.0f,  1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f,  0.5f,  0.5f},  joj::Vector3{0.0f,  0.0f,  1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f, -0.5f,  0.5f},  joj::Vector3{0.0f,  0.0f,  1.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+
+        { joj::Vector3{-0.5f,  0.5f,  0.5f},  joj::Vector3{-1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f,  0.5f, -0.5f},  joj::Vector3{-1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f, -0.5f, -0.5f},  joj::Vector3{-1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f, -0.5f, -0.5f},  joj::Vector3{-1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f, -0.5f,  0.5f},  joj::Vector3{-1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f,  0.5f,  0.5f},  joj::Vector3{-1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+
+        { joj::Vector3{0.5f,  0.5f,  0.5f},  joj::Vector3{1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{0.5f,  0.5f, -0.5f},  joj::Vector3{1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{0.5f, -0.5f, -0.5f},  joj::Vector3{1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{0.5f, -0.5f, -0.5f},  joj::Vector3{1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{0.5f, -0.5f,  0.5f},  joj::Vector3{1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{0.5f,  0.5f,  0.5f},  joj::Vector3{1.0f,  0.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+
+        { joj::Vector3{-0.5f, -0.5f, -0.5f},  joj::Vector3{0.0f, -1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f, -0.5f, -0.5f},  joj::Vector3{0.0f, -1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f, -0.5f,  0.5f},  joj::Vector3{0.0f, -1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f, -0.5f,  0.5f},  joj::Vector3{0.0f, -1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f, -0.5f,  0.5f},  joj::Vector3{0.0f, -1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f, -0.5f, -0.5f},  joj::Vector3{0.0f, -1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+
+        { joj::Vector3{-0.5f,  0.5f, -0.5f},  joj::Vector3{0.0f,  1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f,  0.5f, -0.5f},  joj::Vector3{0.0f,  1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f,  0.5f,  0.5f},  joj::Vector3{0.0f,  1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{ 0.5f,  0.5f,  0.5f},  joj::Vector3{0.0f,  1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f,  0.5f,  0.5f},  joj::Vector3{0.0f,  1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} },
+        { joj::Vector3{-0.5f,  0.5f, -0.5f},  joj::Vector3{0.0f,  1.0f,  0.0f}, joj::Vector4{1.0f, 1.0f, 0.0f, 1.0f} }
     };
-    constexpr unsigned int indices[] = {  // note that we start from 0!
-        0, 1, 3,  // first Triangle
-        1, 2, 3   // second Triangle
-    };
-    unsigned int VBO, VAO, EBO;
+
+    joj::Mesh quad{};
+    // Add vertices to mesh
+    for (const joj::Vertex& v : quad_vertices)
+        quad.vertices.push_back(v);
+
+    unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
     // bind the Vertex Array Object first, then bind and set vertex buffer(s), and then configure vertex attributes(s).
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, quad.get_vertex_count() * sizeof(joj::Vertex), quad.get_vertex_data(), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(joj::Vertex), static_cast<void*>(0));
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(joj::Vertex), (void*)(3 * sizeof(f32)));
+    glEnableVertexAttribArray(1);
 
     // note that this is allowed, the call to glVertexAttribPointer registered VBO as the vertex attribute's bound vertex buffer object so afterwards we can safely unbind
     glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -93,6 +122,14 @@ int main()
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
 
+    const joj::Matrix4 world = joj::MathHelper::mat4_id();
+    constexpr joj::Vector4 color{
+        .x = 1.0f,
+        .y = 0.5f,
+        .z = 0.31f,
+        .w = 1.0f
+    };
+
     b8 running = true;
     while (running) {
         if (!process_events()) {
@@ -103,16 +140,16 @@ int main()
 
         // draw our first triangle
         shader.use();
+        shader.set_vec4("inColor", color);
+        shader.set_mat4("transform", world);
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        glDrawArrays(GL_TRIANGLES, 0, quad.get_vertex_count());
 
         window.swap_buffers();
     }
 
-    glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
-    glDeleteBuffers(1, &EBO);
+    glDeleteVertexArrays(1, &VAO);
 
     renderer.shutdown();
     context.destroy();

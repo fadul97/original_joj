@@ -12,7 +12,7 @@ namespace  joj {
         ERR_FILE_OPEN = -3,
         ERR_VSHADER = -4,
         ERR_FSHADER = -5,
-        ERR_SHADER_PROGRAM = -6
+        ERR_SHADER_PROGRAM = -6,
         ERR_RENDERER = -7,
     };
 
