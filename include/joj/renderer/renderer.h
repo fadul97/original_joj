@@ -6,7 +6,7 @@
 
 #include <memory>
 #include "platform/window.h"
-#include "error.h"
+#include "error_code.h"
 
 namespace joj
 {
@@ -17,14 +17,14 @@ namespace joj
         IRenderer();
         virtual ~IRenderer() = 0;
 
-        virtual b8 init(std::unique_ptr<Twindow>& window) = 0;
+        virtual b8 init(Twindow& window) = 0;
         virtual void render() = 0;
         virtual void clear() = 0;
         virtual void clear(f32 r, f32 g, f32 b, f32 a) = 0;
         virtual void swap_buffers() = 0;
         virtual void shutdown() = 0;
 
-        virtual ErrorCode setup_default_pipeline(std::unique_ptr<Twindow>& window) = 0;
+        virtual ErrorCode setup_default_pipeline(Twindow& window) = 0;
     };
 }
 

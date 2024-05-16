@@ -3,23 +3,18 @@
 #define JOJ_GL_DEFINE_EXTERN
 #include "platform/context/opengl/joj_gl.h"
 #include <iostream>
+#include <logger.h>
 
 joj::GLRenderer::GLRenderer()
-{
-    // Background color
-	bg_color[0] = 1.0f;		// Red
-	bg_color[1] = 1.0f;		// Green
-	bg_color[2] = 1.0f;		// Blue
-	bg_color[3] = 1.0f;		// Alpha (0 = transparent, 1 = solid)
-}
-
-joj::GLRenderer::~GLRenderer()
+    : bg_color{1.0f, 1.0f, 1.0f, 1.0f}
 {
 }
 
-b8 joj::GLRenderer::init(std::unique_ptr<JojWindow>& window)
+joj::GLRenderer::~GLRenderer() = default;
+
+b8 joj::GLRenderer::init(WindowConfig& window)
 {
-    glViewport(0, 0, window->get_width(), window->get_height());
+    glViewport(0, 0, window.height, window.height);
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
@@ -30,10 +25,10 @@ b8 joj::GLRenderer::init(std::unique_ptr<JojWindow>& window)
 
 void joj::GLRenderer::render()
 {
-    std::cout << "TODO()!\n";
+    JTODO();
 }
 
-void joj::GLRenderer::clear(f32 r, f32 g, f32 b, f32 a)
+void joj::GLRenderer::clear(const f32 r, const f32 g, const f32 b, const f32 a)
 {
     glClearColor(r, g, b, a);
     glClear(GL_COLOR_BUFFER_BIT);
@@ -47,16 +42,15 @@ void joj::GLRenderer::clear()
 
 void joj::GLRenderer::swap_buffers()
 {
-    std::cout << "TODO()!\n";
-    // glXSwapBuffers(window->get_display(), window->get_id());
+    JTODO();
 }
 
 void joj::GLRenderer::shutdown()
 {
-    std::cout << "TODO()!\n";
+    JTODO();
 }
 
-joj::ErrorCode joj::GLRenderer::setup_default_pipeline(std::unique_ptr<JojWindow>& window)
+joj::ErrorCode joj::GLRenderer::setup_default_pipeline(WindowConfig& window)
 {
     return ErrorCode::OK;
 }
