@@ -4,8 +4,6 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#include <memory>
-#include "platform/window.h"
 #include "error_code.h"
 
 namespace joj
@@ -17,7 +15,7 @@ namespace joj
         IRenderer();
         virtual ~IRenderer() = 0;
 
-        virtual b8 init(Twindow& window) = 0;
+        virtual ErrorCode init(Twindow& window) = 0;
         virtual void render() = 0;
         virtual void clear() = 0;
         virtual void clear(f32 r, f32 g, f32 b, f32 a) = 0;

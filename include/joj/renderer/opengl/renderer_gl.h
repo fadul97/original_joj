@@ -19,7 +19,7 @@ namespace joj
         GLRenderer();
         ~GLRenderer() override;
         
-        b8 init(WindowConfig& window) override;
+        ErrorCode init(WindowConfig& window) override;
         void render() override;
         void clear() override;
         void clear(f32 r, f32 g, f32 b, f32 a) override;

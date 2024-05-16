@@ -12,15 +12,9 @@ joj::GLRenderer::GLRenderer()
 
 joj::GLRenderer::~GLRenderer() = default;
 
-b8 joj::GLRenderer::init(WindowConfig& window)
+joj::ErrorCode joj::GLRenderer::init(WindowConfig& window)
 {
-    glViewport(0, 0, window.height, window.height);
-
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    return true;
+    return ErrorCode::OK;
 }
 
 void joj::GLRenderer::render()
