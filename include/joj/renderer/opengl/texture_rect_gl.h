@@ -4,8 +4,7 @@
 #define JOJ_ENGINE_IMPLEMENTATION
 #include "defines.h"
 
-#include "math/vector4.h"
-#include "math/vector2.h"
+#include "math/jmath.h"
 
 namespace joj
 {
