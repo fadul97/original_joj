@@ -1,6 +1,7 @@
 #include <iostream>
 #include "joj/platform/win32/window_win32.h"
 #include "joj/platform/context/opengl/win32/context_gl.h"
+#include "joj/renderer/opengl/renderer_gl.h"
 
 b8 process_events();
 
@@ -30,13 +31,21 @@ int main()
         return -3;
     }
 
+    joj::GLRenderer renderer{};
+    renderer.init(window.get_window_config());
+
     b8 running = true;
     while (running) {
         if (!process_events()) {
             running = false;
         }
+
+        renderer.clear(1.0f, 1.0f, 1.0f, 1.0f);
+        window.swap_buffers();
     }
 
+    renderer.shutdown();
+    context.destroy();
     window.destroy();
 
     printf("Hello, Refactoring!\n");
