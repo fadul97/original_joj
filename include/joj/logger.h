@@ -9,10 +9,12 @@
 #define LOG_WARN_ENABLED 0
 #define LOG_DEBUG_ENABLED 0
 #define LOG_INFO_ENABLED 0
+#define LOG_TODO 0
 #else
 #define LOG_WARN_ENABLED 1
 #define LOG_DEBUG_ENABLED 1
 #define LOG_INFO_ENABLED 1
+#define LOG_TODO 1
 #endif
 
 namespace joj {
@@ -25,6 +27,7 @@ namespace joj {
     };
 
     void log_output(LogLevel level, ErrorCode err, const char* message, ...);
+    void todo();
 }
 
 #ifndef JFATAL
@@ -52,5 +55,11 @@ namespace joj {
 #else
 #define JINFO(message, ...);
 #endif
+
+#if LOG_TODO == 1
+#define JTODO() todo()
+#else
+#define JTODO();
+#endif // LOG_TODO
 
 #endif // JOJ_LOGGER_H

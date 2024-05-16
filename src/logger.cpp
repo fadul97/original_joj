@@ -64,4 +64,13 @@ void joj::log_output(const LogLevel level, const ErrorCode err, const char* mess
     SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Reset to default
 }
 
+void joj::todo() {
+    // Get the console handle
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN);
+    printf("[TODO] File: %s - Line: %d\n", __FILE__, __LINE__);
+    SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE); // Reset to default
+}
+
 #endif // JPLATFORM_WINDOWS
