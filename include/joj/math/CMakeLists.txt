@@ -6,7 +6,7 @@ add_library(jojMath INTERFACE .)
 target_include_directories(jojMath
     INTERFACE
     .
-    ${CMAKE_CURRENT_SOURCE_DIR}/..
+    ${CMAKE_CURRENT_SOURCE_DIR}/../
 )
 
 if (WIN32)

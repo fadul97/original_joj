@@ -1,68 +1,51 @@
 #include "renderer/opengl/shader_gl.h"
 
-#include <fstream>
-#include <sstream>
-#include <iostream>
+#include "logger.h"
 
 joj::GLShader::GLShader()
 {
-    id = 0;
+    m_id = 0;
 }
 
-joj::GLShader::GLShader(const char* vertex_path, const char* fragment_path)
+joj::GLShader::GLShader(const char* vertex_shader, const char* fragment_shader)
 {
-    // Open Vertex Shader file
-    std::ifstream vshader_file;
-    vshader_file.open(vertex_path);
-    if (vshader_file.fail())
-    {
-        // TODO: Use own logger
-        std::cout << "ERROR: Failed to open vertex shader file.\n";
-    }
-
-    // Open Fragment Shader file
-    std::ifstream fshader_file;
-    fshader_file.open(fragment_path);
-    if (fshader_file.fail())
-    {
-        // TODO: Use own logger
-        std::cout << "ERROR: Failed to open fragment shader file.\n";
-    }
-
-    // Read file's buffer contents into streams
-    std::stringstream vshader_stream, fshader_stream;
-    vshader_stream << vshader_file.rdbuf();
-    fshader_stream << fshader_file.rdbuf();
-
-    // Close file handlers
-    vshader_file.close();
-    fshader_file.close();    
-
-    // Convert stream into string
-    std::string vertex_code = vshader_stream.str();
-    std::string fragment_code = fshader_stream.str();
-
-    const char* vshader_code = vertex_code.c_str();
-    const char* fshader_code = fragment_code.c_str();
+    b8 failed = false;
 
     // Vertex shader
-    u32 vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vshader_code, NULL);
+    const u32 vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vertex_shader, nullptr);
     glCompileShader(vertex);
-    check_compile_errors(vertex, ShaderType::VERTEX);
-    
-    // Fragment Shader
-    u32 fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fshader_code, NULL);
-    glCompileShader(fragment);
-    check_compile_errors(fragment, ShaderType::FRAGMENT);
+    if (!check_compile_errors(vertex, ShaderType::VERTEX))
+    {
+        JERROR(ErrorCode::ERR_VSHADER, "Failed to compile vertex shader.");
+        failed = true;
+    }
 
-    // Shader Program
-    id = glCreateProgram();
-    glAttachShader(id, vertex);
-    glAttachShader(id, fragment);
-    glLinkProgram(id);
-    check_compile_errors(id, ShaderType::PROGRAM);
+    // Fragment Shader
+    const u32 fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fragment_shader, nullptr);
+    glCompileShader(fragment);
+    if (!check_compile_errors(fragment, ShaderType::FRAGMENT))
+    {
+        JERROR(ErrorCode::ERR_FSHADER, "Failed to compile fragment shader.");
+        failed = true;
+    }
+
+    if (failed) {
+        m_id = 0;
+    } else {
+        // Shader Program
+        m_id = glCreateProgram();
+        glAttachShader(m_id, vertex);
+        glAttachShader(m_id, fragment);
+        glLinkProgram(m_id);
+        if (!check_compile_errors(m_id, ShaderType::PROGRAM))
+        {
+            // TODO: Use own logger and return value
+            JERROR(ErrorCode::ERR_SHADER_PROGRAM, "Failed to compile shader program.");
+            glDeleteProgram(m_id);
+        }
+    }
 
     // Delete the shaders as they're linked into our program now and no longer necessary
     glDeleteShader(vertex);
@@ -71,41 +54,48 @@ joj::GLShader::GLShader(const char* vertex_path, const char* fragment_path)
 
 joj::GLShader::~GLShader()
 {
+    glDeleteProgram(m_id);
 }
 
 b8 joj::GLShader::compile_shaders(const char* vertex_shader, const char* fragment_shader)
 {
+    b8 failed = false;
+
     // Vertex shader
-    u32 vertex = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertex, 1, &vertex_shader, NULL);
+    const u32 vertex = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vertex, 1, &vertex_shader, nullptr);
     glCompileShader(vertex);
     if (!check_compile_errors(vertex, ShaderType::VERTEX))
     {
-        // TODO: Use own logger and return value
-        std::cout << "ERROR: Failed to compile vertex shader.\n";
-        return false;
+        JERROR(ErrorCode::ERR_VSHADER, "Failed to compile vertex shader.");
+        failed = true;
     }
-    
+
     // Fragment Shader
-    u32 fragment = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragment, 1, &fragment_shader, NULL);
+    const u32 fragment = glCreateShader(GL_FRAGMENT_SHADER);
+    glShaderSource(fragment, 1, &fragment_shader, nullptr);
     glCompileShader(fragment);
     if (!check_compile_errors(fragment, ShaderType::FRAGMENT))
     {
-        // TODO: Use own logger and return value
-        std::cout << "ERROR: Failed to compile fragment shader.\n";
+        JERROR(ErrorCode::ERR_FSHADER, "Failed to compile fragment shader.");
+        failed = true;
+    }
+
+    if (failed) {
+        m_id = 0;
         return false;
     }
 
     // Shader Program
-    id = glCreateProgram();
-    glAttachShader(id, vertex);
-    glAttachShader(id, fragment);
-    glLinkProgram(id);
-    if (!check_compile_errors(id, ShaderType::PROGRAM))
+    m_id = glCreateProgram();
+    glAttachShader(m_id, vertex);
+    glAttachShader(m_id, fragment);
+    glLinkProgram(m_id);
+    if (!check_compile_errors(m_id, ShaderType::PROGRAM))
     {
         // TODO: Use own logger and return value
-        std::cout << "ERROR: Failed to compile shader program.\n";
+        JERROR(ErrorCode::ERR_SHADER_PROGRAM, "Failed to compile shader program.");
+        glDeleteProgram(m_id);
         return false;
     }
 
@@ -116,7 +106,7 @@ b8 joj::GLShader::compile_shaders(const char* vertex_shader, const char* fragmen
     return true;
 }
 
-b8 joj::GLShader::check_compile_errors(i32 shader, ShaderType shader_type)
+b8 joj::GLShader::check_compile_errors(const i32 shader, const ShaderType shader_type)
 {
     std::string shadertype_name;
     switch (shader_type)
@@ -143,8 +133,9 @@ b8 joj::GLShader::check_compile_errors(i32 shader, ShaderType shader_type)
         if (!success)
         {
             // TODO: Use own logger and return value
-            glGetShaderInfoLog(shader, 1024, NULL, info_log);
-            std::cout << "ERROR::SHADER_COMPILATION_ERROR of type: " << shadertype_name << "\n" << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
+            glGetShaderInfoLog(shader, 1024, nullptr, info_log);
+            JERROR(ErrorCode::ERR_SHADER_PROGRAM, "ERROR::SHADER_COMPILATION_ERROR of type: %s\n%s\n",
+                shadertype_name, info_log);
             return false;
         }
     }
@@ -154,8 +145,9 @@ b8 joj::GLShader::check_compile_errors(i32 shader, ShaderType shader_type)
         if (!success)
         {
             // TODO: Use own logger and return value
-            glGetProgramInfoLog(shader, 1024, NULL, info_log);
-            std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: " << shadertype_name << "\n" << info_log << "\n -- --------------------------------------------------- -- " << std::endl;
+            glGetProgramInfoLog(shader, 1024, nullptr, info_log);
+            JERROR(ErrorCode::ERR_SHADER_PROGRAM, "ERROR::PROGRAM_LINKING_ERROR of type: %s\n%s\n",
+                shadertype_name, info_log);
             return false;
         }
     }
