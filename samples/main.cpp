@@ -1,5 +1,6 @@
 #include <iostream>
 #include <logger.h>
+#include <platform/win32/input_win32.h>
 #include <renderer/opengl/shader_gl.h>
 #include "joj/platform/win32/window_win32.h"
 #include "joj/platform/context/opengl/win32/context_gl.h"
@@ -8,12 +9,15 @@
 #include "joj/resources/vertex.h"
 #include "joj/resources/mesh.h"
 
+#define WIDTH 800
+#define HEIGHT 600
+
 b8 process_events();
 
 int main()
 {
     joj::Win32Window window{};
-    if (window.create(800, 600, "Refactored window", joj::WindowMode::Windowed) < joj::ErrorCode::OK) {
+    if (window.create(WIDTH, HEIGHT, "Refactored window", joj::WindowMode::Windowed) < joj::ErrorCode::OK) {
         return -1;
     }
 
@@ -122,7 +126,23 @@ int main()
     // VAOs requires a call to glBindVertexArray anyways so we generally don't unbind VAOs (nor VBOs) when it's not directly necessary.
     glBindVertexArray(0);
 
-    const joj::Matrix4 world = joj::MathHelper::mat4_id();
+    joj::Matrix4 world = joj::MathHelper::mat4_id();
+
+    auto pos = joj::MathHelper::vec3_create(0, 0, -10);
+    auto target = joj::MathHelper::vec3_create(0, 0, 0);
+    auto up = joj::MathHelper::vec3_create(0, 1, 0);
+    const joj::Matrix4 view = joj::MathHelper::look_at_lh(pos, target, up);
+
+    const joj::Matrix4 proj = joj::MathHelper::perspective_lh(
+        joj::MathHelper::to_radians(45),
+        static_cast<f32>(WIDTH) / HEIGHT,
+        0.1f, 100.0f);
+
+    joj::Matrix4 wvp = joj::MathHelper::mat4_mul(world, view);
+    wvp = joj::MathHelper::mat4_mul(wvp, proj);
+
+    joj::Win32Input input{};
+
     constexpr joj::Vector4 color{
         .x = 1.0f,
         .y = 0.5f,
@@ -136,12 +156,20 @@ int main()
             running = false;
         }
 
-        renderer.clear(0.0f, 0.5f, 0.31f, 1.0f);
+        renderer.clear(0.23f, 0.23f, 0.23f, 1.0f);
+
+        if (joj::Win32Input::is_key_pressed('A')) {
+            JDEBUG("A pressed.");
+            world = joj::MathHelper::mat4_translatef(world, 0.5f, 0.5f, 0.0f);
+        }
+
+        wvp = joj::MathHelper::mat4_mul(world, view);
+        wvp = joj::MathHelper::mat4_mul(wvp, proj);
 
         // draw our first triangle
         shader.use();
         shader.set_vec4("inColor", color);
-        shader.set_mat4("transform", world);
+        shader.set_mat4("transform", wvp);
         glBindVertexArray(VAO); // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         glDrawArrays(GL_TRIANGLES, 0, quad.get_vertex_count());
 
