@@ -8,6 +8,7 @@
 #include "joj/renderer/opengl/shader_library_gl.h"
 #include "joj/resources/vertex.h"
 #include "joj/resources/mesh.h"
+#include "joj/systems/camera.h"
 
 #define WIDTH 800
 #define HEIGHT 600
@@ -128,17 +129,15 @@ int main()
 
     joj::Matrix4 world = joj::MathHelper::mat4_id();
 
-    auto pos = joj::MathHelper::vec3_create(0, 0, -10);
-    auto target = joj::MathHelper::vec3_create(0, 0, 0);
-    auto up = joj::MathHelper::vec3_create(0, 1, 0);
-    const joj::Matrix4 view = joj::MathHelper::look_at_lh(pos, target, up);
+    joj::Camera camera{};
+    camera.m_position = joj::MathHelper::vec3_create(0, 0, -10);
 
     const joj::Matrix4 proj = joj::MathHelper::perspective_lh(
         joj::MathHelper::to_radians(45),
         static_cast<f32>(WIDTH) / HEIGHT,
         0.1f, 100.0f);
 
-    joj::Matrix4 wvp = joj::MathHelper::mat4_mul(world, view);
+    joj::Matrix4 wvp = joj::MathHelper::mat4_mul(world, camera.get_view_mat());
     wvp = joj::MathHelper::mat4_mul(wvp, proj);
 
     joj::Win32Input input{};
@@ -150,10 +149,28 @@ int main()
         .w = 1.0f
     };
 
+    constexpr f32 dt = 0.05f;
+
     b8 running = true;
     while (running) {
         if (!process_events()) {
             running = false;
+        }
+
+        if (joj::Win32Input::is_key_down(joj::KEY_UP)) {
+            camera.process_keyboard(joj::CameraMovement::FORWARD, dt);
+        }
+
+        if (joj::Win32Input::is_key_down(joj::KEY_DOWN)) {
+            camera.process_keyboard(joj::CameraMovement::BACKWARD, dt);
+        }
+
+        if (joj::Win32Input::is_key_down(joj::KEY_LEFT)) {
+            camera.process_keyboard(joj::CameraMovement::LEFT, dt);
+        }
+
+        if (joj::Win32Input::is_key_down(joj::KEY_RIGHT)) {
+            camera.process_keyboard(joj::CameraMovement::RIGHT, dt);
         }
 
         renderer.clear(0.23f, 0.23f, 0.23f, 1.0f);
@@ -163,7 +180,7 @@ int main()
             world = joj::MathHelper::mat4_translatef(world, 0.5f, 0.5f, 0.0f);
         }
 
-        wvp = joj::MathHelper::mat4_mul(world, view);
+        wvp = joj::MathHelper::mat4_mul(world, camera.get_view_mat());
         wvp = joj::MathHelper::mat4_mul(wvp, proj);
 
         // draw our first triangle

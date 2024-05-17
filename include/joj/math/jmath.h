@@ -385,7 +385,7 @@ namespace joj::MathHelper {
 
     inline Matrix4 look_at_lh(Vector3 position, Vector3 target, Vector3 up)
     {
-        Vector3 forward = vec3_normalized(vec3_sub(target, position));
+        Vector3 forward = vec3_normalized(vec3_sub(position, target));
         Vector3 right = vec3_normalized(vec3_cross(up, forward));
         Vector3 u = vec3_cross(forward, right);
 
@@ -446,7 +446,7 @@ namespace joj::MathHelper {
         out.data[0] = 1.0f / (aspect_ratio * half_tan_fov);
         out.data[5] = 1.0f / half_tan_fov;
         out.data[10] = (far_plane + near_plane) / (far_plane - near_plane);
-        out.data[11] = 1.0f;
+        out.data[11] = -1.0f;
         out.data[14] = - (2.0f * far_plane * near_plane) / (far_plane - near_plane);
 
         return out;
