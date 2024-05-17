@@ -15,7 +15,7 @@ add_subdirectory(vendor)
 add_subdirectory(platform)
 add_subdirectory(renderer)
 add_subdirectory(resources)
-#add_subdirectory(systems)
+add_subdirectory(systems)
 
 # Specify library directories for joj
 target_link_directories(
@@ -25,7 +25,7 @@ target_link_directories(
     ${CMAKE_CURRENT_SOURCE_DIR}/renderer
     ${CMAKE_CURRENT_SOURCE_DIR}/resources
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor
-#    ${CMAKE_CURRENT_SOURCE_DIR}/systems
+    ${CMAKE_CURRENT_SOURCE_DIR}/systems
 )
 
-target_link_libraries(joj PUBLIC jojPlatform jojSTBImage jojRenderer jojResources)
+target_link_libraries(joj PUBLIC jojPlatform jojSTBImage jojRenderer jojResources jojSystems)

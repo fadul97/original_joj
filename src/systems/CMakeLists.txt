@@ -8,5 +8,5 @@ add_library(jojSystems STATIC camera.cpp)
 target_include_directories(
     jojSystems
     PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/joj
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../include/joj/
 )
