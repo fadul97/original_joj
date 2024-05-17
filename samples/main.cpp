@@ -13,6 +13,22 @@
 #define WIDTH 800
 #define HEIGHT 600
 
+// Camera settings
+joj::Matrix4 World = joj::MathHelper::mat4_id();
+joj::Matrix4 View = joj::MathHelper::mat4_id();
+joj::Matrix4 Proj = joj::MathHelper::mat4_id();
+
+// Movement
+float lastX = 800 / 2.0f;
+float lastY = 600 / 2.0f;
+b8 firstMouse = true;
+b8 firstPerson = true;
+b8 hideCursor = false;
+i32 centerX = 400;
+i32 centerY = 300;
+i32 cmouseX = 0;
+i32 cmouseY = 0;
+
 b8 process_events();
 
 int main()
@@ -157,6 +173,27 @@ int main()
         if (!process_events()) {
             running = false;
         }
+
+        if (joj::Win32Input::is_key_pressed(joj::KEY_TAB))
+        {
+            firstPerson = !firstPerson;
+            hideCursor = !hideCursor;
+            ShowCursor(!hideCursor);
+        }
+
+        // Now read the mouse position
+        POINT cursor_position;
+        GetCursorPos(&cursor_position);  // Get the current cursor position
+        // Rotate freely inside window
+
+        SetCursorPos(centerX, centerY);
+
+        // Calculate the mouse movement
+        f32 xoffset = cursor_position.x - centerX;
+        f32 yoffset = centerY - cursor_position.y;
+
+        //mouse_callback(JojEngine::Engine::pm->get_xmouse(), JojEngine::Engine::pm->get_ymouse());
+        camera.process_mouse_movement(xoffset, yoffset);
 
         if (joj::Win32Input::is_key_down(joj::KEY_UP)) {
             camera.process_keyboard(joj::CameraMovement::FORWARD, dt);
