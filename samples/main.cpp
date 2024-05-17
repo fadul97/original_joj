@@ -130,7 +130,8 @@ int main()
     joj::Matrix4 world = joj::MathHelper::mat4_id();
 
     joj::Camera camera{};
-    camera.m_position = joj::MathHelper::vec3_create(0, 0, -10);
+    camera.m_position = joj::MathHelper::vec3_create(0, 0, 10);
+    // camera.m_target = joj::MathHelper::vec3_create(0, 0, 0);
 
     const joj::Matrix4 proj = joj::MathHelper::perspective_lh(
         joj::MathHelper::to_radians(45),
@@ -175,9 +176,20 @@ int main()
 
         renderer.clear(0.23f, 0.23f, 0.23f, 1.0f);
 
+        if (joj::Win32Input::is_key_pressed('W')) {
+            world = joj::MathHelper::mat4_translatef(world, 0.0f, 0.0f, -3.0f);
+        }
+
+        if (joj::Win32Input::is_key_pressed('S')) {
+            world = joj::MathHelper::mat4_translatef(world, 0.0f, 0.0f, 3.0f);
+        }
+
+        if (joj::Win32Input::is_key_pressed('D')) {
+            world = joj::MathHelper::mat4_translatef(world, 1.0f, 0.0f, 0.0f);
+        }
+
         if (joj::Win32Input::is_key_pressed('A')) {
-            JDEBUG("A pressed.");
-            world = joj::MathHelper::mat4_translatef(world, 0.5f, 0.5f, 0.0f);
+            world = joj::MathHelper::mat4_translatef(world, -1.0f, 0.0f, 0.0f);
         }
 
         wvp = joj::MathHelper::mat4_mul(world, camera.get_view_mat());
