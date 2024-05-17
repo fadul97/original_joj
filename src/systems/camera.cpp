@@ -7,7 +7,7 @@ joj::Camera::Camera(const Vector3 pos, const Vector3 up, const f32 yaw, const f3
     m_up = up;
     m_yaw = yaw;
     m_pitch = pitch;
-    m_right = MathHelper::vec3_create(1.0f, 0.0f, 0.0f);
+    // m_right = MathHelper::vec3_create(1.0f, 0.0f, 0.0f);
     update_camera_vectors();
 }
 
@@ -45,7 +45,7 @@ void joj::Camera::process_mouse_movement(f32 xoffset, f32 yoffset, const b8 cons
     update_camera_vectors();
 }
 
-void joj::Camera::process_mouse_scroll(f32 yoffset)
+void joj::Camera::process_mouse_scroll(const f32 yoffset)
 {
     m_zoom -= yoffset;
     if (m_zoom < 1.0f)
@@ -57,7 +57,7 @@ void joj::Camera::process_mouse_scroll(f32 yoffset)
 void joj::Camera::update_camera_vectors()
 {
     Vector3 front = MathHelper::vec3_create(1.0f, 1.0f, 1.0f);
-    front.x = static_cast<f32>(cos(MathHelper::to_radians(m_yaw)) * cos(MathHelper::to_radians(m_pitch))) * -1;
+    front.x = static_cast<f32>(cos(MathHelper::to_radians(m_yaw)) * cos(MathHelper::to_radians(m_pitch)));
     front.y = static_cast<f32>(sin(MathHelper::to_radians(m_pitch)));
     front.z = static_cast<f32>(sin(MathHelper::to_radians(m_yaw)) * cos(MathHelper::to_radians(m_pitch)));
     m_target = MathHelper::vec3_normalized(front);

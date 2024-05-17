@@ -41,11 +41,10 @@ namespace joj
         void move_to(f32 x, f32 y, f32 z);
 
     public:
-        Vector3 m_position;
+        Vector3 m_position{};
         Vector3 m_target;
-        Vector3 m_up;
-        Vector3 m_right;
-        Vector3 m_world_up;
+        Vector3 m_up{};
+        Vector3 m_right{};
 
         f32 m_yaw;
         f32 m_pitch;
@@ -58,7 +57,7 @@ namespace joj
     };
 
     inline Matrix4 Camera::get_view_mat() const
-    { return MathHelper::look_at_lh(m_position, MathHelper::vec3_add(m_target, m_position), m_up); }
+    { return MathHelper::look_at_lh(m_position, MathHelper::vec3_add(m_position, m_target), m_up); }
 
     inline void Camera::move_to(const f32 x, const f32 y, const f32 z)
     { m_position.x = x; m_position.y = y; m_position.z = z;}
