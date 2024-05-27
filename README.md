@@ -6,7 +6,7 @@ Version: 0.0.1
 
 ### Description
 
-A game engine under development.
+A game engine under development — a never-ending learning project.
 
 ### TODO
 
