@@ -160,10 +160,10 @@ int main()
     joj::Win32Input input{};
 
     constexpr joj::Vector4 color{
-        .x = 1.0f,
-        .y = 0.5f,
-        .z = 0.31f,
-        .w = 1.0f
+        1.0f,
+        0.5f,
+        0.31f,
+        1.0f
     };
 
     constexpr f32 dt = 0.05f;

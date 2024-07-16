@@ -31,9 +31,9 @@ typedef int b32;
 #if defined(__GNUC__)
 #define JCOMPILER_GNUC
 #elif defined(_MSC_VER)
-#define JCOMPILER_MSC
+#define JCOMPILER_MSC 1
 #else
-#define JCOMPILER
+#define JCOMPILER_MSC 0
 #endif
 
 // STATIC_ASSERT macro

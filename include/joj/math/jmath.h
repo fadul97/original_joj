@@ -7,6 +7,7 @@
 #include <cstring>
 #include <cmath>
 #include <iomanip>
+#include <sstream>
 
 #define J_PI 3.14159265358979323846f
 #define JDEG2RAD (J_PI / 180.0f)
@@ -193,25 +194,25 @@ namespace joj::MathHelper {
 
     inline Vector2 vec2_create(const f32 x, const f32 y) {
         return Vector2 {
-            .x = x,
-            .y = y
+            x,
+            y
         };
     }
 
     inline Vector3 vec3_create(const f32 x, const f32 y, const f32 z) {
         return Vector3 {
-            .x = x,
-            .y = y,
-            .z = z
+            x,
+            y,
+            z
         };
     }
 
     inline Vector4 vec4_create(const f32 x, const f32 y, const f32 z, const f32 w) {
         return Vector4 {
-            .x = x,
-            .y = y,
-            .z = z,
-            .w = w
+            x,
+            y,
+            z,
+            w
         };
     }
 
@@ -229,16 +230,18 @@ namespace joj::MathHelper {
     }
 
     inline Vector3 vec3_cpy(const Vector3 v) {
-        return (Vector3) {
-            .x = v.x,
-            .y = v.y,
-            .z = v.z
+        return Vector3 {
+            v.x,
+            v.y,
+            v.z
         };
     }
 
     inline Vector3 vec3_sub(const Vector3 v0, const Vector3 v1) {
-        return (Vector3){v0.x - v1.x, v0.y - v1.y,
-                      v0.z - v1.z};
+        return Vector3 {
+            v0.x - v1.x,
+            v0.y - v1.y,
+            v0.z - v1.z};
     }
 
     inline f32 vec3_length_squared(const Vector3 v) {
@@ -272,9 +275,9 @@ namespace joj::MathHelper {
         const f32 length = vec3_length(v);
 
         const Vector3 out {
-            .x = v.x /= length,
-            .y = v.y /= length,
-            .z = v.z /= length,
+            v.x /= length,
+            v.y /= length,
+            v.z /= length,
         };
 
         // vec3_normalize(&v);
@@ -282,7 +285,7 @@ namespace joj::MathHelper {
     }
 
     inline Vector3 vec3_cross(const Vector3 v0, const Vector3 v1) {
-        return (Vector3){
+        return Vector3 {
             v0.y * v1.z - v0.z * v1.y,
             v0.z * v1.x - v0.x * v1.z,
             v0.x * v1.y - v0.y * v1.x
@@ -294,18 +297,18 @@ namespace joj::MathHelper {
     }
 
     inline Vector3 vec3_add(const Vector3 v0, const Vector3 v1) {
-        return (Vector3) {
-            .x = v0.x + v1.x,
-            .y = v0.y + v1.y,
-            .z = v0.z + v1.z,
+        return Vector3 {
+            v0.x + v1.x,
+            v0.y + v1.y,
+            v0.z + v1.z,
         };
     }
 
     inline Vector3 vec3_minus(const Vector3 v0, const Vector3 v1) {
-        return (Vector3) {
-            .x = v0.x - v1.x,
-            .y = v0.y - v1.y,
-            .z = v0.z - v1.z,
+        return Vector3 {
+            v0.x - v1.x,
+            v0.y - v1.y,
+            v0.z - v1.z,
         };
     }
 
@@ -315,15 +318,15 @@ namespace joj::MathHelper {
         // out.y = v.y * k;
         // out.z = v.z * k;
         // return out;
-        return (Vector3) {
-            .x = v.x * k,
-            .y = v.y * k,
-            .z = v.z * k,
+        return Vector3 {
+            v.x * k,
+            v.y * k,
+            v.z * k,
         };
     }
 
     inline Vector3 vec4_to_vec3(const Vector4 v) {
-        return (Vector3){v.x, v.y, v.z};
+        return Vector3 {v.x, v.y, v.z};
     }
 
     inline Matrix4 look_at_rh(Vector3 position, Vector3 target, Vector3 up)
